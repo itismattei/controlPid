@@ -26,3 +26,7 @@
 *.exe
 *.out
 *.app
+.c*
+.project
+.launches/tiva-pid.launch
+.set*
