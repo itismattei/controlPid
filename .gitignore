@@ -30,3 +30,4 @@
 .project
 .launches/tiva-pid.launch
 .set*
+/Debug
