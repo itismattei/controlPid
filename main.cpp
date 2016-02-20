@@ -50,6 +50,9 @@
 #include "sens_col_ir/sens1.h"
 #include "allineamento/allineamento.h"
 
+
+size_t printFloat(double number, uint8_t digits);
+
 /// variabili globali
 volatile int procCom = 0, tick;
 volatile int procCom4 = 0;
@@ -115,8 +118,10 @@ int main(void) {
 	setupMCU();
 	/// imposta i parametri del PID
 	//setupPID(CTRL);
-	/// imposta le UART
-	setupUART();
+	/// imposta le UART e setta la PRINTF sulla 1 in modo da trasmettere la telemetria
+	//setupUART(1);
+	/// imposta le UART e setta la PRINTF sulla 0
+	setupUART(0);
     //inizializzo l'i2c
 	//InitI2C0();
 	/// messaggio d'inizio
@@ -193,6 +198,11 @@ int main(void) {
 	/// task principale
 	while(1){
 
+		HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_5 << 2))) ^=  GPIO_PIN_5;
+		HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_5 << 2))) ^=  GPIO_PIN_5;
+		HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_5 << 2))) ^=  GPIO_PIN_5;
+		HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_5 << 2))) ^=  GPIO_PIN_5;
+		for(volatile int a = 60000; a > 0; a--);
 		/// invia la risposta per i comandi di rotazione, quando sono stati eseguiti
 //		if(pidPtr->rispondi == TRUE){
 //			rispostaRotazione(pidPtr, &synSTATO);
@@ -238,12 +248,16 @@ int main(void) {
 
 			/* misura gli encoder e calcola spostameti e velocità */
 			/* misura i sensori di distanza */
-			if (tick >= 100){
-				/// TODO controllare se riesce a funzionare mentre legge le accelerazioni su I2C
-				ROM_ADCProcessorTrigger(ADC0_BASE, 0);
-				tick = 0;
-				HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_3 << 2))) ^=  GPIO_PIN_3;
-			}
+//			if (tick >= 100){
+//				uint32_t v = 13456780;
+//				float f = v / 110.0;
+//				/// TODO controllare se riesce a funzionare mentre legge le accelerazioni su I2C
+//				ROM_ADCProcessorTrigger(ADC0_BASE, 0);
+//				tick = 0;
+//				HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_3 << 2))) ^=  GPIO_PIN_3;
+//				PRINTF("%d \n", v);
+//				printFloat(f, 3);
+//			}
 
 			/// misura i dati forniti dall'accelerometro se disponibili
 //			if(A.isPresent)
@@ -279,4 +293,46 @@ int main(void) {
 
 		//}
 	}
+}
+
+
+
+size_t printFloat(double number, uint8_t digits){
+
+  //size_t n = 0;
+
+  // Handle negative numbers
+  if (number < 0.0)
+  {
+     PRINTF("-");
+     number = -number;
+  }
+
+  // Round correctly so that print(1.999, 2) prints as "2.00"
+  double rounding = 0.5;
+  for (uint8_t i=0; i<digits; ++i)
+    rounding /= 10.0;
+
+  number += rounding;
+
+  // Extract the integer part of the number and print it
+  unsigned long int_part = (unsigned long)number;
+  double remainder = number - (double)int_part;
+  PRINTF("%d", int_part);
+
+  // Print the decimal point, but only if there are digits beyond
+  if (digits > 0) {
+    PRINTF(".");
+  }
+
+  // Extract digits from the remainder one at a time
+  while (digits-- > 0)
+  {
+    remainder *= 10.0;
+    int toPrint = int(remainder);
+    PRINTF("%d", toPrint);
+    remainder -= toPrint;
+  }
+
+  return 0;
 }

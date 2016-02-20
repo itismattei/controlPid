@@ -166,22 +166,23 @@ void setupMCU(void){
 
 
 	//setup PB0 per scopi di debug
+	/// ******** NON PUO' ESSERE USATO QUANDO SI IMPOSTA LA UART1 *******
 	ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOB);
 	/// PB0 in uscita
-	HWREG(GPIO_PORTB_BASE + GPIO_O_DIR) 	|= GPIO_PIN_0;
+	HWREG(GPIO_PORTB_BASE + GPIO_O_DIR) 	|= GPIO_PIN_5;
 	/// no alternate function
-	HWREG(GPIO_PORTB_BASE + GPIO_O_AFSEL) 	&= ~GPIO_PIN_0;
+	HWREG(GPIO_PORTB_BASE + GPIO_O_AFSEL) 	&= ~GPIO_PIN_5;
 	/// 2 ma di corrente
-	HWREG(GPIO_PORTB_BASE + GPIO_O_DR2R)	|= GPIO_PIN_0;
+	HWREG(GPIO_PORTB_BASE + GPIO_O_DR2R)	|= GPIO_PIN_5;
 	/// controllo slew rate off
-	HWREG(GPIO_PORTB_BASE + GPIO_O_SLR)		&= ~GPIO_PIN_0;
+	HWREG(GPIO_PORTB_BASE + GPIO_O_SLR)		&= ~GPIO_PIN_5;
 	/// pull up
 	//HWREG(GPIO_PORTF_BASE + GPIO_O_PUR)		|= GPIO_PIN_4;
 	/// abilitazione della funzione digitale
-	HWREG(GPIO_PORTB_BASE + GPIO_O_DEN)		|= GPIO_PIN_0;
+	HWREG(GPIO_PORTB_BASE + GPIO_O_DEN)		|= GPIO_PIN_5;
 	/// imposta il pin (ricordare lo shift di 2 posizione verso sinistra della maschera di bit
-	HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_0 << 2))) |=  GPIO_PIN_0;
-	HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_0 << 2))) &=  ~GPIO_PIN_0;
+	HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_5 << 2))) |=  GPIO_PIN_5;
+	HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_5 << 2))) &=  ~GPIO_PIN_5;
 	HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_3 << 2))) |=  GPIO_PIN_3;
 
 }
@@ -204,13 +205,17 @@ void attesa(int delay){
 extern volatile uint32_t g_ui32Base;
 extern volatile const uint32_t g_ui32UARTBase[3];
 
-void setupUART(void){
+void setupUART(int num){
+	if (num > 1)
+		num = 0;
 	/// inizializza UART1
 	ConfigureUART(115200, UART1);
 	/// inizializza UART0
 	ConfigureUART(115200, UART0);
 	/// seleziona la uart a cui andra' 'uscita di PRINTF
-	g_ui32Base = g_ui32UARTBase[UART0];
+	/// uart0 e' quella su usb, uart1 e' quella sui pin PB0 e PB1
+	//g_ui32Base = g_ui32UARTBase[UART0];
+	g_ui32Base = g_ui32UARTBase[num];
 }
 
 ///

@@ -90,8 +90,9 @@ void ConfigureUART(uint32_t baud, int numUart){
 		// Initialize the UART for console I/O.
 		//
 		UARTStdioConfig(1, baud, UART_CLK);
-		ROM_IntEnable(INT_UART1); //enable the UART interrupt
-		ROM_UARTIntEnable(UART1_BASE, UART_INT_RX | UART_INT_RT); //only enable RX and TX interrupts
+		/// per questo test non abilitiamo le interruzioni
+		//ROM_IntEnable(INT_UART1); //enable the UART interrupt
+		//ROM_UARTIntEnable(UART1_BASE, UART_INT_RX | UART_INT_RT); //only enable RX and TX interrupts
 	}
 }
 

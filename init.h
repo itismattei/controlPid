@@ -86,7 +86,7 @@ void rispondiComando(syn_stat *sSTAT, dati *);
 void sendReply(syn_stat *, uint8_t numChar);
 void dati_a_struttura(gyro *, distanza *, cinematica *, colore *, temperatura* ,survivor *, dati *);
 void rispostaRotazione(pid *, syn_stat *);
-void setupUART(void);
+void setupUART(int);
 void PRINT_WELCOME(void);
 
 /// invia la lettura di un sensore

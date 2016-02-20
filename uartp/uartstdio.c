@@ -1030,6 +1030,9 @@ again:
                     goto convert;
                 }
 
+                /// Handle the %f command
+//                case 'f':
+//                break;
                 //
                 // Handle the %s command.
                 //
