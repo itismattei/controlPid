@@ -99,14 +99,10 @@ void adcISR(void){
 	volatile uint32_t attesa;
 	ADCIntClear(ADC0_BASE, 0);
 	numByte = ADCSequenceData_Get(ADC0_BASE, 0, dPtr->dI);    // Read ADC Value.
+	/// finito di trascrivere i dati, spegne il pin di segnalazione
+	HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_5 << 2))) &=  ~GPIO_PIN_5;
 	/// riavvia il campionamento
 	//HWREG(ADC0_BASE + ADC_O_PSSI) |= ((2 & 0xffff0000) | (1 << (2 & 0xf)));
-	HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_0 << 2))) &=  ~GPIO_PIN_0;
-	//ADCProcessorTrigger(ADC0_BASE, 0);
-	for(attesa = 0; attesa < 1000; attesa++);
-	HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_0 << 2))) |=  GPIO_PIN_0;
-	/// per scopi di debug
-	///
 	///riutilizzo della variabile attesa per stampare a video i dati provenienti dal buffer dell'adc
 	for(attesa= 0; attesa < 5; attesa++)
 		PRINTF("val: %d \t", dPtr->dI[attesa]);
@@ -150,8 +146,9 @@ void initHW_ADC(){
 	// PE.0
 	ADCSequenceStepConfigure(ADC0_BASE, 0, 3, ADC_CTL_CH3 );
 	/// PD.3
-	ADCSequenceStepConfigure(ADC0_BASE, 0, 4, ADC_CTL_CH4 | ADC_CTL_IE | ADC_CTL_END);
-
+	ADCSequenceStepConfigure(ADC0_BASE, 0, 4, ADC_CTL_CH4 );
+	/// PD.2
+	ADCSequenceStepConfigure(ADC0_BASE, 0, 5, ADC_CTL_CH5 | ADC_CTL_IE | ADC_CTL_END);
 	/// abilita il sequencer 0
 	ADCSequenceEnable(ADC0_BASE, 0);
 

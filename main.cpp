@@ -198,11 +198,6 @@ int main(void) {
 	/// task principale
 	while(1){
 
-		HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_5 << 2))) ^=  GPIO_PIN_5;
-		HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_5 << 2))) ^=  GPIO_PIN_5;
-		HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_5 << 2))) ^=  GPIO_PIN_5;
-		HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_5 << 2))) ^=  GPIO_PIN_5;
-		for(volatile int a = 60000; a > 0; a--);
 		/// invia la risposta per i comandi di rotazione, quando sono stati eseguiti
 //		if(pidPtr->rispondi == TRUE){
 //			rispostaRotazione(pidPtr, &synSTATO);
@@ -248,16 +243,15 @@ int main(void) {
 
 			/* misura gli encoder e calcola spostameti e velocità */
 			/* misura i sensori di distanza */
-//			if (tick >= 100){
-//				uint32_t v = 13456780;
-//				float f = v / 110.0;
-//				/// TODO controllare se riesce a funzionare mentre legge le accelerazioni su I2C
-//				ROM_ADCProcessorTrigger(ADC0_BASE, 0);
-//				tick = 0;
-//				HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_3 << 2))) ^=  GPIO_PIN_3;
-//				PRINTF("%d \n", v);
-//				printFloat(f, 3);
-//			}
+			if (tick >= 100){
+
+				/// TODO controllare se riesce a funzionare mentre legge le accelerazioni su I2C
+				ROM_ADCProcessorTrigger(ADC0_BASE, 0);
+				/// accende il pin PB5
+				HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_5 << 2))) |=  GPIO_PIN_5;
+				tick = 0;
+				HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_3 << 2))) ^=  GPIO_PIN_3;
+			}
 
 			/// misura i dati forniti dall'accelerometro se disponibili
 //			if(A.isPresent)

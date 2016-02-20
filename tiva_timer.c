@@ -157,7 +157,7 @@ void initTimer1(int interval){
     //
     volatile int tick = 0;
 
-    tick = (SysCtlClockGet() / 1000) * interval; //100 sono i ms
+    tick = (ROM_SysCtlClockGet() / 1000) * interval; //100 sono i ms
     //
     // Enable the peripherals used by this example.
     //
