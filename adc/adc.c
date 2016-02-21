@@ -39,6 +39,8 @@ void initAdc(volatile distanza *d){
 		d->d_mm[i] = 0;
 		d->dI[i] = 0;
 	}
+	d->dI[5] = 0;
+	d->d_mm[5] = 0;
 	initHW_ADC();
 	/// setta ad on al presenza e funzionalita' del sensore
 	d->run = true;
@@ -104,7 +106,7 @@ void adcISR(void){
 	/// riavvia il campionamento
 	//HWREG(ADC0_BASE + ADC_O_PSSI) |= ((2 & 0xffff0000) | (1 << (2 & 0xf)));
 	///riutilizzo della variabile attesa per stampare a video i dati provenienti dal buffer dell'adc
-	for(attesa= 0; attesa < 5; attesa++)
+	for(attesa = 1; attesa < 6; attesa++)
 		PRINTF("val: %d \t", dPtr->dI[attesa]);
 	PRINTF("\n");
 }

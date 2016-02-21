@@ -15,9 +15,9 @@
 /// e la conversione in millimetri
 typedef struct _dist{
 
-	float 		misSens[5];		/// distanza in millimetri con virgola
+	float 		misSens[6];		/// distanza in millimetri con virgola
 	float 		kf;				/// coefficiente di trasformazione tensione - distanza
-	int 		d_mm[5];		/// distanza in millimetri (intera)
+	int 		d_mm[6];		/// distanza in millimetri (intera)
 	uint32_t	dI[8];
 	bool		run;			/// indica se il dispositivo funziona
 
