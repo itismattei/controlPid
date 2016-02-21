@@ -93,7 +93,15 @@ int32_t ADCSequenceData_Get(uint32_t ui32Base, uint32_t ui32SequenceNum, uint32_
 
 
 extern  distanza *dPtr;
+#include "../distMis.h"
+extern  distMis *misPtr;
 volatile uint32_t numByte;
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 
 void adcISR(void){
 	volatile uint32_t attesa;
@@ -109,6 +117,10 @@ void adcISR(void){
 	PRINTF("\n");
 }
 
+
+#ifdef __cplusplus
+}
+#endif
 
 /*void Timer0ISR(void){
 

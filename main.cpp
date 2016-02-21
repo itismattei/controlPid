@@ -59,6 +59,7 @@ volatile int procCom = 0, tick;
 volatile int procCom4 = 0;
 extern volatile uint8_t uart1buffer[16], RX_PTR1, READ_PTR1;
 volatile distanza *dPtr;
+volatile distMis *misPtr;
 void *servo;
 temperatura *TEMPptr;
 
@@ -104,6 +105,7 @@ int main(void) {
 	DI();
 	//pidPtr = CTRL;
 	dPtr = &DIST;
+	misPtr = &MISURE;
 	/*TEMPptr =  &TEMP;
 	CIN.Aptr = &A;
 	CIN.distPTR = &DIST;
