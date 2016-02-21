@@ -48,9 +48,9 @@ void UART1IntHandler(void)
         //
         // Read the next character from the UART and write it back to the UART.
         //
-    	uart1buffer[RX_PTR1]=ROM_UARTCharGetNonBlocking(UART1_BASE);
+    	uart1buffer[RX_PTR1] = ROM_UARTCharGetNonBlocking(UART1_BASE);
     	/// echo
-    	ROM_UARTCharPutNonBlocking(UART0_BASE, uart1buffer[RX_PTR1]);
+    	//ROM_UARTCharPutNonBlocking(UART0_BASE, uart1buffer[RX_PTR1]);
     	RX_PTR1++;
     	RX_PTR1 &= DIM_READ_BUFF - 1;
         //UARTCharPutNonBlocking(UART1_BASE,

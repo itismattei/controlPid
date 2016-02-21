@@ -87,6 +87,8 @@ void parse(syn_stat *STATO){
 
 	case 3:
 		// resetta l'automa e rimette lo stato a NON_VALIDO
+		/// l'invio del comando e' fatto di 4 bytes e quindi passa di qui quando e' arrivato il IV byte cioe' quello
+		/// del terminatore
 		resetAutoma(STATO);
 	break;
 
@@ -139,6 +141,7 @@ void convertToToken(syn_stat *STATO){
 		STATO->token = LETTURA_DATI;
 	}*/
 	/// azzera il contatore della persistenza del comando
+	/// cio' vuol di re che c'e' un nuovo comando da servire
 	STATO->tick = 0;
 
 }

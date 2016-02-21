@@ -57,7 +57,10 @@ size_t printFloat(double number, uint8_t digits);
 /// variabili globali
 volatile int procCom = 0, tick;
 volatile int procCom4 = 0;
+volatile int ADCflag = 0;
+/// buffer per la seriale che riceve i dati dalla raspPi
 extern volatile uint8_t uart1buffer[16], RX_PTR1, READ_PTR1;
+
 volatile distanza *dPtr;
 volatile distMis *misPtr;
 void *servo;
@@ -106,6 +109,8 @@ int main(void) {
 	//pidPtr = CTRL;
 	dPtr = &DIST;
 	misPtr = &MISURE;
+
+	dati DATA;
 	/*TEMPptr =  &TEMP;
 	CIN.Aptr = &A;
 	CIN.distPTR = &DIST;
@@ -202,6 +207,16 @@ int main(void) {
 	/// task principale
 	while(1){
 
+		///extern volatile uint8_t uart1buffer[16], RX_PTR1, READ_PTR1;
+		/*    *****     */
+		// controllo di messaggio sulla seriale 1 (ricevuto comando da rasp
+		if (READ_PTR1 != RX_PTR1){
+			 parse(&synSTATO);
+		}
+		if (synSTATO.valid == VALIDO && synSTATO.token != ERRORE){
+			/// il comandoche e' stato analizzato ha prodotto un risultat adeguato
+			rispondiComando(&synSTATO, &DATA);
+		}
 		/// invia la risposta per i comandi di rotazione, quando sono stati eseguiti
 //		if(pidPtr->rispondi == TRUE){
 //			rispostaRotazione(pidPtr, &synSTATO);
@@ -256,6 +271,19 @@ int main(void) {
 				tick = 0;
 				HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_3 << 2))) ^=  GPIO_PIN_3;
 			}
+
+			if(ADCflag == 1){
+				/// arrivata una nuova conversione AD
+				ADCflag = 0;
+				for(int attesa = 1; attesa < 6; attesa++){
+					PRINTF("val: %d \t", DIST.dI[attesa]);
+					MISURE.dI[attesa] = DIST.dI[attesa];
+				}
+				PRINTF("\n");
+				MISURE.dI[0] = DIST.dI[0];
+			}
+
+
 
 			/// misura i dati forniti dall'accelerometro se disponibili
 //			if(A.isPresent)

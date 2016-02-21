@@ -95,6 +95,7 @@ int32_t ADCSequenceData_Get(uint32_t ui32Base, uint32_t ui32SequenceNum, uint32_
 extern  distanza *dPtr;
 #include "../distMis.h"
 extern  distMis *misPtr;
+volatile extern  int ADCflag;
 volatile uint32_t numByte;
 
 #ifdef __cplusplus
@@ -112,9 +113,12 @@ void adcISR(void){
 	/// riavvia il campionamento
 	//HWREG(ADC0_BASE + ADC_O_PSSI) |= ((2 & 0xffff0000) | (1 << (2 & 0xf)));
 	///riutilizzo della variabile attesa per stampare a video i dati provenienti dal buffer dell'adc
-	for(attesa= 0; attesa < 5; attesa++)
+	for(attesa= 1; attesa < 6; attesa++){
 		PRINTF("val: %d \t", dPtr->dI[attesa]);
+		misPtr->dI[attesa] = dPtr->dI[attesa];
+	}
 	PRINTF("\n");
+	misPtr->dI[0] = dPtr->dI[0];
 }
 
 
