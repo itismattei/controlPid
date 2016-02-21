@@ -226,6 +226,6 @@ void PRINT_WELCOME(void){
 	PRINTF("Modulo robotico\n");
 	for(i = 0; i < 10000; i++);
 	PRINTF("Lettura dal clock\n");
-	valore = SysCtlClockGet();
+	valore = ROM_SysCtlClockGet();
 	PRINTF("Frequenza del clock %d\n", valore);
 }

@@ -25,6 +25,8 @@ extern volatile int procCom, tick;
 extern pwm *servo;
 extern temperatura * TEMPptr;
 
+extern volatile uint8_t uart1buffer[16], RX_PTR1, READ_PTR1;
+
 ///
 /// routine di servizio del timer0
 void Timer0ISR(void){
@@ -43,6 +45,18 @@ void Timer0ISR(void){
 
     procCom = 1;
     tick++;
+    if ((tick % 10) == 0){
+		uint8_t valore = 0;
+		uart1buffer[RX_PTR1++] = 'D';
+		valore ^= 'D';
+		uart1buffer[RX_PTR1++] = 1;
+		valore ^= 1;
+		valore ^= 0xA9;
+		uart1buffer[RX_PTR1++] = valore;
+		uart1buffer[RX_PTR1++] = '*';
+		RX_PTR1 &= 0xF;
+	 }
+
     //
     // Use the flags to Toggle the LED for this timer
     //

@@ -212,6 +212,8 @@ int main(void) {
 		// controllo di messaggio sulla seriale 1 (ricevuto comando da rasp
 		if (READ_PTR1 != RX_PTR1){
 			 parse(&synSTATO);
+			 READ_PTR1++;
+			 READ_PTR1 &= 0xF;
 		}
 		if (synSTATO.valid == VALIDO && synSTATO.token != ERRORE){
 			/// il comandoche e' stato analizzato ha prodotto un risultat adeguato
@@ -276,7 +278,7 @@ int main(void) {
 				/// arrivata una nuova conversione AD
 				ADCflag = 0;
 				for(int attesa = 1; attesa < 6; attesa++){
-					PRINTF("val: %d \t", DIST.dI[attesa]);
+					PRINTF("val%d: %d \t", attesa, DIST.dI[attesa]);
 					MISURE.dI[attesa] = DIST.dI[attesa];
 				}
 				PRINTF("\n");

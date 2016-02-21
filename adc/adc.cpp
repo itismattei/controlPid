@@ -34,7 +34,7 @@
 
 void initAdc(volatile distanza *d){
 	int i;
-	for (i = 0; i < 5; i++){
+	for (i = 0; i < 6; i++){
 		d->misSens[i] = 0.0;
 		d->d_mm[i] = 0;
 		d->dI[i] = 0;
@@ -113,12 +113,14 @@ void adcISR(void){
 	/// riavvia il campionamento
 	//HWREG(ADC0_BASE + ADC_O_PSSI) |= ((2 & 0xffff0000) | (1 << (2 & 0xf)));
 	///riutilizzo della variabile attesa per stampare a video i dati provenienti dal buffer dell'adc
-	for(attesa= 1; attesa < 6; attesa++){
-		PRINTF("val: %d \t", dPtr->dI[attesa]);
-		misPtr->dI[attesa] = dPtr->dI[attesa];
-	}
-	PRINTF("\n");
-	misPtr->dI[0] = dPtr->dI[0];
+//	for(attesa= 1; attesa < 6; attesa++){
+//		PRINTF("val: %d \t", dPtr->dI[attesa]);
+//		misPtr->dI[attesa] = dPtr->dI[attesa];
+//	}
+//	PRINTF("\n");
+//	misPtr->dI[0] = dPtr->dI[0];
+
+	ADCflag = 1;
 }
 
 
