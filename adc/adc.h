@@ -10,6 +10,7 @@
 
 #include "../accel/accel_init.h"
 
+
 ///
 /// struttura che mantiene la distanza misurata dai 5 sensori
 /// e la conversione in millimetri
@@ -22,7 +23,6 @@ typedef struct _dist{
 	bool		run;			/// indica se il dispositivo funziona
 
 } distanza;
-
 
 
 typedef struct _cinematica{

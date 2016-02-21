@@ -49,6 +49,7 @@
 #include "qei.h"
 #include "sens_col_ir/sens1.h"
 #include "allineamento/allineamento.h"
+#include "distMis.h"
 
 
 size_t printFloat(double number, uint8_t digits);
@@ -67,6 +68,7 @@ int main(void) {
 	volatile int32_t arrot;
 	volatile int16_t val1 = 0, x, y, z;
 	distanza DIST;
+	distMis  MISURE;
 
 	//--------------------------//
 	///definizione strutture/////
