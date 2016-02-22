@@ -110,19 +110,18 @@ int main(void) {
 	dPtr = &DIST;
 	misPtr = &MISURE;
 
-	dati DATA;
-	/*TEMPptr =  &TEMP;
-	CIN.Aptr = &A;
-	CIN.distPTR = &DIST;
-	CIN.vel = 0.0;
+	//TEMPptr =  &TEMP;
+//	CIN.Aptr = &A;
+//	CIN.distPTR = &DIST;
+//	CIN.vel = 0.0;
 
 	dati DATA;
-
+	DATA.distPtr = &DIST;
 	//passaggio degli indirizzi delle strutture alla struttura generale
-	dati_a_struttura(&G, &DIST, &CIN, &COL, &TEMP, &SUR, &DATA);
+	//dati_a_struttura(&G, &DIST, &CIN, &COL, &TEMP, &SUR, &DATA);
 
 	/// commento per provare il merge su server remoto
-*/
+
 	/// setup di base
 	setupMCU();
 	/// imposta i parametri del PID
@@ -218,6 +217,9 @@ int main(void) {
 		if (synSTATO.valid == VALIDO && synSTATO.token != ERRORE){
 			/// il comandoche e' stato analizzato ha prodotto un risultat adeguato
 			rispondiComando(&synSTATO, &DATA);
+			/// avendo terminato la risposta, la validità dell'automa
+			/// va rimossa.
+			synSTATO.valid = NON_VALIDO;
 		}
 		/// invia la risposta per i comandi di rotazione, quando sono stati eseguiti
 //		if(pidPtr->rispondi == TRUE){
@@ -283,6 +285,12 @@ int main(void) {
 				}
 				PRINTF("\n");
 				MISURE.dI[0] = DIST.dI[0];
+				/// converte la misure grazza in mm
+				MISURE.rawTomm();
+				/// ricopia nella struttare DIST:
+				for(int attesa = 1; attesa < 6; attesa++){
+					DIST.d_mm[attesa] = MISURE.d_mm[attesa];
+				}
 			}
 
 

@@ -313,6 +313,7 @@ void rispondiComando(syn_stat *sSTAT, dati *data){
 			sSTAT->buff_reply[3] = 0;
 		}
 		/// la spedizione avviene sopra
+
 		///sendReply(sSTAT, 4);
 	}
 }
