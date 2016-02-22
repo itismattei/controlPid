@@ -290,7 +290,9 @@ int main(void) {
 				/// ricopia nella struttare DIST:
 				for(int attesa = 1; attesa < 6; attesa++){
 					DIST.d_mm[attesa] = MISURE.d_mm[attesa];
+					PRINTF("mm(%d): %d \t", attesa, MISURE.d_mm[attesa]);
 				}
+				PRINTF("\n********\n");
 			}
 
 

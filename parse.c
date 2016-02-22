@@ -56,7 +56,7 @@ void parse(syn_stat *STATO){
 
 	case 1:
 
-		STATO->check ^= STATO->cmd[1];
+		STATO->check += STATO->cmd[1];
 		STATO->ST = 2;
 		/// si analizza il checksum e poi si esegue il comando
 		/*if (STATO->cmd[0] ^ CHECK_SUM == STATO->cmd[1]){
@@ -300,18 +300,19 @@ void rispondiComando(syn_stat *sSTAT, dati *data){
 
 		int i;
 		if (sSTAT->dato_valido == 1){
+			sSTAT->check  = 0;
 		/// calcolo checksum
 			for(i = 0; i < 3; i++)
 				/// calcola il checksum
-				sSTAT->check ^= sSTAT->buff_reply[i];
+				sSTAT->check += sSTAT->buff_reply[i];
+
 			sSTAT->check ^=CHECK_SUM;
 			sSTAT->buff_reply[3] = sSTAT->check;
+			sSTAT->buff_reply[4] = '*';
 		}
-		else{
-			sSTAT->buff_reply[1] = 0;
-			sSTAT->buff_reply[2] = 0;
-			sSTAT->buff_reply[3] = 0;
-		}
+		else
+			for ( i = 0; i < 5; i++)
+				sSTAT->buff_reply[i] = 0;
 		/// la spedizione avviene sopra
 
 		///sendReply(sSTAT, 4);
@@ -344,38 +345,38 @@ void inviaSensore(syn_stat *sSTAT, dati *data){
 		case(1):
 			//risposta con ID del sensore
 			sSTAT->buff_reply[0] = 1;
-			sSTAT->buff_reply[1] = (data->distPtr->d_mm[0]  & 0xFF00) >> 8;
-			sSTAT->buff_reply[2] = data->distPtr->d_mm[0]  & 0x00FF;
+			sSTAT->buff_reply[1] = (data->distPtr->d_mm[1]  & 0xFF00) >> 8;
+			sSTAT->buff_reply[2] = data->distPtr->d_mm[1]  & 0x00FF;
 
 			break;
 
 		//sensore di distanza DD2
 		case(2):
 			sSTAT->buff_reply[0] = 2;
-			sSTAT->buff_reply[1] = (data->distPtr->d_mm[1]  & 0xFF00) >> 8;
-			sSTAT->buff_reply[2] = data->distPtr->d_mm[1]  & 0x00FF;
+			sSTAT->buff_reply[1] = (data->distPtr->d_mm[2]  & 0xFF00) >> 8;
+			sSTAT->buff_reply[2] = data->distPtr->d_mm[2]  & 0x00FF;
 
 			break;
 
 
 		case(3):
 			sSTAT->buff_reply[0] = 3;
-			sSTAT->buff_reply[1] = (data->distPtr->d_mm[2]  & 0xFF00) >> 8;
-			sSTAT->buff_reply[2] = data->distPtr->d_mm[2]  & 0x00FF;
-
-			break;
-
-		case(4):
-			sSTAT->buff_reply[0] = 4;
 			sSTAT->buff_reply[1] = (data->distPtr->d_mm[3]  & 0xFF00) >> 8;
 			sSTAT->buff_reply[2] = data->distPtr->d_mm[3]  & 0x00FF;
 
 			break;
 
+		case(4):
+			sSTAT->buff_reply[0] = 4;
+			sSTAT->buff_reply[1] = (data->distPtr->d_mm[4]  & 0xFF00) >> 8;
+			sSTAT->buff_reply[2] = data->distPtr->d_mm[4]  & 0x00FF;
+
+			break;
+
 		case(5):
 			sSTAT->buff_reply[0] = 5;
-			sSTAT->buff_reply[1] = (data->distPtr->d_mm[4] & 0xFF00) >> 8;
-			sSTAT->buff_reply[2] = data->distPtr->d_mm[4]  & 0x00FF;
+			sSTAT->buff_reply[1] = (data->distPtr->d_mm[5] & 0xFF00) >> 8;
+			sSTAT->buff_reply[2] = data->distPtr->d_mm[5]  & 0x00FF;
 
 			break;
 

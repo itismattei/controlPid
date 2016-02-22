@@ -45,12 +45,12 @@ void Timer0ISR(void){
 
     procCom = 1;
     tick++;
-    if ((tick % 10) == 0){
+    if ((tick % 50) == 0){
 		uint8_t valore = 0;
 		uart1buffer[RX_PTR1++] = 'D';
-		valore ^= 'D';
+		valore += 'D';
 		uart1buffer[RX_PTR1++] = 1;
-		valore ^= 1;
+		valore += 1;
 		valore ^= 0xA9;
 		uart1buffer[RX_PTR1++] = valore;
 		uart1buffer[RX_PTR1++] = '*';
