@@ -62,7 +62,6 @@ volatile int ADCflag = 0;
 extern volatile uint8_t uart1buffer[16], RX_PTR1, READ_PTR1;
 
 volatile distanza *dPtr;
-volatile distMis *misPtr;
 void *servo;
 temperatura *TEMPptr;
 
@@ -108,7 +107,7 @@ int main(void) {
 	DI();
 	//pidPtr = CTRL;
 	dPtr = &DIST;
-	misPtr = &MISURE;
+
 
 	//TEMPptr =  &TEMP;
 //	CIN.Aptr = &A;
@@ -279,20 +278,30 @@ int main(void) {
 			if(ADCflag == 1){
 				/// arrivata una nuova conversione AD
 				ADCflag = 0;
-				for(int attesa = 1; attesa < 6; attesa++){
-					PRINTF("val%d: %d \t", attesa, DIST.dI[attesa]);
-					MISURE.dI[attesa] = DIST.dI[attesa];
+				/// i dati grezzi vongono copiati nella classe distMis
+				for (int i = 0; i < 6; i++)
+					MISURE.dI[i] = DIST.dI[i];
+#ifdef _DEBUG_
+				for(int i = 1; i < 6; i++){
+					if (i == 3)
+						continue;
+					PRINTF("val%d: %d \t", i, DIST.dI[i]);
+
 				}
 				PRINTF("\n");
-				MISURE.dI[0] = DIST.dI[0];
+
+#endif
 				/// converte la misure grazza in mm
 				MISURE.rawTomm();
+#ifdef _DEBUG_
 				/// ricopia nella struttare DIST:
 				for(int attesa = 1; attesa < 6; attesa++){
-					DIST.d_mm[attesa] = MISURE.d_mm[attesa];
+					if (attesa == 3)
+						continue;
 					PRINTF("mm(%d): %d \t", attesa, MISURE.d_mm[attesa]);
 				}
 				PRINTF("\n********\n");
+#endif
 			}
 
 

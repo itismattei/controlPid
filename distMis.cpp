@@ -39,8 +39,8 @@ void distMis::rawTomm(){
 	 * f = k * dI + q
 	 * distanza = 1/f
 	 *
-	 * k1 = (0,142 - 0,025)/(1,78-0,35) =  (0,142 - 0,025)/(2209 - 434)
-	 * q1 = f - k1 * dI = 0,142 - k1 * 2209 = 0,142 - 6.592e-5 * 2209 = -3.617e-3
+	 * k1 = (0,06935 - 0,03287)/(0,925 - 0,43) =  (0,06935 - 0,03287)/(1144 - 532) = 59.61e-6
+	 * q1 = f - k1 * dI = 0,925 - k1 * 1144 = 1.159e-3
 	 *
 	 * k2 = (0,2 - 0,142)/(2,35 - 1,78) =  (0,2 - 0,142)/(2916 - 2209) = 8.204e-5
 	 * q2 = f - k2 * dI = 0,142 - k2 * 2209 = -3.92e-2
@@ -49,36 +49,44 @@ void distMis::rawTomm(){
 	 * q3 = f - k3 * dI = 0,2 - k3 * 2916 = -0.1111372
 	 * */
 
-	float f, d, k = 0.87 * (0.2857 - 0.03125)/(3723.0 - 496.0);
-	float k1, k2, k3, q1, q2, q3;
-	k1 = 6.592e-5;
-	q1 = -3.617e-3;
-	k2 = 8.204e-5;
-	q2 = -3.92e-2;
-	k3 = 1.067e-4;
-	q3 = -0.1111372;
+	//float f, d, k = 0.87 * (0.2857 - 0.03125)/(3723.0 - 496.0);
+	float f, d;
+	float m[4] = {5.60984E-05, 6.55586E-05, 1.07152e-4, 0.0 };
+	float q[4] = {0.01611, 0.005897452, -0.08579, 0.0};
+//	m[0] = 5.60984E-05;
+//	m[1] = 6.55586E-05;
+//	m[2] = 1.07152e-4;
+//	m[3] = 8.65196E-05;
+//	q[0] = 0.01611;
+//	q[1] = 0.005897452;
+//	q[2] = -0.08579;
+//	q[3] = -0.065974265;
+
 	/// conversione del dato grezzo in cm
 	for (int i = 0; i < 6; i++){
 		/// distnza superiori a 40cm non vengono calcolate
 		if (dI[i] < 400)
 			dI[i] = 400;
-		if (dI[i] < 2210){
+		if (dI[i] < 970){
 			/// si usa la prima retta interpolante
-			f = k1 * dI[i] + q1;
+			f = m[0] * dI[i] + q[0];
 		}
-		else if (dI[i] < 2916){
+		else if (dI[i] < 2050){
 			/// intervallo 5 - 7 cm
-			f = k2 * dI[i] + q2;
+			f = m[1] * dI[i] + q[1];
 			}
-		else if (dI[i] < 3723){
-			/// intervallo 5 - 3.5 cm
-			f = k3 * dI[i] + q3;
-		}
+			else if (dI[i] < 3745){
+				/// intervallo 5 - 3.5 cm
+				f = m[2] * dI[i] + q[2];
+				}
+//				else if (dI[i] < 3711){
+//					f = m[3] * dI[i] + q[3];
+//				}
 
-		if (dI[i] > 3723){
+		if (dI[i] >= 3745){
 			/// valori minori di 3.5cm non hanno senso
-			dI[i] = 3723;
-			f =  k3 * 3723.0 + q3;
+			dI[i] = 3745;
+			f =  m[2] * 3711.0 + q[2];
 		}
 
 		/// la distanza (in cm) e' 1 / f
@@ -86,14 +94,4 @@ void distMis::rawTomm(){
 
 		d_mm[i] = (int) d;
 	}
-
-//	for (int i = 0; i < 6; i++){
-//		if (dI[i] < 400)
-//			dI[i] = 400;
-//		f = k * (float) dI[i];
-//		d = 1/f * 10;		/// risultato in millimetri
-//		d_mm[i] = (int) d;
-//
-//	}
-
 }
