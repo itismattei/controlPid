@@ -8,6 +8,12 @@
 #ifndef QEI_H_
 #define QEI_H_
 
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct _qei{
 
 	uint32_t 	pos_1; //posizione encoder 1
@@ -23,9 +29,8 @@ typedef struct _qei{
 } qei;
 
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
+
 
 
 void QEI0IntHandler();
