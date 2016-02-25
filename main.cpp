@@ -126,9 +126,9 @@ int main(void) {
 	/// imposta i parametri del PID
 	//setupPID(CTRL);
 	/// imposta le UART e setta la PRINTF sulla 1 in modo da trasmettere la telemetria
-	//setupUART(1);
+	setupUART(1);
 	/// imposta le UART e setta la PRINTF sulla 0
-	setupUART(0);
+	//setupUART(0);
     //inizializzo l'i2c
 	//InitI2C0();
 	/// messaggio d'inizio
