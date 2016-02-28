@@ -5,7 +5,7 @@
  *      Author: massimo
  */
 
-#include "C:encQuad.h"
+#include "encQuad.h"
 
 encQuad::encQuad() {
 	// TODO Auto-generated constructor stub

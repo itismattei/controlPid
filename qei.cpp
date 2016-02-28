@@ -23,6 +23,67 @@
 
 #define UART0 0
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+//void QEI0IntHandler(qei *p)
+qei *p;
+void QEI0IntHandler()
+{
+
+	unsigned long status1;
+	status1 = QEIIntStatus(QEI0_BASE,false);
+	if ( (status1 & QEI_INTTIMER) == QEI_INTTIMER)
+	{
+		QEIIntClear(QEI0_BASE, QEI_INTTIMER);
+		p->pos_1 = QEIPositionGet(QEI0_BASE); //questo valore da la posizione dell'encoder
+		p->vel_1 = QEIVelocityGet(QEI0_BASE); //questo valore da la velocità dell'encoder
+	}
+
+	if (  (status1 & QEI_INTDIR) == QEI_INTDIR)
+	{
+		QEIIntClear(QEI0_BASE, QEI_INTDIR);
+	}
+
+	if (  (status1 & QEI_INTDIR) == QEI_INTERROR)
+	{
+		QEIIntClear(QEI0_BASE, QEI_INTERROR);
+	}
+
+	volatile int ix = 0;
+	while(ix < 1000)     {ix++;}
+}
+
+void QEI1IntHandler()
+{
+	unsigned long status1;
+	status1 = QEIIntStatus(QEI1_BASE,false);
+	if ( (status1 & QEI_INTTIMER) == QEI_INTTIMER)
+	{
+		QEIIntClear(QEI1_BASE, QEI_INTTIMER);
+		p->pos_2 = QEIPositionGet(QEI1_BASE); //questo valore da la posizione dell'encoder
+		p->vel_2 = QEIVelocityGet(QEI1_BASE); //questo valore da la velocità dell'encoder
+	}
+
+	if (  (status1 & QEI_INTDIR) == QEI_INTDIR)
+	{
+		QEIIntClear(QEI1_BASE, QEI_INTDIR);
+	}
+
+	if (  (status1 & QEI_INTDIR) == QEI_INTERROR)
+	{
+		QEIIntClear(QEI1_BASE, QEI_INTERROR);
+	}
+
+	volatile int ix = 0;
+	while(ix < 1000)     {ix++;}
+}
+
+#ifdef __cplusplus
+}
+#endif
+
 
 
 /*
@@ -47,8 +108,9 @@ void qei_init(qei *p)
 {
 
 	///TODO: tarare i due valori: periodo e fondoscala
-	p->vel_period = SysCtlClockGet()/10;
-	p->fscala = 200000;
+	p->vel_period = ROM_SysCtlClockGet()/10;
+	p->fscala = 80000;
+	p->zero_pos = 0;
 
 	// *************************************************************************************************** Lx4F232H5QD
 	    //    Initialize right side QEI (Quadrature Encoder Interface) for use by the right side drive.
@@ -131,8 +193,8 @@ void qei_init(qei *p)
 		//! \return None.
 
 	    //configurazione qei
-	    QEIConfigure(QEI0_BASE,(QEI_CONFIG_CAPTURE_A_B | QEI_CONFIG_NO_RESET | QEI_CONFIG_QUADRATURE | QEI_CONFIG_NO_SWAP), p->fscala);
-	    QEIConfigure(QEI1_BASE,(QEI_CONFIG_CAPTURE_A_B | QEI_CONFIG_NO_RESET | QEI_CONFIG_QUADRATURE | QEI_CONFIG_NO_SWAP), p->fscala);
+	    QEIConfigure(QEI0_BASE,(QEI_CONFIG_CAPTURE_A | QEI_CONFIG_NO_RESET | QEI_CONFIG_QUADRATURE | QEI_CONFIG_NO_SWAP), p->fscala);
+	    QEIConfigure(QEI1_BASE,(QEI_CONFIG_CAPTURE_A | QEI_CONFIG_NO_RESET | QEI_CONFIG_QUADRATURE | QEI_CONFIG_NO_SWAP), p->fscala);
 
 		QEIPositionSet(QEI1_BASE, p->zero_pos);
 		QEIPositionSet(QEI0_BASE, p->zero_pos);
@@ -149,19 +211,19 @@ void qei_init(qei *p)
 
 
 		//configurazione interrupt
-		QEIIntRegister(QEI0_BASE,*QEI0IntHandler);
-		QEIIntRegister(QEI1_BASE,*QEI1IntHandler);
-
-		///TODO: se si vuole usare l'interrupt del qei vanno decommentate le due righe che seguono
-		//IntEnable(INT_QEI0);
-		//IntEnable(INT_QEI1);
-
-		//QEIIntEnable(QEI0_BASE, QEI_INTDIR | QEI_INTTIMER); //interruzione abilitata al cambio di direzione e al timer della velocità finito
-		QEIIntEnable(QEI0_BASE, QEI_INTDIR);
-		QEIIntEnable(QEI1_BASE, QEI_INTDIR);
-
-
-	    QEIEnable(QEI1_BASE);
+//		QEIIntRegister(QEI0_BASE,*QEI0IntHandler);
+//		QEIIntRegister(QEI1_BASE,*QEI1IntHandler);
+//
+//		///TODO: se si vuole usare l'interrupt del qei vanno decommentate le due righe che seguono
+//		//IntEnable(INT_QEI0);
+//		//IntEnable(INT_QEI1);
+//
+//		//QEIIntEnable(QEI0_BASE, QEI_INTDIR | QEI_INTTIMER); //interruzione abilitata al cambio di direzione e al timer della velocità finito
+//		QEIIntEnable(QEI0_BASE, QEI_INTDIR);
+//		QEIIntEnable(QEI1_BASE, QEI_INTDIR);
+//
+//
+		QEIEnable(QEI1_BASE);
 	    QEIEnable(QEI0_BASE);
 
 
@@ -170,10 +232,10 @@ void qei_init(qei *p)
 
 void qei_test(qei *p)
 {	volatile int i;
-		for(i=0; i<1000000; i++)
-		{
-
-		}
+//		for(i=0; i<1000000; i++)
+//		{
+//
+//		}
 
 		p->pos_1 =  QEIPositionGet(QEI0_BASE);
 		p->vel_1 =  QEIVelocityGet(QEI0_BASE);
@@ -211,60 +273,4 @@ void qei_reset(qei *p)
 	QEIPositionSet(QEI0_BASE, p->zero_pos);
 	QEIPositionSet(QEI1_BASE, p->zero_pos);
 }
-
-
-
-
-void QEI0IntHandler(qei *p)
-{
-
-	unsigned long status1;
-	status1 = QEIIntStatus(QEI0_BASE,false);
-	if ( (status1 & QEI_INTTIMER) == QEI_INTTIMER)
-	{
-		QEIIntClear(QEI0_BASE, QEI_INTTIMER);
-		p->pos_1 = QEIPositionGet(QEI0_BASE); //questo valore da la posizione dell'encoder
-		p->vel_1 = QEIVelocityGet(QEI0_BASE); //questo valore da la velocità dell'encoder
-	}
-
-	if (  (status1 & QEI_INTDIR) == QEI_INTDIR)
-	{
-		QEIIntClear(QEI0_BASE, QEI_INTDIR);
-	}
-
-	if (  (status1 & QEI_INTDIR) == QEI_INTERROR)
-	{
-		QEIIntClear(QEI0_BASE, QEI_INTERROR);
-	}
-
-	volatile int ix = 0;
-	while(ix < 1000)     {ix++;}
-}
-
-void QEI1IntHandler(qei *p)
-{
-	unsigned long status1;
-	status1 = QEIIntStatus(QEI1_BASE,false);
-	if ( (status1 & QEI_INTTIMER) == QEI_INTTIMER)
-	{
-		QEIIntClear(QEI1_BASE, QEI_INTTIMER);
-		p->pos_2 = QEIPositionGet(QEI1_BASE); //questo valore da la posizione dell'encoder
-		p->vel_2 = QEIVelocityGet(QEI1_BASE); //questo valore da la velocità dell'encoder
-	}
-
-	if (  (status1 & QEI_INTDIR) == QEI_INTDIR)
-	{
-		QEIIntClear(QEI1_BASE, QEI_INTDIR);
-	}
-
-	if (  (status1 & QEI_INTDIR) == QEI_INTERROR)
-	{
-		QEIIntClear(QEI1_BASE, QEI_INTERROR);
-	}
-
-	volatile int ix = 0;
-	while(ix < 1000)     {ix++;}
-}
-
-
 
