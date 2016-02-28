@@ -21,30 +21,42 @@ allineamento::~allineamento(){
 
 //N.B. ancora è molto rude...
 
-void allineamento::adc_allinea(distanza *DIST, pwm *PWM, pid *C)
+void allineamento::adc_allinea(distMis &DIST, pwm *PWM, pid *C)
 {
 	//variabili
-	double delta=0, d[2];
-	int angolo_minimo=5; //cambiare il valore del'angolo minimo per decidere quando far scattare l'algoritmo di allineamento
-	double dist_sens=0; //distanza tra i due sensori nella basetta, è fissa
-	double angolo; //angolo tra la parete e il robot
-	float angolo_pid; // l'angolo da dare al pid
+	float delta = 0.0, d[4];
+	int angolo_minimo = 5; 	//cambiare il valore del'angolo minimo per decidere quando far scattare l'algoritmo di allineamento
+
+	float angolo;	 		//angolo tra la parete e il robot
+	float angolo_pid; 		// l'angolo da dare al pid
 
 	//leggi il sensore di distanza destro e sinistro
 
-	d[0]= DIST->d_mm[0];
-	d[1]= DIST->d_mm[1];
+	d[0]= DIST.d_mm[0];
+	d[1]= DIST.d_mm[1];
 
 	//determino se la differenza delle letture dei due sensori è significativa
 	delta = d[0] - d[1];
+	distMDX = (d[0] + d[1]) / 2.0;
 
-	angolo = atan(delta / dist_sens);
+	angoloCalc1 = atan(delta / distMDX);
+	delta = (DIST.d_mm[4] - DIST.d_mm[5]);
+	distMSX = (DIST.d_mm[4] + DIST.d_mm[5]) / 2.0;
+	angoloCalc2 = atan( delta / distMSX);
+
 	angolo_pid = (float) - angolo;
 
+	/// adesso vuole capire se ruota sul baricentro o si sposta.
+	/// il criterio potrebbe essere: se sono verso il centro ruoto sul baricentro,
+	/// se invece sono vicino ad un lato provo a muovermi
+	if (distMSX > distMDX)
+		dx = true;
+
+	else
+		dx = false;
 
 	//se l'angolo è consistente avvio il programma di correzzione della traiettoria
-	if(angolo > angolo_minimo)
-	{
+	if(angolo > angolo_minimo){
 		///setto il pid dandogli come valore finale l'inverso dell'angolo
 
 		//preso dal codice pid.c il case RUOTA
@@ -71,5 +83,9 @@ void allineamento::gyro_allinea()
 
 }
 
+///
+/// allinea secondo il parametro dx
+void allineamento::allinea(void){
 
+}
 

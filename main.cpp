@@ -101,7 +101,7 @@ int main(void) {
 	//inizializzazione struttura per qei
 	//qei QEI;
 	/// oggetto che riallinea il mezzo
-	//allineamento AL;
+	allineamento AL;
 
 	/// disabilita le interruzioni
 	DI();

@@ -10,6 +10,7 @@
 
 #include "../adc/adc.h"
 #include "../pid.h"
+#include "../distMis.h"
 #include <cmath>
 
 class allineamento{
@@ -22,14 +23,20 @@ public:
 	///
 	/// metodi
 	///
-	void adc_allinea(distanza *DIST, pwm *PWM, pid *C);
+	void adc_allinea(distMis &DIST, pwm *PWM, pid *C);
 	void gyro_allinea();
 
 private:
-	int valore;
-	distanza *dPtr;
+	int 	valore;
+	float 	angoloCalc1, angoloCalc2;
+	float 	distMDX, distMSX;
+	bool  	dx;
 	pwm *p;
 	pid *cPtr;
+
+private:
+	void allinea(void);
+
 
 };
 
