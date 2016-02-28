@@ -381,5 +381,6 @@ size_t printFloat(double number, uint8_t digits){
     remainder -= toPrint;
   }
 
+
   return 0;
 }
