@@ -26,11 +26,11 @@ void blinkBlueLed(){
 	volatile uint32_t i;
 	/// per segnalalre la presenza del giroscopio lampeggia 2 volte
 	GPIOPinWrite(GPIO_PORTF_BASE, BLUE_LED, BLUE_LED);
-	for (i = 30000; i > 0; i--);
+	for (i = 3000000; i > 0; i--);
 	GPIOPinWrite(GPIO_PORTF_BASE, BLUE_LED, 0);
-	for (i = 30000; i > 0; i--);
+	for (i = 3000000; i > 0; i--);
 	GPIOPinWrite(GPIO_PORTF_BASE, BLUE_LED, BLUE_LED);
-	for (i = 30000; i > 0; i--);
+	for (i = 3000000; i > 0; i--);
 	GPIOPinWrite(GPIO_PORTF_BASE, BLUE_LED, 0);
 }
 
@@ -70,7 +70,7 @@ void setupAssi(gyro *G, char stato){
 	mask = 0x08| stato;
 	I2CSend(GYRO_ADDR, 2, CTRL_REG1, mask);
 	if(I2CReceive(GYRO_ADDR, CTRL_REG1) == mask){
-		GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, GPIO_PIN_1);
+		//GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, GPIO_PIN_1);
 		G->IsOn = ON;
 		G->asseOn = stato;
 	}
@@ -153,6 +153,12 @@ void setupMCU(void){
 	ROM_GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, BLUE_LED | GREEN_LED | RED_LED);
 	/// spegne i led
 	ROM_GPIOPinWrite(GPIO_PORTF_BASE, BLUE_LED | GREEN_LED | RED_LED, 0);
+	ROM_GPIOPinWrite(GPIO_PORTF_BASE, BLUE_LED | GREEN_LED | RED_LED, GREEN_LED);
+	ROM_GPIOPinWrite(GPIO_PORTF_BASE, BLUE_LED | GREEN_LED | RED_LED, 0);
+	ROM_GPIOPinWrite(GPIO_PORTF_BASE, BLUE_LED | GREEN_LED | RED_LED, BLUE_LED);
+	ROM_GPIOPinWrite(GPIO_PORTF_BASE, BLUE_LED | GREEN_LED | RED_LED, 0);
+	ROM_GPIOPinWrite(GPIO_PORTF_BASE, BLUE_LED | GREEN_LED | RED_LED, RED_LED);
+	ROM_GPIOPinWrite(GPIO_PORTF_BASE, BLUE_LED | GREEN_LED | RED_LED, 0);
 	//
 	// Set the pin direction and mode.
 	//
@@ -194,7 +200,9 @@ void setupMCU(void){
 	/// imposta il pin (ricordare lo shift di 2 posizione verso sinistra della maschera di bit
 	HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_5 << 2))) |=  GPIO_PIN_5;
 	HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_5 << 2))) &=  ~GPIO_PIN_5;
-	HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_3 << 2))) |=  GPIO_PIN_3;
+
+	/// non accendiamo subito il led verde
+	//HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_3 << 2))) |=  GPIO_PIN_3;
 
 }
 

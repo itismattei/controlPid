@@ -126,9 +126,9 @@ int main(void) {
 	/// imposta i parametri del PID
 	//setupPID(CTRL);
 	/// imposta le UART e setta la PRINTF sulla 1 in modo da trasmettere la telemetria
-	setupUART(1);
+	//setupUART(1);
 	/// imposta le UART e setta la PRINTF sulla 0
-	//setupUART(0);
+	setupUART(0);
     //inizializzo l'i2c
 	InitI2C0();
 	/// messaggio d'inizio
@@ -158,18 +158,18 @@ int main(void) {
 	/// abilita le interruzioni
 	EI();
 	/// attende che il sensore vada a regime
-//	if (G.IsPresent == OK){
-//		PRINTF("\nAzzeramento assi giroscopio\n");
-//		while (blink < 70){
-//			if (procCom == 1){
-//				procCom = 0;
-//				blink++;
-//			}
-//		}
-//		blink = 0;
-//		/// azzeramento degli assi
-//		azzeraAssi(&G);
-//	}
+	if (G.IsPresent == OK){
+		PRINTF("\nAzzeramento assi giroscopio\n");
+		while (blink < 70){
+			if (procCom == 1){
+				procCom = 0;
+				blink++;
+			}
+		}
+		blink = 0;
+		/// azzeramento degli assi
+		azzeraAssi(&G);
+	}
 
 	/// test della presenza del modulo zig-bee
 	/// il modulo zig-be si attiva con al sequnza '+++' e risponde con 'OK' (maiuscolo)
@@ -301,6 +301,8 @@ int main(void) {
 					PRINTF("mm(%d): %d \t", attesa, MISURE.d_mm[attesa]);
 				}
 				PRINTF("\n********\n");
+				misuraAngoli(&G);
+				PRINTF("\tasse z: %d\n", G.yaw);
 #endif
 			}
 
