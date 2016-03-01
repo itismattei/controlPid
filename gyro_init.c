@@ -22,6 +22,17 @@
 #include "uartp/uartstdio.h"
 #include "uartp/uart.h"
 
+void blinkBlueLed(){
+	volatile uint32_t i;
+	/// per segnalalre la presenza del giroscopio lampeggia 2 volte
+	GPIOPinWrite(GPIO_PORTF_BASE, BLUE_LED, BLUE_LED);
+	for (i = 30000; i > 0; i--);
+	GPIOPinWrite(GPIO_PORTF_BASE, BLUE_LED, 0);
+	for (i = 30000; i > 0; i--);
+	GPIOPinWrite(GPIO_PORTF_BASE, BLUE_LED, BLUE_LED);
+	for (i = 30000; i > 0; i--);
+	GPIOPinWrite(GPIO_PORTF_BASE, BLUE_LED, 0);
+}
 
 void initGyro(gyro *G, char assi){
 	volatile uint32_t valore;
@@ -29,7 +40,7 @@ void initGyro(gyro *G, char assi){
 	G->yaw = G->roll = G->pitch = 0;
 	//chiedo il dato presente nel registro WHO_AM_I
 	if (I2CReceive(GYRO_ADDR, WHO_AM_I) == 0xD4){
-		GPIOPinWrite(GPIO_PORTF_BASE, BLUE_LED, BLUE_LED);
+		blinkBlueLed();
 		G->IsPresent = OK;
 		/// imposta gli assi
 		/// per il drone, stato = ALL (0x7)
@@ -54,7 +65,7 @@ void setupAssi(gyro *G, char stato){
 	G->gradiSec = 0;
 	G->kz = 1.1688;
 	/// lo stato e' cosi' interpretato: bit0: x; bit1: y; bit2: z.
-	// scrivo nel registro 0x20 il valore 0x0C, cioe' banda minima, modulo on e assi on
+	/// scrivo nel registro 0x20 il valore 0x0C, cioe' banda minima, modulo on e assi on
 	/// sintassi: indirizzo slave, num parm, indirizzo reg, valore da scrivere
 	mask = 0x08| stato;
 	I2CSend(GYRO_ADDR, 2, CTRL_REG1, mask);

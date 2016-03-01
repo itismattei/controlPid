@@ -130,11 +130,11 @@ int main(void) {
 	/// imposta le UART e setta la PRINTF sulla 0
 	//setupUART(0);
     //inizializzo l'i2c
-	//InitI2C0();
+	InitI2C0();
 	/// messaggio d'inizio
 	PRINT_WELCOME();
 	/// inizializza il giroscopio
-	//initGyro(&G, Z_AXIS);
+	initGyro(&G, Z_AXIS);
 	tick = 0;
 	/// inizializza il timer 0 e genera un tick da 10 ms
 	initTimer0(10, &G);
