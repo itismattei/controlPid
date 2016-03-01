@@ -29,7 +29,7 @@ public:
 private:
 	int 	valore;
 	float 	angoloCalc1, angoloCalc2;
-	float 	distMDX, distMSX;
+	float 	distMDX, distMSX, distAssi;
 	bool  	dx;
 	pwm *p;
 	pid *cPtr;

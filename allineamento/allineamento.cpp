@@ -25,7 +25,7 @@ void allineamento::adc_allinea(distMis &DIST, pwm *PWM, pid *C)
 {
 	//variabili
 	float delta = 0.0, d[4];
-	int angolo_minimo = 5; 	//cambiare il valore del'angolo minimo per decidere quando far scattare l'algoritmo di allineamento
+	float angolo_minimo = 5.0; 	//cambiare il valore del'angolo minimo per decidere quando far scattare l'algoritmo di allineamento
 
 	float angolo;	 		//angolo tra la parete e il robot
 	float angolo_pid; 		// l'angolo da dare al pid
@@ -35,14 +35,15 @@ void allineamento::adc_allinea(distMis &DIST, pwm *PWM, pid *C)
 	d[0]= DIST.d_mm[0];
 	d[1]= DIST.d_mm[1];
 
+	distAssi = 150.0;
 	//determino se la differenza delle letture dei due sensori è significativa
 	delta = d[0] - d[1];
 	distMDX = (d[0] + d[1]) / 2.0;
 
-	angoloCalc1 = atan(delta / distMDX);
+	angoloCalc1 = atan(delta / distAssi);
 	delta = (DIST.d_mm[4] - DIST.d_mm[5]);
 	distMSX = (DIST.d_mm[4] + DIST.d_mm[5]) / 2.0;
-	angoloCalc2 = atan( delta / distMSX);
+	angoloCalc2 = atan( delta / distAssi);
 
 	angolo_pid = (float) - angolo;
 
