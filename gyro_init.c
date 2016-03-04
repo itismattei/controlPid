@@ -248,3 +248,33 @@ void PRINT_WELCOME(void){
 	valore = ROM_SysCtlClockGet();
 	PRINTF("Frequenza del clock %d\n", valore);
 }
+
+
+///
+/// calcola i minimi quadrati
+void minQuad(int16_t *x, int16_t *y, int numS, float *b, float *a){
+
+	float m, q, p1, p2, p3, p4;
+	int s1, s2, s3, s4;
+	int i;
+	s1 = s2 = s3 = s4 = 0;
+
+	for (i = 0; i < numS; i++){
+		s1 += x[i] * y[i];
+		s2 += x[i];
+		s3 += y[i];
+		s4 += x[i] * x[i];
+	}
+
+	p1 = (float) s1;
+	p2 = (float) s2;
+	p3 = (float) s3;
+	p4 = (float) s4;
+
+	m = (float) (numS * p1 - p2 * p3)/(numS * p4 - p2 * p2);
+	q = ((float) p3  - m * (float) p2) / numS;
+
+	*b = m;
+	*a = q;
+
+}

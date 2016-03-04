@@ -50,6 +50,7 @@
 #include "sens_col_ir/sens1.h"
 #include "allineamento/allineamento.h"
 #include "distMis.h"
+#include "Giroscopio.h"
 
 
 size_t printFloat(double number, uint8_t digits);
@@ -79,6 +80,7 @@ int main(void) {
 
 	//volatile double d = 1.9845637456;
 	gyro G;
+	Giroscopio Rot;
 	//accelerazione A;
 	//cinematica CIN;
 	/// servono differenti PID, almeno uno per la rotazione ed uno per lo spostamento
@@ -168,7 +170,12 @@ int main(void) {
 		}
 		blink = 0;
 		/// azzeramento degli assi
-		azzeraAssi(&G);
+		//azzeraAssi(&G);
+		Rot.azzeraAssi();
+		printFloat(Rot.media, 4);
+		PRINTF("\n");
+		printFloat(Rot.q, 4);
+		PRINTF("\n");
 	}
 
 	/// test della presenza del modulo zig-bee

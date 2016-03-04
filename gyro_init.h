@@ -115,6 +115,7 @@ void azzeraAssi(gyro *);
 /// set up di base: clock, led, ingresso di avvio
 void setupMCU();
 void attesa(int);
+void minQuad(int16_t *, int16_t *, int, float *, float *);
 
 #ifdef __cplusplus
 }
