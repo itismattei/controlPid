@@ -56,7 +56,7 @@ void parse(syn_stat *STATO){
 
 	case 1:
 
-		STATO->check += STATO->cmd[1];
+		STATO->check ^= STATO->cmd[1];
 		STATO->ST = 2;
 		/// si analizza il checksum e poi si esegue il comando
 		/*if (STATO->cmd[0] ^ CHECK_SUM == STATO->cmd[1]){
@@ -304,9 +304,10 @@ void rispondiComando(syn_stat *sSTAT, dati *data){
 		/// calcolo checksum
 			for(i = 0; i < 3; i++)
 				/// calcola il checksum
-				sSTAT->check += sSTAT->buff_reply[i];
+				sSTAT->check ^= sSTAT->buff_reply[i];
 
-			sSTAT->check ^=CHECK_SUM;
+			/// aggiunge la chiave 0xA9
+			sSTAT->check ^= CHECK_SUM;
 			sSTAT->buff_reply[3] = sSTAT->check;
 			sSTAT->buff_reply[4] = '*';
 		}
