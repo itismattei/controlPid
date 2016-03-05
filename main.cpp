@@ -131,15 +131,20 @@ int main(void) {
 	//setupUART(1);
 	/// imposta le UART e setta la PRINTF sulla 0
 	setupUART(0);
+	PRINTF("impostata UART0 per debug\n");
+	/// messaggio d'inizio
+	PRINT_WELCOME();
     //inizializzo l'i2c
 	InitI2C0();
 	/// messaggio d'inizio
-	PRINT_WELCOME();
+	PRINTF("inizializzato I2C\n");
 	/// inizializza il giroscopio
-	initGyro(&G, Z_AXIS);
+	Rot.initGyro(Z_AXIS);
+	//initGyro(&G, Z_AXIS);
 	tick = 0;
 	/// inizializza il timer 0 e genera un tick da 10 ms
 	initTimer0(10, &G);
+	PRINTF("inizializzato TIMER0\n");
 	/// inizializza il timer 1
 	//initTimer1(100);
 	/// inizializza il contatore della persistenza del comando
@@ -148,9 +153,12 @@ int main(void) {
 	//pwmMotInit(&PWM);
 	// TODO: //pwmServoInit (&pwmServi);
 	/// inizializza l'adc e lo prepara a funzionare ad interruzioni.
+
 	initAdc(&DIST);
+	PRINTF("inizializzato ADC\n");
 	/// reset dell'automa di analisi della sintassi
 	resetAutoma(&synSTATO);
+	PRINTF("inizializzato automa comandi\n");
 
 	//servo = (pwm *) &pwmServi;
 
@@ -159,8 +167,10 @@ int main(void) {
 
 	/// abilita le interruzioni
 	EI();
+	PRINTF("abilitate interruzioni\n");
 	/// attende che il sensore vada a regime
-	if (G.IsPresent == OK){
+	//if (G.IsPresent == OK){
+	if (Rot.IsPresent == OK){
 		PRINTF("\nAzzeramento assi giroscopio\n");
 		while (blink < 70){
 			if (procCom == 1){

@@ -170,9 +170,6 @@ void initHW_ADC(){
 	/// abilita il sequencer 0
 	ADCSequenceEnable(ADC0_BASE, 0);
 
-	/// messaggio di benvenuto
-	PRINTF("Ciao: stai provando il converntitore AD!\n");
-
 	/// abilta l'interruzione del sequencer 0
 	ADCIntClear(ADC0_BASE, 0);
     //
