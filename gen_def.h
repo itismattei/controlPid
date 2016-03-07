@@ -10,6 +10,7 @@
 
 #include "gyro_f.h"
 
+
 #define		OFF				4
 #define		ON				2
 #define		OK				0

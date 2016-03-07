@@ -20,11 +20,13 @@ public:
 	void misuraAngoli();
 	void azzeraAssi(void);
 	void printAsseZ(int);
+	int getTemp();
 
 	int16_t buffValori[512];
 	int16_t buffX[512];
 	float  media;
 	float m, q;
+
 
 //private:
 	char IsPresent;
@@ -53,6 +55,8 @@ public:
 	float tick;
 	/// fattori di scala per ciscun asse
 	float kz, ky, kx;
+	/// temepratura
+	int temp;
 };
 
 #endif /* GIROSCOPIO_H_ */

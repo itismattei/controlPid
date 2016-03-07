@@ -317,9 +317,7 @@ int main(void) {
 						continue;
 					PRINTF("mm(%d): %d \t", attesa, MISURE.d_mm[attesa]);
 				}
-				PRINTF("\n********\n");
-				misuraAngoli(&G);
-				PRINTF("\tasse z: %d\n", G.yaw);
+				PRINTF("\nTemperatura %d\n", Rot.getTemp());
 #endif
 			}
 

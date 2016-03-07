@@ -240,3 +240,25 @@ void Giroscopio::misuraAngoli(){
 		}
 	}
 }
+
+///
+/// restituisce la temepratura del sensore
+int Giroscopio::getTemp(){
+
+	int8_t ris;
+	ris = I2CReceive(GYRO_ADDR, OUT_TEMP);
+	/// la temperatura dovrebbe avere 25° come punto unito
+	/// cioe' 25 gradi = 0x19 nel sensore e poi
+	/// la retta ha t = -1 * x + 50  cioe':
+	/// t   |   x
+	/// ----|-----
+	/// 25  |  25
+	/// 30  |  20
+	/// 50  |   0
+	/// 60  | -10
+	/// ........
+	temp = (int)  50 - ris;
+	return temp;
+}
+
+

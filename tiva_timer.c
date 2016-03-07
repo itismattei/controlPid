@@ -113,7 +113,7 @@ void Timer1ISR (void)
 //*****************************************************************************
 
 
-void initTimer0(int interval, gyro *G, ){
+void initTimer0(int interval, gyro *G){
     //
     // Enable lazy stacking for interrupt handlers.  This allows floating-point
     // instructions to be used within interrupt handlers, but at the expense of
