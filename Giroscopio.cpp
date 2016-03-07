@@ -140,12 +140,12 @@ void Giroscopio::setupAssi(char stato){
 	/// lo stato e' cosi' interpretato: bit0: x; bit1: y; bit2: z.
 	/// scrivo nel registro 0x20 il valore 0x0C, cioe' banda minima, modulo on e assi on
 	/// sintassi: indirizzo slave, num parm, indirizzo reg, valore da scrivere
-	mask = 0x08| stato;
+	mask = 0x08 | stato;
 	I2CSend(GYRO_ADDR, 2, CTRL_REG1, mask);
 	if(I2CReceive(GYRO_ADDR, CTRL_REG1) == mask){
 		//GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, GPIO_PIN_1);
 		IsOn = ON;
-		asseOn = stato;
+		asseOn = stato & 0x7;
 	}
 
 	/// set FS to 500 degree per sec.
@@ -250,15 +250,15 @@ int Giroscopio::getTemp(){
 	ris = I2CReceive(GYRO_ADDR, OUT_TEMP);
 	/// la temperatura dovrebbe avere 25° come punto unito
 	/// cioe' 25 gradi = 0x19 nel sensore e poi
-	/// la retta ha t = -1 * x + 50  cioe':
+	/// la retta ha t = -1 * x + 45  cioe':
 	/// t   |   x
 	/// ----|-----
-	/// 25  |  25
-	/// 30  |  20
-	/// 50  |   0
-	/// 60  | -10
+	/// 20  |  25
+	/// 25  |  20
+	/// 45  |   0
+	/// 55  | -10
 	/// ........
-	temp = (int)  50 - ris;
+	temp = (int)  45 - ris;
 	return temp;
 }
 

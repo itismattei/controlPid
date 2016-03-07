@@ -88,6 +88,9 @@
 #define		I2_ORUN				2
 #define		I2_EMPTY			1
 
+/// data rate ODR
+#define		ODR_95				0
+#define		ODR_190				64
 
 #define		FS0					16
 #define		FS1					32

@@ -138,8 +138,8 @@ int main(void) {
 	InitI2C0();
 	/// messaggio d'inizio
 	PRINTF("inizializzato I2C\n");
-	/// inizializza il giroscopio
-	Rot.initGyro(Z_AXIS);
+	/// inizializza il giroscopio con banda a 190Hz invece cha a 95Hz
+	Rot.initGyro(ODR_190 | Z_AXIS);
 	//initGyro(&G, Z_AXIS);
 	tick = 0;
 	/// inizializza il timer 0 e genera un tick da 10 ms
@@ -182,8 +182,11 @@ int main(void) {
 		/// azzeramento degli assi
 		//azzeraAssi(&G);
 		Rot.azzeraAssi();
+		PRINTF("media: ");
 		printFloat(Rot.media, 4);
-		PRINTF("\n");
+		PRINTF("\nm: ");
+		printFloat(Rot.m, 4);
+		PRINTF("\n  q: ");
 		printFloat(Rot.q, 4);
 		PRINTF("\n");
 	}
@@ -280,7 +283,7 @@ int main(void) {
 			/// TODO: il PID viene calcolato ongi 10ms oppure ogni 20ms? Come è meglio?
 
 
-			/* misura gli encoder e calcola spostameti e velocità */
+			/* misura gli encoder e calcola spostamenti e velocità */
 			/* misura i sensori di distanza */
 			if (tick >= 100){
 
@@ -308,7 +311,7 @@ int main(void) {
 				PRINTF("\n");
 
 #endif
-				/// converte la misure grazza in mm
+				/// converte la misure grezza in mm
 				MISURE.rawTomm();
 #ifdef _DEBUG_
 				/// ricopia nella struttare DIST:
