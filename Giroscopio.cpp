@@ -128,6 +128,7 @@ void Giroscopio::initGyro(char assi){
 
 ///
 /// impostazione delle funzionalita del giroscopio
+/// in questo punto imposto la velocita' 250 gradi/secondo
 void Giroscopio::setupAssi(char stato){
 	char mask;
 	uint32_t valore;
@@ -148,11 +149,11 @@ void Giroscopio::setupAssi(char stato){
 	}
 
 	/// set FS to 500 degree per sec.
-	I2CSend(GYRO_ADDR, 2, CTRL_REG4, FS_500);
-	gradiSec = 500;
-	FS = (float) 500 / 32768;
+	I2CSend(GYRO_ADDR, 2, CTRL_REG4, FS_250);
+	gradiSec = 250;
+	FS = (float) 250 / 32768;
 	valore = I2CReceive(GYRO_ADDR,CTRL_REG4);
-	PRINTF("Lettura dal REG4 %d\n", valore);
+	PRINTF("Lettura dal REG4 %d - deg/s %d \n", valore, gradiSec);
 }
 
 ///
