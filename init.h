@@ -11,6 +11,7 @@
 #include "sens_col_ir/sens.h"
 #include "qei.h"
 
+
 #ifndef INIT_H_
 #define INIT_H_
 
@@ -81,16 +82,15 @@ void convertToToken(syn_stat *);
 /// reset dell'automa (o inizializzazione)
 void resetAutoma(syn_stat * STATO);
 void initModule();
-pid * leggiComando(syn_stat *sSTAT, pid CTRL[], pid *p, dati *);
-void rispondiComando(syn_stat *sSTAT, dati *);
+
+
 void sendReply(syn_stat *, uint8_t numChar);
-void dati_a_struttura(gyro *, distanza *, cinematica *, colore *, temperatura* ,survivor *, dati *);
+
 void rispostaRotazione(pid *, syn_stat *);
 void setupUART(int);
 void PRINT_WELCOME(void);
 
-/// invia la lettura di un sensore
-void inviaSensore(syn_stat *, dati *);
+
 
 #ifdef __cplusplus
 }

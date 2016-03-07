@@ -5,6 +5,9 @@
  *      Author: massimo
  */
 
+/// in questa revisione sistemo le misure di distanza secondo quanto previsto dal protocollo di comunicazione.
+
+
 #include "distMis.h"
 
 distMis::distMis() {

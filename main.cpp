@@ -51,6 +51,7 @@
 #include "allineamento/allineamento.h"
 #include "distMis.h"
 #include "Giroscopio.h"
+#include "parse.h"
 
 
 size_t printFloat(double number, uint8_t digits);
@@ -235,7 +236,7 @@ int main(void) {
 		}
 		if (synSTATO.valid == VALIDO && synSTATO.token != ERRORE){
 			/// il comandoche e' stato analizzato ha prodotto un risultat adeguato
-			rispondiComando(&synSTATO, &DATA);
+			rispondiComando(&synSTATO, &DATA, MISURE);
 			/// avendo terminato la risposta, la validità dell'automa
 			/// va rimossa.
 			synSTATO.valid = NON_VALIDO;

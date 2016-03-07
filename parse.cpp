@@ -15,6 +15,8 @@
 #include "pid.h"
 
 #include "sens_col_ir/sens.h"
+#include "distMis.h"
+#include "parse.h"
 
 
 extern volatile uint8_t uart1buffer[16], RX_PTR1, READ_PTR1;
@@ -232,7 +234,7 @@ pid * leggiComando(syn_stat *sSTAT, pid CTRL[], pid *p, dati *data){
 
 		case LETTURA_SENSORE:
 			PRINTF("Sta chiedendo dei dati\n");
-			rispondiComando(sSTAT, data);
+			//rispondiComando(sSTAT, data);
 		break;
 
 		case STOP:
@@ -277,7 +279,7 @@ pid * leggiComando(syn_stat *sSTAT, pid CTRL[], pid *p, dati *data){
 /// fornisce dati dai sensori a seguito di richiesta
 
 
-void rispondiComando(syn_stat *sSTAT, dati *data){
+void rispondiComando(syn_stat *sSTAT, dati *data, distMis& D){
 	/// controlla se la sintazzi e' valida
 	sSTAT->check = 0;
 	if (sSTAT->valid == VALIDO){
@@ -294,7 +296,7 @@ void rispondiComando(syn_stat *sSTAT, dati *data){
 		/// fornisce la risposta alla lettura di un sensore
 		case LETTURA_SENSORE:
 			/// prepara solamente il buffer di risposta
-			inviaSensore(sSTAT, data);
+			inviaSensore(sSTAT, data, &D);
 		break;
 		}
 
@@ -333,7 +335,7 @@ void sendReply(syn_stat *sSTAT, uint8_t numChar){
 }
 
 /// risponde alla richiesta di un sensore
-void inviaSensore(syn_stat *sSTAT, dati *data){
+void inviaSensore(syn_stat *sSTAT, dati *data, distMis * D){
 
 	//TODO: ho aggiunto il puntatore alla struttura del colore, va aggiunto anche quello della temperatura?
 	uint8_t  datoValido = 1;
@@ -346,38 +348,38 @@ void inviaSensore(syn_stat *sSTAT, dati *data){
 		case(1):
 			//risposta con ID del sensore
 			sSTAT->buff_reply[0] = 1;
-			sSTAT->buff_reply[1] = (data->distPtr->d_mm[1]  & 0xFF00) >> 8;
-			sSTAT->buff_reply[2] = data->distPtr->d_mm[1]  & 0x00FF;
+			sSTAT->buff_reply[1] = (D->d_mm[1]  & 0xFF00) >> 8;
+			sSTAT->buff_reply[2] = D->d_mm[1]  & 0x00FF;
 
 			break;
 
 		//sensore di distanza DD2
 		case(2):
 			sSTAT->buff_reply[0] = 2;
-			sSTAT->buff_reply[1] = (data->distPtr->d_mm[2]  & 0xFF00) >> 8;
-			sSTAT->buff_reply[2] = data->distPtr->d_mm[2]  & 0x00FF;
+			sSTAT->buff_reply[1] = (D->d_mm[2]  & 0xFF00) >> 8;
+			sSTAT->buff_reply[2] = D->d_mm[2]  & 0x00FF;
 
 			break;
 
 
 		case(3):
 			sSTAT->buff_reply[0] = 3;
-			sSTAT->buff_reply[1] = (data->distPtr->d_mm[3]  & 0xFF00) >> 8;
-			sSTAT->buff_reply[2] = data->distPtr->d_mm[3]  & 0x00FF;
+			sSTAT->buff_reply[1] = (D->d_mm[3]  & 0xFF00) >> 8;
+			sSTAT->buff_reply[2] = D->d_mm[3]  & 0x00FF;
 
 			break;
 
 		case(4):
 			sSTAT->buff_reply[0] = 4;
-			sSTAT->buff_reply[1] = (data->distPtr->d_mm[4]  & 0xFF00) >> 8;
-			sSTAT->buff_reply[2] = data->distPtr->d_mm[4]  & 0x00FF;
+			sSTAT->buff_reply[1] = (D->d_mm[4]  & 0xFF00) >> 8;
+			sSTAT->buff_reply[2] = D->d_mm[4]  & 0x00FF;
 
 			break;
 
 		case(5):
 			sSTAT->buff_reply[0] = 5;
-			sSTAT->buff_reply[1] = (data->distPtr->d_mm[5] & 0xFF00) >> 8;
-			sSTAT->buff_reply[2] = data->distPtr->d_mm[5]  & 0x00FF;
+			sSTAT->buff_reply[1] = (D->d_mm[5] & 0xFF00) >> 8;
+			sSTAT->buff_reply[2] = D->d_mm[5]  & 0x00FF;
 
 			break;
 
