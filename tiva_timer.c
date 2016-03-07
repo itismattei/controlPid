@@ -45,17 +45,17 @@ void Timer0ISR(void){
 
     procCom = 1;
     tick++;
-    if ((tick % 50) == 0){
-		uint8_t valore = 0;
-		uart1buffer[RX_PTR1++] = 'D';
-		valore += 'D';
-		uart1buffer[RX_PTR1++] = 1;
-		valore += 1;
-		valore ^= 0xA9;
-		uart1buffer[RX_PTR1++] = valore;
-		uart1buffer[RX_PTR1++] = '*';
-		RX_PTR1 &= 0xF;
-	 }
+//    if ((tick % 50) == 0){
+//		uint8_t valore = 0;
+//		uart1buffer[RX_PTR1++] = 'D';
+//		valore += 'D';
+//		uart1buffer[RX_PTR1++] = 1;
+//		valore += 1;
+//		valore ^= 0xA9;
+//		uart1buffer[RX_PTR1++] = valore;
+//		uart1buffer[RX_PTR1++] = '*';
+//		RX_PTR1 &= 0xF;
+//	 }
 
     //
     // Use the flags to Toggle the LED for this timer
@@ -113,7 +113,7 @@ void Timer1ISR (void)
 //*****************************************************************************
 
 
-void initTimer0(int interval, gyro *G){
+void initTimer0(int interval, gyro *G, ){
     //
     // Enable lazy stacking for interrupt handlers.  This allows floating-point
     // instructions to be used within interrupt handlers, but at the expense of

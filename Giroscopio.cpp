@@ -134,6 +134,7 @@ void Giroscopio::setupAssi(char stato){
 	x0 = y0 = z0 = 32767;
 	pitchF = rollF = yawF = pitchP = rollP = yawP = 0.0;
 	gradiSec = 0;
+	/// trovato empiricamente
 	kz = 1.1688;
 	/// lo stato e' cosi' interpretato: bit0: x; bit1: y; bit2: z.
 	/// scrivo nel registro 0x20 il valore 0x0C, cioe' banda minima, modulo on e assi on

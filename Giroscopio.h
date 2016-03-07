@@ -47,6 +47,7 @@ public:
 	float yawP, rollP, pitchP;
 	/// valori di gradi al secondo dedotti dal manuale del giroscopio
 	int16_t gradiSec;
+	/// fondo scala (°/s)
 	float FS;
 	/// intervallo di integrazione in ms
 	float tick;
