@@ -334,6 +334,14 @@ int main(void) {
 //				misuraAccelerazioni(&A);
 			/// le misure del giroscopio invece sono effettuate solo dall'apposito pid
 
+			if (Rot.IsPresent == OK)
+				if (contatore == 1){
+					/// aggiorna l'angolo di yaw
+					Rot.misuraAngoli();
+#ifdef _DEBUG_
+					PRINTF("\tasse z: %d\n", Rot.yaw);
+#endif
+				}
 			/*if(G.IsPresent == OK)
 				if( contatore == 1){
 					/// ogni 10 ms effettua il calcolo del PID
