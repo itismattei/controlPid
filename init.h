@@ -41,7 +41,7 @@
 #define		TRUE				'1'
 #define		FALSE				'0'
 
-
+#define		INT_STEP_10_MS		10
 
 
 

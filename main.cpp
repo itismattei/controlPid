@@ -144,8 +144,10 @@ int main(void) {
 	//initGyro(&G, Z_AXIS);
 	tick = 0;
 	/// inizializza il timer 0 e genera un tick da 10 ms
-	initTimer0(10, &G);
+	initTimer0(INT_STEP_10_MS, &G);
 	PRINTF("inizializzato TIMER0\n");
+	/// imposta il passo di integrazione per il calcolo dell'angolo
+	Rot.tick = (ROM_SysCtlClockGet() / 1000) * INT_STEP_10_MS;
 	/// inizializza il timer 1
 	//initTimer1(100);
 	/// inizializza il contatore della persistenza del comando
