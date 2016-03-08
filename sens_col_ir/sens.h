@@ -37,11 +37,13 @@ typedef struct _colore{
 	int bianco;
 } colore;
 
+/// indica le mattonelle scure da evitare
 typedef struct _tile{
 	char isDark;
 } tile;
 
 typedef struct _survivor{
+	///contatore dei sopravvissuti trovati
 	uint8_t isSurvivor;
 } survivor;
 

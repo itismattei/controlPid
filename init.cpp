@@ -6,6 +6,11 @@
  */
 
 #include "init.h"
+#include "distMis.h"
+#include "Giroscopio.h"
+#include "parse.h"
+
+
 
 void initModule(){
 	;
@@ -22,3 +27,14 @@ void dati_a_struttura(gyro *G, distanza *D, cinematica *CIN, colore *COL, temper
 }
 
 
+void datiRaccolti(distanza *D, cinematica *CIN, colore *COL, temperatura *TEMP, survivor *SUR, distMis *DIS, Giroscopio *GYRO, glb *GLB ){
+
+	GLB->surPtr 	= SUR;
+
+	GLB->cinPtr 	= CIN;
+	GLB->colPtr 	= COL;
+	GLB->distPtr 	= D;
+	GLB->tempPtr 	= TEMP;
+	GLB->DSTptr 	= DIS;
+	GLB->gyro		= GYRO;
+}

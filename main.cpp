@@ -54,7 +54,7 @@
 #include "parse.h"
 
 
-size_t printFloat(double number, uint8_t digits);
+
 
 /// variabili globali
 volatile int procCom = 0, tick;
@@ -83,7 +83,7 @@ int main(void) {
 	gyro G;
 	Giroscopio Rot;
 	//accelerazione A;
-	//cinematica CIN;
+	cinematica CIN;
 	/// servono differenti PID, almeno uno per la rotazione ed uno per lo spostamento
 	/// per la rotazione sarebbero interessante usarne 2, uno per la ortazione soft ed uno per la rotazione
 	/// brusca.
@@ -93,14 +93,14 @@ int main(void) {
 	/// modulo zigbee per telemetria
 	//xbee XB;
 	/// pwm servi e motori
-	//pwm PWM, pwmServi;
+	pwm PWM, pwmServi;
 	/// struttura del sensore di colore
-	//colore COL;
+	colore COL;
 	/// sensore di temperatura ad infrarossi
-	//temperatura TEMP;
+	temperatura TEMP;
 	//TEMPER sensIR;
-	/// indormazioni sul sopravvissuto
-	//survivor SUR;
+	/// informazioni sul sopravvissuto
+	survivor SUR;
 	//inizializzazione struttura per qei
 	//qei QEI;
 	/// oggetto che riallinea il mezzo
@@ -112,17 +112,17 @@ int main(void) {
 	dPtr = &DIST;
 
 
-	//TEMPptr =  &TEMP;
+	TEMPptr =  &TEMP;
 //	CIN.Aptr = &A;
 //	CIN.distPTR = &DIST;
 //	CIN.vel = 0.0;
 
-	dati DATA;
-	DATA.distPtr = &DIST;
+	glb  COLLECTDATA;
+	//DATA.distPtr = &DIST;
 	//passaggio degli indirizzi delle strutture alla struttura generale
 	//dati_a_struttura(&G, &DIST, &CIN, &COL, &TEMP, &SUR, &DATA);
-
-	/// commento per provare il merge su server remoto
+	/// l'oggetto COLLECTDATA (glb) e' una struttara che contiene i puntatori alle strutture e classi del progetto
+	datiRaccolti(&DIST, &CIN, &COL, &TEMP, &SUR, &MISURE, &Rot, &COLLECTDATA);
 
 	/// setup di base
 	setupMCU();
@@ -236,7 +236,7 @@ int main(void) {
 		}
 		if (synSTATO.valid == VALIDO && synSTATO.token != ERRORE){
 			/// il comandoche e' stato analizzato ha prodotto un risultat adeguato
-			rispondiComando(&synSTATO, &DATA, MISURE);
+			rispondiComando(&synSTATO, &COLLECTDATA);
 			/// avendo terminato la risposta, la validità dell'automa
 			/// va rimossa.
 			synSTATO.valid = NON_VALIDO;
@@ -365,7 +365,7 @@ int main(void) {
 
 
 
-size_t printFloat(double number, uint8_t digits){
+uint8_t printFloat(double number, uint8_t digits){
 
   //size_t n = 0;
 
@@ -378,7 +378,7 @@ size_t printFloat(double number, uint8_t digits){
 
   // Round correctly so that print(1.999, 2) prints as "2.00"
   double rounding = 0.5;
-  for (uint8_t i=0; i<digits; ++i)
+  for (uint8_t i = 0; i < digits; ++i)
     rounding /= 10.0;
 
   number += rounding;

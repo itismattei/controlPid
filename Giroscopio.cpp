@@ -262,4 +262,29 @@ int Giroscopio::getTemp(){
 	return temp;
 }
 
+extern volatile int procCom;
+///
+/// primo azzeramento degli assi del giroscopio
+void Giroscopio::primoAzzeramento(){
+	int blink = 0;
+	if (IsPresent == OK){
+		PRINTF("\nAzzeramento assi giroscopio\n");
+		while (blink < 70){
+			if (procCom == 1){
+				procCom = 0;
+				blink++;
+			}
+		}
 
+		/// azzeramento degli assi
+		//azzeraAssi(&G);
+		azzeraAssi();
+		PRINTF("media: ");
+		printFloat(media, 4);
+		PRINTF("\nm: ");
+		printFloat(m, 4);
+		PRINTF("\n  q: ");
+		printFloat(q, 4);
+		PRINTF("\n");
+	}
+}

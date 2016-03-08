@@ -21,6 +21,7 @@ public:
 	void azzeraAssi(void);
 	void printAsseZ(int);
 	int getTemp();
+	void primoAzzeramento(void);
 
 	int16_t buffValori[512];
 	int16_t buffX[512];
@@ -58,5 +59,7 @@ public:
 	/// temepratura
 	int temp;
 };
+
+uint8_t printFloat(double number, uint8_t digits);
 
 #endif /* GIROSCOPIO_H_ */

@@ -15,14 +15,27 @@
 #include "qei.h"
 #include "distMis.h"
 
+#include "Giroscopio.h"
+
+typedef struct _glb{
+	gyro 		*gPtr;
+	temperatura *tempPtr;
+	colore 		*colPtr;
+	distanza 	*distPtr;
+	cinematica 	*cinPtr;
+	qei 		*qeiPtr;
+	survivor 	*surPtr;
+	distMis 	*DSTptr;
+	Giroscopio  *gyro;
+} glb;
 
 
-
-void rispondiComando(syn_stat *sSTAT, dati *, distMis &);
+void rispondiComando(syn_stat *sSTAT, glb *);
 /// invia la lettura di un sensore
-void inviaSensore(syn_stat *, dati *, distMis *);
+void inviaSensore(syn_stat *,  glb*);
 
 void dati_a_struttura(gyro *, distanza *, cinematica *, colore *, temperatura* ,survivor *, dati *);
+void datiRaccolti(distanza *D, cinematica *CIN, colore *COL, temperatura *TEMP, survivor *SUR, distMis *DIS, Giroscopio *GYRO, glb *GLB );
 
 pid * leggiComando(syn_stat *sSTAT, pid CTRL[], pid *p, dati *);
 

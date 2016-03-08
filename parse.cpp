@@ -279,32 +279,34 @@ pid * leggiComando(syn_stat *sSTAT, pid CTRL[], pid *p, dati *data){
 /// fornisce dati dai sensori a seguito di richiesta
 
 
-void rispondiComando(syn_stat *sSTAT, dati *data, distMis& D){
+void rispondiComando(syn_stat *sSTAT, glb *colletedD){
 	/// controlla se la sintazzi e' valida
 	sSTAT->check = 0;
+	/// controllo ridondante gia' effettuato
 	if (sSTAT->valid == VALIDO){
-
+		/// analizza il token e per il momento risposnde alle richieste di dati
+		/// i tokens sono: MISURA_GRADI LETTURA_SENSORE (con nuero di sensore in sSTAT.cmd[1])
 		switch(sSTAT->token){
 
-		case MISURA_GRADI:
-			sSTAT->buff_reply[0] = 'G';
-			sSTAT->buff_reply[1] = (data->gPtr->yaw  & 0xFF00) >> 8;
-			sSTAT->buff_reply[2] = data->gPtr->yaw  & 0x00FF;
-
-		break;
+//		case MISURA_GRADI:
+//			sSTAT->buff_reply[0] = 'G';
+//			sSTAT->buff_reply[1] = (data->gPtr->yaw  & 0xFF00) >> 8;
+//			sSTAT->buff_reply[2] = data->gPtr->yaw  & 0x00FF;
+//
+//		break;
 
 		/// fornisce la risposta alla lettura di un sensore
 		case LETTURA_SENSORE:
 			/// prepara solamente il buffer di risposta
-			inviaSensore(sSTAT, data, &D);
+			inviaSensore(sSTAT, colletedD);
 		break;
 		}
 
-		int i;
+		/// se il dato e' valido viene trasmesso al richiedente (raspberry)
 		if (sSTAT->dato_valido == 1){
 			sSTAT->check  = 0;
 		/// calcolo checksum
-			for(i = 0; i < 3; i++)
+			for(int i = 0; i < 3; i++)
 				/// calcola il checksum
 				sSTAT->check ^= sSTAT->buff_reply[i];
 
@@ -314,11 +316,11 @@ void rispondiComando(syn_stat *sSTAT, dati *data, distMis& D){
 			sSTAT->buff_reply[4] = '*';
 		}
 		else
-			for ( i = 0; i < 5; i++)
+			for (int  i = 0; i < 5; i++)
 				sSTAT->buff_reply[i] = 0;
-		/// la spedizione avviene sopra
 
-		///sendReply(sSTAT, 4);
+		/// invia i 4 byte su seriale. L'ultimo e' invato dalla funzione sendReply
+		sendReply(sSTAT, 4);
 	}
 }
 
@@ -334,52 +336,53 @@ void sendReply(syn_stat *sSTAT, uint8_t numChar){
 	UARTCharPut(UART1_BASE, '*');
 }
 
+///
 /// risponde alla richiesta di un sensore
-void inviaSensore(syn_stat *sSTAT, dati *data, distMis * D){
+void inviaSensore(syn_stat *sSTAT, glb * collectedD){
 
 	//TODO: ho aggiunto il puntatore alla struttura del colore, va aggiunto anche quello della temperatura?
 	uint8_t  datoValido = 1;
 	//analizzo il secondo byte, che è quello contentente l'ID del sensore
 	//se ci dovesse essere un sensore in più quello va come case (0)
-	switch(sSTAT->cmd[1])
-	{
-		//i sensori vengono numerati da quello davanti in senso antiorario
-		//sensore di distanza DD1
+	switch(sSTAT->cmd[1]){
+		// i sensori vengono numerati da quello davanti in senso antiorario
+		// la misura dfornita e' in millimetri
+		// sensore di distanza DD1
 		case(1):
 			//risposta con ID del sensore
 			sSTAT->buff_reply[0] = 1;
-			sSTAT->buff_reply[1] = (D->d_mm[1]  & 0xFF00) >> 8;
-			sSTAT->buff_reply[2] = D->d_mm[1]  & 0x00FF;
+			sSTAT->buff_reply[1] = (collectedD->DSTptr->d_mm[1]  & 0xFF00) >> 8;
+			sSTAT->buff_reply[2] = collectedD->DSTptr->d_mm[1]  & 0x00FF;
 
 			break;
 
 		//sensore di distanza DD2
 		case(2):
 			sSTAT->buff_reply[0] = 2;
-			sSTAT->buff_reply[1] = (D->d_mm[2]  & 0xFF00) >> 8;
-			sSTAT->buff_reply[2] = D->d_mm[2]  & 0x00FF;
+			sSTAT->buff_reply[1] = (collectedD->DSTptr->d_mm[2]  & 0xFF00) >> 8;
+			sSTAT->buff_reply[2] = collectedD->DSTptr->d_mm[2]  & 0x00FF;
 
 			break;
 
-
+		/// sensore di distanza anteriore
 		case(3):
 			sSTAT->buff_reply[0] = 3;
-			sSTAT->buff_reply[1] = (D->d_mm[3]  & 0xFF00) >> 8;
-			sSTAT->buff_reply[2] = D->d_mm[3]  & 0x00FF;
+			sSTAT->buff_reply[1] = (collectedD->DSTptr->d_mm[3]  & 0xFF00) >> 8;
+			sSTAT->buff_reply[2] = collectedD->DSTptr->d_mm[3]  & 0x00FF;
 
 			break;
 
 		case(4):
 			sSTAT->buff_reply[0] = 4;
-			sSTAT->buff_reply[1] = (D->d_mm[4]  & 0xFF00) >> 8;
-			sSTAT->buff_reply[2] = D->d_mm[4]  & 0x00FF;
+			sSTAT->buff_reply[1] = (collectedD->DSTptr->d_mm[4]  & 0xFF00) >> 8;
+			sSTAT->buff_reply[2] = collectedD->DSTptr->d_mm[4]  & 0x00FF;
 
 			break;
 
 		case(5):
 			sSTAT->buff_reply[0] = 5;
-			sSTAT->buff_reply[1] = (D->d_mm[5] & 0xFF00) >> 8;
-			sSTAT->buff_reply[2] = D->d_mm[5]  & 0x00FF;
+			sSTAT->buff_reply[1] = (collectedD->DSTptr->d_mm[5] & 0xFF00) >> 8;
+			sSTAT->buff_reply[2] = collectedD->DSTptr->d_mm[5]  & 0x00FF;
 
 			break;
 
@@ -393,38 +396,38 @@ void inviaSensore(syn_stat *sSTAT, dati *data, distMis * D){
 		//lettura giroscopio (angolo tra 0 e 360°)
 		case(6):
 				sSTAT->buff_reply[0] = 6;
-				sSTAT->buff_reply[1] = (data->gPtr->yaw & 0xFF00) >> 8;
-				sSTAT->buff_reply[2] = data->gPtr->yaw & 0x00FF;
+				sSTAT->buff_reply[1] = (collectedD->gyro->yaw & 0xFF00) >> 8;
+				sSTAT->buff_reply[2] = collectedD->gyro->yaw & 0x00FF;
 				break;
 
 		//lettura luminosità (valore tra 0 e 255)
 		case(7):
 					sSTAT->buff_reply[0] = 8;
-					sSTAT->buff_reply[1] = (data->colPtr->luminanza & 0xFF00) >> 8;
-					sSTAT->buff_reply[2] = data->colPtr->luminanza & 0x00FF;
+					sSTAT->buff_reply[1] = (collectedD->colPtr->luminanza & 0xFF00) >> 8;
+					sSTAT->buff_reply[2] = collectedD->colPtr->luminanza & 0x00FF;
 				break;
 
 		//lettura temperatura (valore tra 20 e 40)
 		case(8):
 					sSTAT->buff_reply[0] = 8;
-					sSTAT->buff_reply[1] = ((int)data->tempPtr->Temp & 0xFF00) >> 8;
-					sSTAT->buff_reply[2] = (int)data->tempPtr->Temp & 0x00FF;
+					sSTAT->buff_reply[1] = ((int)collectedD->tempPtr->Temp & 0xFF00) >> 8;
+					sSTAT->buff_reply[2] = (int)collectedD->tempPtr->Temp & 0x00FF;
 				break;
 
 		//velocità (cm/s)
 		case(9):
 				sSTAT->buff_reply[0] = 9;
 				//cast necessario, bisogna passare un intero
-				sSTAT->buff_reply[1] = ((int)data->cinPtr->vel  & 0xFF00) >> 8;
-				sSTAT->buff_reply[2] = (int)data->cinPtr->vel  & 0x00FF;
+				sSTAT->buff_reply[1] = ((int)collectedD->cinPtr->vel  & 0xFF00) >> 8;
+				sSTAT->buff_reply[2] = (int)collectedD->cinPtr->vel  & 0x00FF;
 				break;
 
 		//distanza percorsa (cm)
 		case(10):
 				sSTAT->buff_reply[0] = 10;
 				//cast necessario, bisogna passare un intero
-				sSTAT->buff_reply[1] = ((int)data->cinPtr->spazio[0]  & 0xFF00) >> 8;
-				sSTAT->buff_reply[2] = (int)data->cinPtr->spazio[0]  & 0x00FF;
+				sSTAT->buff_reply[1] = ((int)collectedD->cinPtr->spazio[0]  & 0xFF00) >> 8;
+				sSTAT->buff_reply[2] = (int)collectedD->cinPtr->spazio[0]  & 0x00FF;
 				break;
 
 		default:
@@ -435,6 +438,7 @@ void inviaSensore(syn_stat *sSTAT, dati *data, distMis * D){
 		break;
 	}
 
+	/// tiene nella struttura della sintassi se il dato richiesto e' valido oppure non lo e'
 	if (datoValido == 1)
 		sSTAT->dato_valido = 1;
 	else
