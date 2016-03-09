@@ -19,6 +19,7 @@
 #include "driverlib/interrupt.h"
 #include "driverlib/pin_map.h"
 #include "driverlib/rom.h"
+#include "../distMis.h"
 
 
 #define ADC_SEQ                 (ADC_O_SSMUX0)
@@ -93,8 +94,10 @@ int32_t ADCSequenceData_Get(uint32_t ui32Base, uint32_t ui32SequenceNum, uint32_
 
 
 extern  distanza *dPtr;
+
 #include "../distMis.h"
-extern  distMis *misPtr;
+extern  distMis *distMisPtr;
+
 volatile extern  int ADCflag;
 volatile uint32_t numByte;
 
@@ -107,7 +110,8 @@ extern "C" {
 void adcISR(void){
 	volatile uint32_t attesa;
 	ADCIntClear(ADC0_BASE, 0);
-	numByte = ADCSequenceData_Get(ADC0_BASE, 0, dPtr->dI);    // Read ADC Value.
+	//numByte = ADCSequenceData_Get(ADC0_BASE, 0, dPtr->dI);    // Read ADC Value.
+	numByte = ADCSequenceData_Get(ADC0_BASE, 0, distMisPtr->dI);    // Read ADC Value.
 	/// finito di trascrivere i dati, spegne il pin di segnalazione
 	HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_5 << 2))) &=  ~GPIO_PIN_5;
 	/// riavvia il campionamento

@@ -64,6 +64,8 @@ volatile int ADCflag = 0;
 extern volatile uint8_t uart1buffer[16], RX_PTR1, READ_PTR1;
 
 volatile distanza *dPtr;
+/// puntatore globale per scrivere dentro usando la routine di servizio delle interruzioni
+volatile distMis *distMisPtr;
 void *servo;
 temperatura *TEMPptr;
 
@@ -74,7 +76,7 @@ int main(void) {
 	volatile int16_t val1 = 0, x, y, z;
 	distanza DIST;
 	distMis  MISURE;
-
+	distMisPtr = &MISURE;
 	//--------------------------//
 	///definizione strutture/////
 	//-------------------------//
@@ -301,9 +303,11 @@ int main(void) {
 			if(ADCflag == 1){
 				/// arrivata una nuova conversione AD
 				ADCflag = 0;
-				/// i dati grezzi vongono copiati nella classe distMis
-				for (int i = 0; i < 6; i++)
-					MISURE.dI[i] = DIST.dI[i];
+				/// i dati grezzi vongono copiati nella classe distMis.
+				/// verificato il funzionamento del puntatore in adc.cpp
+				/// le due righe successive possono essere tolte.
+				//for (int i = 0; i < 6; i++)
+				//	MISURE.dI[i] = DIST.dI[i];
 #ifdef _DEBUG_
 				for(int i = 1; i < 6; i++){
 					if (i == 3)
