@@ -149,7 +149,7 @@ int main(void) {
 	initTimer0(INT_STEP_10_MS, &G);
 	PRINTF("inizializzato TIMER0\n");
 	/// imposta il passo di integrazione per il calcolo dell'angolo
-	Rot.tick = (ROM_SysCtlClockGet() / 1000) * INT_STEP_10_MS;
+	Rot.tick = (INT_STEP_10_MS / 1000) ;
 	/// inizializza il timer 1
 	//initTimer1(100);
 	/// inizializza il contatore della persistenza del comando
@@ -337,15 +337,20 @@ int main(void) {
 //			if(A.isPresent)
 //				misuraAccelerazioni(&A);
 			/// le misure del giroscopio invece sono effettuate solo dall'apposito pid
-
-			if (Rot.IsPresent == OK)
-				if (contatore == 1){
+			if (procCom == 1 ){
+				contatore++;
+				procCom = 0;
+				if (Rot.IsPresent == OK){
 					/// aggiorna l'angolo di yaw
 					Rot.misuraAngoli();
 #ifdef _DEBUG_
-					PRINTF("\tasse z: %d\n", Rot.yaw);
+					if(contatore >= 100){
+						contatore = 0;
+						PRINTF("\tasse z: %d\n", Rot.yaw);
+					}
 #endif
 				}
+			}
 			/*if(G.IsPresent == OK)
 				if( contatore == 1){
 					/// ogni 10 ms effettua il calcolo del PID
