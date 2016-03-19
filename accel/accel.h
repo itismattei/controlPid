@@ -52,7 +52,7 @@ public:
 
 	void impostaAccel();
 	void misuraAccelerazioni();
-	bool testAccel();
+	void testAccel();
 
 	float 	a[3];			/// valori di accelerazione lungo i 3 assi
 	bool  	isPresent;		/// presenza dell'accelerometro

@@ -119,6 +119,7 @@ void setupMCU();
 void attesa(int);
 void minQuad(int16_t *, int16_t *, int, float *, float *);
 void blinkBlueLed();
+void blinkRedLed();
 
 #ifdef __cplusplus
 }

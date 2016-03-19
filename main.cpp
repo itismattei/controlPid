@@ -34,7 +34,7 @@
 #include "uartp/cmdline.h"
 #include "I2C/tiva_i2c.h"
 #include "gyro_init.h"
-#include "accel/accel1.h"
+#include "accel/accel.h"
 #include "gen_def.h"
 #include "gyro_f.h"
 #include "uartp/uart.h"
@@ -85,6 +85,7 @@ int main(void) {
 	gyro G;
 	Giroscopio Rot;
 	//accelerazione A;
+	accelerometro A;
 	cinematica CIN;
 	/// servono differenti PID, almeno uno per la rotazione ed uno per lo spostamento
 	/// per la rotazione sarebbero interessante usarne 2, uno per la ortazione soft ed uno per la rotazione
@@ -166,7 +167,11 @@ int main(void) {
 	PRINTF("inizializzato automa comandi\n");
 
 	//servo = (pwm *) &pwmServi;
-
+	/// inizializzazione accelerometro
+	A.testAccel();
+	if (A.isPresent == true)
+		/// imposta l'accelerometro
+		A.impostaAccel();
 	/// iniziailizzazione del lettore encoder
 	//qei_init(&QEI);
 
@@ -364,6 +369,10 @@ int main(void) {
 						printFloat(Rot.yawF, 4);
 						PRINTF("\t");
 						printFloat(Rot.yawF0, 4);
+						if (A.isPresent == true){
+							PRINTF("\t");
+							A.misuraAccelerazioni();
+						}
 						PRINTF("\n");
 					}
 #endif

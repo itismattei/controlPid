@@ -34,6 +34,20 @@ void blinkBlueLed(){
 	GPIOPinWrite(GPIO_PORTF_BASE, BLUE_LED, 0);
 }
 
+
+void blinkRedLed(){
+	volatile uint32_t i;
+	/// per segnalalre la presenza del giroscopio lampeggia 2 volte
+	GPIOPinWrite(GPIO_PORTF_BASE, RED_LED, RED_LED);
+	for (i = 3000000; i > 0; i--);
+	GPIOPinWrite(GPIO_PORTF_BASE, RED_LED, 0);
+	for (i = 3000000; i > 0; i--);
+	GPIOPinWrite(GPIO_PORTF_BASE, RED_LED, RED_LED);
+	for (i = 3000000; i > 0; i--);
+	GPIOPinWrite(GPIO_PORTF_BASE, RED_LED, 0);
+}
+
+
 void initGyro(gyro *G, char assi){
 	volatile uint32_t valore;
 	G->IsOn = OFF;
