@@ -26,7 +26,7 @@
 
 Giroscopio::Giroscopio() {
 	// TODO Auto-generated constructor stub
-
+	tempReg = 0;
 }
 
 Giroscopio::~Giroscopio() {
@@ -71,7 +71,7 @@ void Giroscopio::azzeraAssi(){
 		/// asse z ON
 
 		media = 0;
-		while(conteggio < 512){
+		while(conteggio < 64){
 			/// effettua 32 letture e calcola la media
 			valore = I2CReceive(GYRO_ADDR,STATUS_REG);
 			//PRINTF("REG_STAT 0x%x\n", valore);
@@ -86,11 +86,12 @@ void Giroscopio::azzeraAssi(){
 				for (int i = 0; i < 50000; i++);
 			}
 		}
-		media /= 512.0;
+		media /= 64.0;
 
-		printAsseZ(512);
-		minQuad(buffX, buffValori, 512, &m, &q);
+		//printAsseZ(64);
+		minQuad(buffX, buffValori, 64, &m, &q);
 		z0 = (int16_t) media;
+		//tempReg = 0;
 	break;
 	}
 }
@@ -151,7 +152,7 @@ void Giroscopio::setupAssi(char stato){
 	/// set FS to 500 degree per sec.
 	I2CSend(GYRO_ADDR, 2, CTRL_REG4, FS_250);
 	gradiSec = 250;
-	FS = (float) 250 / 32768;
+	FS = (float) 250.0 / 32768.0;
 	valore = I2CReceive(GYRO_ADDR,CTRL_REG4);
 	PRINTF("Lettura dal REG4 %d - deg/s %d \n", valore, gradiSec);
 }
@@ -173,28 +174,37 @@ void Giroscopio::misuraAngoli(){
 		/// stato = readI2C_N_Byte(OUT_X_L_M, 6, buff);			/// compass
 		if ((asseOn & Z_AXIS) == Z_AXIS){
 			I2CReceiveN(GYRO_ADDR, OUT_Z_L | MUL_READ , 2, buffer);
-			z = (int16_t)((buffer[1]<< 8) + buffer[0]) - z0;
+			z = (int16_t)((buffer[1]<< 8) + buffer[0]);
+			tmp = z;
+			z = z - z0;
+			/// usa la retta di regressione
+			tmp -=  q;
+
 			/// integrazione rettangolare: valore letto * fondo scala * intervallo di tempo di integrazione
 			/// posto a 10ms
 			f = z * DPS * kz;
 			f *= tick;
 			yawF += f;
+			f = tmp * DPS * kz;
+			f *= tick;
+			yawF0 += f;
+//			if (tempoDiReset >= 1000){
+/// TODO: SE NON STA RUOTANDO POTREBBE EFFETTUARE UN AZZERAMENTO ASSI
 
-			if (tempoDiReset >= 1000){
-				/// sono passati 5 secondi e dovrebbe ricalcolare l'offset degli assi
-				/// dovrebbe calcolare se G->yawF è cambiato di almeno 1 grado rispetto ai 5 secondi precedenti
-				/// se non è cmbiato dovrebbe azzerare la parte frazionaria
-				if ((yawF - yawP < 1.0) && (yawF - yawP > -1.0)){
-					/// dopo 5 secondi non ho avuto variazioni significative e quindi ho integrato l'errore del
-					/// sensore
-					yawF = yawP;
-				}
-				else{
-					tmp = (int16_t)yawF;
-					yawP = (float) tmp;
-				}
-				tempoDiReset = 0;
-			}
+//				/// sono passati 10 secondi e dovrebbe ricalcolare l'offset degli assi
+//				/// dovrebbe calcolare se G->yawF è cambiato di almeno 1 grado rispetto ai 5 secondi precedenti
+//				/// se non è cambiato dovrebbe azzerare la parte frazionaria
+//				if ((yawF - yawP < 1.0) && (yawF - yawP > -1.0)){
+//					/// dopo 5 secondi non ho avuto variazioni significative e quindi ho integrato l'errore del
+//					/// sensore
+//					yawF = yawP;
+//				}
+//				else{
+//					tmp = (int16_t)yawF;
+//					yawP = (float) tmp;
+//				}
+//				tempoDiReset = 0;
+//			}
 			/// riporta il valore ad intero
 			yaw = (int16_t) yawF;
 		}
@@ -279,11 +289,11 @@ void Giroscopio::primoAzzeramento(){
 		/// azzeramento degli assi
 		//azzeraAssi(&G);
 		azzeraAssi();
-		PRINTF("media: ");
+		PRINTF("media:\t ");
 		printFloat(media, 4);
-		PRINTF("\nm: ");
+		PRINTF("\nm:\t ");
 		printFloat(m, 4);
-		PRINTF("\n  q: ");
+		PRINTF("\n  q:\t ");
 		printFloat(q, 4);
 		PRINTF("\n");
 	}

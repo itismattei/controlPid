@@ -25,6 +25,7 @@ public:
 
 	int16_t buffValori[512];
 	int16_t buffX[512];
+	int16_t tempReg;
 	float  media;
 	float m, q;
 
@@ -43,7 +44,7 @@ public:
 	int16_t pitch;	/// asse x
 
 	/// valori attuali degli assi
-	float yawF;
+	float yawF, yawF0;
 	float rollF;
 	float pitchF;
 	/// valori precedenti degli assi

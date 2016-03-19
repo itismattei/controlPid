@@ -1,19 +1,7 @@
-/*
- * accel_init.h
- *
- *  Created on: 30/dic/2013
- *      Author: robotics
- */
 
-#ifndef ACCEL_INIT_H_
-#define ACCEL_INIT_H_
 
-#include <stdbool.h>
-#include <stdint.h>
-#include "../I2C/tiva_i2c.h"
-#include "../uartp/uart.h"
-#include "../uartp/uartstdio.h"
-
+#ifndef _ACCEL1_H_
+#define _ACCEL1_H_
 
 ///////////////////////////////////////////////
 ///// ADDRESS
@@ -58,24 +46,20 @@
 
 #define 	MUL_READ		0x80
 
-typedef struct _accel{
+class accelerometro {
+public:
+	accelerometro(){;}
+
+	void impostaAccel();
+	void misuraAccelerazioni();
+	bool testAccel();
 
 	float 	a[3];			/// valori di accelerazione lungo i 3 assi
 	bool  	isPresent;		/// presenza dell'accelerometro
 
-} accelerazione;
 
-#ifdef __cplusplus
-extern "C" {
+};
+
+
+
 #endif
-
-bool testAccel(void);
-void impostaAccel(accelerazione *);
-void misuraAccelerazioni(accelerazione *);
-
-#ifdef __cplusplus
-}
-#endif
-
-
-#endif /* ACCEL_INIT_H_ */

@@ -17,6 +17,7 @@
 #include "sens_col_ir/sens.h"
 #include "distMis.h"
 #include "parse.h"
+#include "uartp/uartstdio.h"
 
 
 extern volatile uint8_t uart1buffer[16], RX_PTR1, READ_PTR1;

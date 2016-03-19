@@ -34,7 +34,7 @@
 #include "uartp/cmdline.h"
 #include "I2C/tiva_i2c.h"
 #include "gyro_init.h"
-#include "accel/accel_init.h"
+#include "accel/accel1.h"
 #include "gen_def.h"
 #include "gyro_f.h"
 #include "uartp/uart.h"
@@ -44,7 +44,7 @@
 #include "xbee/xbee.h"
 #include "pwm/pwm.h"
 #include "adc/adc.h"
-#include "accel/accel_init.h"
+
 #include "pwm/pwm.h"
 #include "qei.h"
 #include "sens_col_ir/sens1.h"
@@ -149,7 +149,7 @@ int main(void) {
 	initTimer0(INT_STEP_10_MS, &G);
 	PRINTF("inizializzato TIMER0\n");
 	/// imposta il passo di integrazione per il calcolo dell'angolo
-	Rot.tick = (INT_STEP_10_MS / 1000) ;
+	Rot.tick = (INT_STEP_10_MS / 1000.0) ;
 	/// inizializza il timer 1
 	//initTimer1(100);
 	/// inizializza il contatore della persistenza del comando
@@ -191,7 +191,7 @@ int main(void) {
 		printFloat(Rot.media, 4);
 		PRINTF("\nm: ");
 		printFloat(Rot.m, 4);
-		PRINTF("\n  q: ");
+		PRINTF("\nq: ");
 		printFloat(Rot.q, 4);
 		PRINTF("\n");
 	}
@@ -228,8 +228,22 @@ int main(void) {
 //	///
 //	qei_test(&QEI);
 	/// task principale
+	int tempCont = 0;
 	while(1){
 
+		if (HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_0 << 2))) != GPIO_PIN_0){
+			PRINTF("Azzeramento assi \n");
+			Rot.azzeraAssi();
+			PRINTF("media:\t ");
+			printFloat(Rot.media, 4);
+			PRINTF("\nm:\t ");
+			printFloat(Rot.m, 4);
+			PRINTF("\nq:\t ");
+			printFloat(Rot.q, 4);
+			PRINTF("\n");
+			//Rot.yawF = 0.0;
+			tempCont = 0;
+		}
 		///extern volatile uint8_t uart1buffer[16], RX_PTR1, READ_PTR1;
 		/*    *****     */
 		// controllo di messaggio sulla seriale 1 (ricevuto comando da rasp
@@ -346,7 +360,11 @@ int main(void) {
 #ifdef _DEBUG_
 					if(contatore >= 100){
 						contatore = 0;
-						PRINTF("\tasse z: %d\n", Rot.yaw);
+						PRINTF("%d\tasse z: %d\t",tempCont++, Rot.yaw);
+						printFloat(Rot.yawF, 4);
+						PRINTF("\t");
+						printFloat(Rot.yawF0, 4);
+						PRINTF("\n");
 					}
 #endif
 				}

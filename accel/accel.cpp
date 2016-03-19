@@ -6,7 +6,13 @@
  */
 
 
-#include "accel_init.h"
+//#include "accel.h"
+#include "accel1.h"
+#include <stdbool.h>
+#include <stdint.h>
+#include "../I2C/tiva_i2c.h"
+#include "../uartp/uart.h"
+#include "../uartp/uartstdio.h"
 
 
 	/*          INIT ACCELEROMETER REGISTERS                */
@@ -14,7 +20,7 @@
 		//valore = readI2CByteFromAddress(CTRL_REG1_A, &stato);
 		//stato =  writeI2CByte(CTRL_REG1_A, ODR1 + ODR0 + ZaxEN + YaxEN + XaxEN);
 
-bool testAccel(){
+bool accelerometro::testAccel(){
 
 	volatile uint32_t valore;
 
@@ -29,7 +35,7 @@ bool testAccel(){
 
 ///
 /// avvia il modulo accelerometro
-void impostaAccel(accelerazione *A){
+void accelerometro::impostaAccel(){
 
 	volatile uint32_t valore;
 	/// imposta il campionamento a 50 sample / s ed abilita i 3 assi
@@ -43,7 +49,7 @@ void impostaAccel(accelerazione *A){
 ///
 /// misura i dati forniti dall'accelelrometro se disponibili
 /// sono restituiti nella struct passata per indirizzo
-void misuraAccelerazioni(accelerazione *A){
+void accelerometro::misuraAccelerazioni(){
 
 	volatile int x, y, z;
 	uint8_t buffer[8];
@@ -53,9 +59,9 @@ void misuraAccelerazioni(accelerazione *A){
 		x = (int16_t)((buffer[1]<< 8) + buffer[0]);
 		y = (int16_t)((buffer[3]<< 8) + buffer[2]);
 		z = (int16_t)((buffer[5]<< 8) + buffer[4]);
-		A->a[0] = (float) x * 2 / 32768;
-		A->a[1] = (float) y * 2 / 32768;
-		A->a[2] = (float) z * 2 / 32768;
+		a[0] = (float) x * 2 / 32768;
+		a[1] = (float) y * 2 / 32768;
+		a[2] = (float) z * 2 / 32768;
 		PRINTF("acc x %d\t acc y %d\t acc z %d\n", x, y, z);
 	}
 }

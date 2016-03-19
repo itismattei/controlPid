@@ -164,22 +164,32 @@ void setupMCU(void){
 	//
 	/// PF4 in ingresso
 	HWREG(GPIO_PORTF_BASE + GPIO_O_DIR) 	&= ~GPIO_PIN_4;
+	HWREG(GPIO_PORTF_BASE + GPIO_O_LOCK) 	= GPIO_LOCK_KEY;
+	HWREG(GPIO_PORTF_BASE + GPIO_O_CR)		= 0xFF;
+	HWREG(GPIO_PORTF_BASE + GPIO_O_DIR) 	&= ~GPIO_PIN_0;
 	/// no alternate function
 	HWREG(GPIO_PORTF_BASE + GPIO_O_AFSEL) 	&= ~GPIO_PIN_4;
+	HWREG(GPIO_PORTF_BASE + GPIO_O_AFSEL) 	&= ~GPIO_PIN_0;
 	/// 2 ma di corrente
 	HWREG(GPIO_PORTF_BASE + GPIO_O_DR2R)	|= GPIO_PIN_4;
+	HWREG(GPIO_PORTF_BASE + GPIO_O_DR2R)	|= GPIO_PIN_0;
 	/// controllo slew rate off
 	HWREG(GPIO_PORTF_BASE + GPIO_O_SLR)		&= ~GPIO_PIN_4;
+	HWREG(GPIO_PORTF_BASE + GPIO_O_SLR)		&= ~GPIO_PIN_0;
 	/// pull up
 	HWREG(GPIO_PORTF_BASE + GPIO_O_PUR)		|= GPIO_PIN_4;
+	HWREG(GPIO_PORTF_BASE + GPIO_O_PUR)		|= GPIO_PIN_0;
 	/// abilitazione della funzione digitale
 	HWREG(GPIO_PORTF_BASE + GPIO_O_DEN)		|= GPIO_PIN_4;
+	HWREG(GPIO_PORTF_BASE + GPIO_O_DEN)		|= GPIO_PIN_0;
 	/// legge il pin (ricordare lo shift di 2 posizione verso sinistra della maschera di bit
 	///  p. 654 U.G.)
 	/// attesa per l'attuazione delle impostazioni
 	valore = 10;
 	while(--valore);
 	while(HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_4 << 2))) == GPIO_PIN_4);
+	//while(HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_0 << 2))) == GPIO_PIN_0);
+
 
 
 	//setup PB0 per scopi di debug

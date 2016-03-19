@@ -8,7 +8,8 @@
 #ifndef ADC_H_
 #define ADC_H_
 
-#include "../accel/accel_init.h"
+//#include "../accel/accel.h"
+#include <stdint.h>
 
 
 ///
@@ -27,7 +28,7 @@ typedef struct _dist{
 
 
 typedef struct _cinematica{
-	accelerazione	*Aptr;			/// accelerazione fornita dal sensore inerziale
+	//accelerazione	*Aptr;			/// accelerazione fornita dal sensore inerziale
 	distanza		*distPTR;		/// distanza fornita dai sensori IR
 	float			vel;			/// velocità media
 	float			spazio[2];		/// distanza misurata su ciascun cingolo
