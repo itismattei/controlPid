@@ -13,6 +13,7 @@
  *  VERSIONE IN C++
  *  Ripresa dalla release precedente
  *  alcune prove
+ *  In questa release si testa sia il giroscopio che l'accelerometro.
  */
 
 
