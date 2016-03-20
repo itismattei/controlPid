@@ -18,7 +18,7 @@
 #include "distMis.h"
 #include "parse.h"
 #include "uartp/uartstdio.h"
-
+#include "pid.h"
 
 extern volatile uint8_t uart1buffer[16], RX_PTR1, READ_PTR1;
 
@@ -33,7 +33,7 @@ void resetAutoma(syn_stat * STATO){
 ///
 /// analizza il comando che e' arrivato
 ///
-void parse(syn_stat *STATO){
+void parse(syn_stat *STATO, comando *cmdPtr){
 
 
 	STATO->cmd[STATO->ST] = uart1buffer[READ_PTR1];
@@ -78,7 +78,7 @@ void parse(syn_stat *STATO){
 		STATO->check ^= CHECK_SUM;
 		if(STATO->check == STATO->cmd[2]){
 			/// ok, il messaggio e' valido
-			convertToToken(STATO);
+			convertToToken(STATO, cmdPtr);
 			/// il comando e' ora valido
 			STATO->valid = VALIDO;
 			STATO->ST = 3;
@@ -101,38 +101,47 @@ void parse(syn_stat *STATO){
 
 ///
 /// converte l'indicatore di un comando in un token
-void convertToToken(syn_stat *STATO){
+void convertToToken(syn_stat *STATO, comando *cmdPtr){
 
 	switch(STATO->cmd[0]){
 	case 'F':
 		STATO->token = AVANTI;
+		cmdPtr->azione = true;
 	break;
 	case 'B':
 		STATO->token = INDIETRO;
+		cmdPtr->azione = true;
 	break;
 	case 'S':
 		STATO->token = STOP;
+		cmdPtr->azione = true;
 	break;
 	case 'R':
 		STATO->token = DESTRA;
+		cmdPtr->azione = true;
 	break;
 	case 'L':
 		STATO->token = SINISTRA;
+		cmdPtr->azione = true;
 	break;
 	case 'I':
 		STATO->token = GIRA_INDIETRO;
+		cmdPtr->azione = true;
 	break;
 	case 'G':
 		//// non ancora implementato
 		STATO->token = MISURA_GRADI;
+		cmdPtr->azione = false;
 	break;
 	case 'D':
 		/// lettura sensore
 		STATO->token = LETTURA_SENSORE;
+		cmdPtr->azione = false;
 	break;
 	case 'P':
 		//rilascio rescue pack
 		STATO->token = RILASCIO_PACK;
+		cmdPtr->azione = true;
 	default:
 		/// se nessun comando e'giusto produce un errore.
 		STATO->token = ERRORE;
@@ -159,7 +168,7 @@ pid * leggiComando(syn_stat *sSTAT, pid CTRL[], pid *p, dati *data){
 	/// controlla se ci sono caratteri da processare
 	if (RX_PTR1 != READ_PTR1){
 		/// e se si', li invia al parser, che restituisce in synSTATO il token del comando
-		parse(sSTAT);
+		//parse(sSTAT);
 		READ_PTR1++;
 		READ_PTR1 &= DIM_READ_BUFF - 1;
 	}

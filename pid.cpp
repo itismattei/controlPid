@@ -12,31 +12,78 @@
 #include "pwm\pwm.h"
 #include "init.h"
 
+void rispostaRotazione(pid *, syn_stat *);
 
 /// impostazioni dei PID presenti
-void setupPID(pid C[]){
+void PID::setupPID(int type){
 	///
 	/// inizializza i coeficienti del pid
 	int i;
 	for (i = 0; i < 3; i++)
-		setKpid(&C[i], 1.1, 2.1, 0.5);
+		setKpid(1.1, 2.1, 0.5);
 	/// impostazione del tipo di PID
-
-	C[0].tipo = AVANZA;
-	C[1].tipo = RUOTA;
-	C[2].tipo = RUOTA_SU_ASSE;
+	tipo = type;
 }
 
 ///
 /// imposta i coefficienti del PID su valori standard
-void setKpid(pid *C, float kp, float kd, float ki){
-	C->kp = kp;
-	C->kd = kd;
-	C->ki = ki;
+void PID::setKpid(float kp, float kd, float ki){
+	kp = kp;
+	kd = kd;
+	ki = ki;
 	/// imposta anche i valori inziali della derivata ed integrale
-	C->I = 0.0;
-	C->d = 0.0;
+	I1 = 0.0;
+	d = 0.0;
 }
+
+///
+/// effettua l'integrazione numerica
+void PID::integra(float tick){
+
+	float D, P, I;
+	/// derivativo
+	D = kd * (e[1] - e[0]) / tick;
+	/// proporzionale
+	P = kp * e[1];
+	/// integrale
+	I = I1 + ki * tick * (e[1] + e[0]);
+	I *= (float)0.50;
+	I1 = I;
+	uscita = D + P + I;
+	/// dispositivo con saturazione
+	if (uscita > 100.0)
+		uscita = 100.0;
+		else if (uscita < -100.0)
+			uscita = -100.0;
+	//aggiornamento dell'errore
+	e[0] = e[1];
+}
+
+/// impostazioni dei PID presenti
+//void setupPID(pid C[]){
+//	///
+//	/// inizializza i coeficienti del pid
+//	int i;
+//	for (i = 0; i < 3; i++)
+//		setKpid(&C[i], 1.1, 2.1, 0.5);
+//	/// impostazione del tipo di PID
+//
+//	C[0].tipo = AVANZA;
+//	C[1].tipo = RUOTA;
+//	C[2].tipo = RUOTA_SU_ASSE;
+//}
+
+///
+/// imposta i coefficienti del PID su valori standard
+//void setKpid(pid *C, float kp, float kd, float ki){
+//	C->kp = kp;
+//	C->kd = kd;
+//	C->ki = ki;
+//	/// imposta anche i valori inziali della derivata ed integrale
+//	C->I = 0.0;
+//	C->d = 0.0;
+//}
+
 
 ///
 /// funzione che legge il sensore e calcola il nuovo valore

@@ -6,10 +6,11 @@
  */
 
 #include <stdint.h>
-#include "pid.h"
+//#include "pid.h"
 #include "adc/adc.h"
 #include "sens_col_ir/sens.h"
 #include "qei.h"
+#include "gyro_f.h"
 
 
 #ifndef INIT_H_
@@ -77,16 +78,7 @@ typedef struct _dati{
 extern "C" {
 #endif
 
-void parse(syn_stat *);
-void convertToToken(syn_stat *);
-/// reset dell'automa (o inizializzazione)
-void resetAutoma(syn_stat * STATO);
-void initModule();
 
-
-void sendReply(syn_stat *, uint8_t numChar);
-
-void rispostaRotazione(pid *, syn_stat *);
 void setupUART(int);
 void PRINT_WELCOME(void);
 

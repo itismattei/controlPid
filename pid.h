@@ -12,10 +12,41 @@
 #include "gyro_f.h"
 #include "pwm/pwm.h"
 #include "adc/adc.h"
+#include <stdint.h>
 
 #define			AVANZA			0
 #define			RUOTA			1
 #define			RUOTA_SU_ASSE	2
+
+class comando{
+public:
+	comando(){azione = false; isRun = false;}
+
+	bool azione;			//indica se e' un comando di azione
+	bool isRun;				// indica se il comando sta andando
+};
+
+class PID{
+public:
+	PID(){;}
+
+	void setupPID(int type);
+	void setKpid(float, float, float);
+	void integra(float tick);
+
+	float 		kp;
+	float 		kd;
+	float 		ki;
+	float 		e[2];		/// errori all'istante attuale e precedente
+	float 		I1;			///valore integrale
+	float 		d;			/// valore della derivata
+	float 		uscita;		/// valore dell'uscita
+	uint32_t 	tipo;		/// tipo di movimento: avenzamento, rotazione, rotazione su asse centrale
+	int			valFin;		/// valore finale da raggiungere
+	bool 		attivo;		/// indica se il pid agisce o e' disattivato.
+	uint8_t		rispondi;	/// flag che indica che occorre fornire risposta, per i comandi di tipo rotazione
+};
+
 
 typedef struct _pid{
 	float 		kp;

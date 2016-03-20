@@ -29,6 +29,22 @@ typedef struct _glb{
 	Giroscopio  *gyro;
 } glb;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void parse(syn_stat *,  comando *);
+void convertToToken(syn_stat *, comando *);
+/// reset dell'automa (o inizializzazione)
+void resetAutoma(syn_stat * STATO);
+void initModule();
+
+
+void sendReply(syn_stat *, uint8_t numChar);
+
+#ifdef __cplusplus
+}
+#endif
 
 void rispondiComando(syn_stat *sSTAT, glb *);
 /// invia la lettura di un sensore

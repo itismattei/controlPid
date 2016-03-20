@@ -122,6 +122,7 @@ int main(void) {
 //	CIN.vel = 0.0;
 
 	glb  COLLECTDATA;
+	comando CMD;
 	//DATA.distPtr = &DIST;
 	//passaggio degli indirizzi delle strutture alla struttura generale
 	//dati_a_struttura(&G, &DIST, &CIN, &COL, &TEMP, &SUR, &DATA);
@@ -256,7 +257,7 @@ int main(void) {
 		/*    *****     */
 		// controllo di messaggio sulla seriale 1 (ricevuto comando da rasp
 		if (READ_PTR1 != RX_PTR1){
-			 parse(&synSTATO);
+			 parse(&synSTATO, &CMD);
 			 READ_PTR1++;
 			 READ_PTR1 &= 0xF;
 		}
