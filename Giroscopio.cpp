@@ -27,6 +27,7 @@
 Giroscopio::Giroscopio() {
 	// TODO Auto-generated constructor stub
 	tempReg = 0;
+	posizione = 0;
 }
 
 Giroscopio::~Giroscopio() {
@@ -71,7 +72,7 @@ void Giroscopio::azzeraAssi(){
 		/// asse z ON
 
 		media = 0;
-		while(conteggio < 64){
+		while(conteggio < maxDimBuff){
 			/// effettua 32 letture e calcola la media
 			valore = I2CReceive(GYRO_ADDR,STATUS_REG);
 			//PRINTF("REG_STAT 0x%x\n", valore);
@@ -86,10 +87,10 @@ void Giroscopio::azzeraAssi(){
 				for (int i = 0; i < 50000; i++);
 			}
 		}
-		media /= 64.0;
+		media /= maxDimBuff;
 
 		//printAsseZ(64);
-		minQuad(buffX, buffValori, 64, &m, &q);
+		minQuad(buffX, buffValori, maxDimBuff, &m, &q);
 		z0 = (int16_t) media;
 		//tempReg = 0;
 	break;
@@ -177,17 +178,20 @@ void Giroscopio::misuraAngoli(){
 			z = (int16_t)((buffer[1]<< 8) + buffer[0]);
 			tmp = z;
 			z = z - z0;
+#ifdef _DEBUG_
 			/// usa la retta di regressione
 			tmp -=  q;
-
+#endif
 			/// integrazione rettangolare: valore letto * fondo scala * intervallo di tempo di integrazione
 			/// posto a 10ms
 			f = z * DPS * kz;
 			f *= tick;
 			yawF += f;
+#ifdef	_DEBUG_
 			f = tmp * DPS * kz;
 			f *= tick;
 			yawF0 += f;
+#endif
 //			if (tempoDiReset >= 1000){
 /// TODO: SE NON STA RUOTANDO POTREBBE EFFETTUARE UN AZZERAMENTO ASSI
 

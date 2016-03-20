@@ -193,6 +193,7 @@ int main(void) {
 		/// azzeramento degli assi
 		//azzeraAssi(&G);
 		Rot.azzeraAssi();
+#ifdef _DEBUG_
 		PRINTF("media: ");
 		printFloat(Rot.media, 4);
 		PRINTF("\nm: ");
@@ -200,6 +201,7 @@ int main(void) {
 		PRINTF("\nq: ");
 		printFloat(Rot.q, 4);
 		PRINTF("\n");
+#endif
 	}
 
 	/// test della presenza del modulo zig-bee

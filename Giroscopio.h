@@ -10,6 +10,8 @@
 
 #include <stdint.h>
 
+#define	maxDimBuff	64
+
 class Giroscopio {
 public:
 	Giroscopio();
@@ -23,8 +25,8 @@ public:
 	int getTemp();
 	void primoAzzeramento(void);
 
-	int16_t buffValori[512];
-	int16_t buffX[512];
+	int16_t buffValori[maxDimBuff];
+	int16_t buffX[maxDimBuff];
 	int16_t tempReg;
 	float  media;
 	float m, q;
@@ -59,6 +61,9 @@ public:
 	float kz, ky, kx;
 	/// temepratura
 	int temp;
+private:
+	uint16_t posizione;
+
 };
 
 uint8_t printFloat(double number, uint8_t digits);
