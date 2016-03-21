@@ -29,6 +29,13 @@ typedef struct _glb{
 	Giroscopio  *gyro;
 } glb;
 
+class syntaxStatus{
+public:
+	syntaxStatus(){valore = 0;}
+
+	int valore;
+};
+
 #ifdef __cplusplus
 extern "C" {
 #endif

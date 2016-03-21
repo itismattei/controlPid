@@ -24,6 +24,7 @@ public:
 	int 		d_mm[6];		/// distanza in millimetri (intera)
 	uint32_t	dI[8];
 	bool		run;			/// indica se il dispositivo funziona
+	int vel;
 
 };
 

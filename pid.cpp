@@ -12,10 +12,11 @@
 #include "pwm\pwm.h"
 #include "init.h"
 
+
 void rispostaRotazione(pid *, syn_stat *);
 
 /// impostazioni dei PID presenti
-void PID::setupPID(int type){
+void ControlloPID::setupPID(int type){
 	///
 	/// inizializza i coeficienti del pid
 	int i;
@@ -27,7 +28,7 @@ void PID::setupPID(int type){
 
 ///
 /// imposta i coefficienti del PID su valori standard
-void PID::setKpid(float kp, float kd, float ki){
+void ControlloPID::setKpid(float kp, float kd, float ki){
 	kp = kp;
 	kd = kd;
 	ki = ki;
@@ -38,7 +39,7 @@ void PID::setKpid(float kp, float kd, float ki){
 
 ///
 /// effettua l'integrazione numerica
-void PID::integra(float tick){
+void ControlloPID::integra(float tick){
 
 	float D, P, I;
 	/// derivativo
@@ -90,45 +91,45 @@ void PID::integra(float tick){
 /// dell'errore dopo l'azione del PID
 /// il PID deve distinguere tra rotazione e movimento lineare e
 /// per questo riceve un vettore di struct di tipo PID
-int PID(gyro *G, pid * C, pwm *PWM, cinematica *CIN){
+int ControlloPID::Run(Giroscopio *G, pwm *PWM, distMis *DISTANZA){
 
 	float soglia = 0.05;
 	/// controllare se arriva un puntatore nullo per il pid, generato da una condizione di time out
 	/// si ricorda che l'errore nel comando  non annulla un comando in esecuzione.
-	if (C == NULL) {
-		C->attivo = false;
-		(C + 1)->attivo= false;
-		(C + 2)->attivo= false;
-		/// stop al pwm
-		PWM->delta_1 = PWM->delta_2 = 0;
-		pwm_power(PWM);
-		/// spento il PWM esce con codice di errore
-		return -1;
-	}
+//	if (C == NULL) {
+//		C->attivo = false;
+//		(C + 1)->attivo= false;
+//		(C + 2)->attivo= false;
+//		/// stop al pwm
+//		PWM->delta_1 = PWM->delta_2 = 0;
+//		pwm_power(PWM);
+//		/// spento il PWM esce con codice di errore
+//		return -1;
+//	}
 
 	/// seleziona il tipo di PID
-	switch(C->tipo){
+	switch(tipo){
 	case AVANZA:
 		//provvede a misurare la velocita'
 		//misuraVelocità()
-		C->e[1] = (float) ((float)C->valFin - CIN->vel);
+		e[1] = (float) ((float)valFin - DISTANZA->vel);
 		/// se l'errore e' minore di una soglia, vuoil dire che e' a regime e
 		/// quindi inutile integrare ulteriormente.
-		if (abs(C->e[1]) > soglia  ){
+		if (abs(e[1]) > soglia  ){
 			/// calcola l'integrale numerico del PID
-			integra(C, G->tick);
+			integra(G->tick);
 			/// avanti oppure indietro
-			if(C->e[1] > 0.0)
+			if(e[1] > 0.0)
 				/// avanti
 				PWM->dir_1 = PWM->dir_2 = 1;
 			else
 				/// indietro
 				PWM->dir_1 = PWM->dir_2 = 2;
 			/// impostazione del PWM ed invio del comando
-			setXPWM(C, PWM);
+			//setXPWM(C, PWM);
 		}
 		else
-			C->attivo = false;
+			attivo = false;
 
 	break;
 
@@ -137,20 +138,20 @@ int PID(gyro *G, pid * C, pwm *PWM, cinematica *CIN){
 		/// prestare attenzione al segnale d'errore che poi andra' rimosso
 		/// dal PWM perche' i motori, a differenza della regolazione della velocita' dovranno
 		/// fermarsi.
-		misuraAngoli(G);
-		C->e[1] = (float) (C->valFin - G->yaw);
+		G->misuraAngoli();
+		e[1] = (float) (valFin - G->yaw);
 		/// calcola l'integrale numerico del PID
-		integra(C, G->tick);
+		integra(G->tick);
 		//TODO: adesso si deve mandare il comando al PWM
 
 	break;
 
 	case RUOTA_SU_ASSE:
-		misuraAngoli(G);
-		C->e[1] = (float) (C->valFin - G->yaw);
+		G->misuraAngoli();
+		e[1] = (float) (valFin - G->yaw);
 		/// calcola l'integrale numerico del PID
-		integra(C, G->tick);
-		if (C->e[1] > 0.0){
+		integra(G->tick);
+		if (e[1] > 0.0){
 			///ruota in senso antiorario
 			PWM->dir_1 = 1;
 			PWM->dir_2 = 2;
@@ -161,13 +162,13 @@ int PID(gyro *G, pid * C, pwm *PWM, cinematica *CIN){
 			PWM->dir_2 = 1;
 		}
 		///
-		if(C->e[1] > -1.0 && C->e[1] < 1.0){
+		if(e[1] > -1.0 && e[1] < 1.0){
 			/// si può pensare che il comando sia stato eseguito e completato e quindi si puo' comunicare
 			/// questo evento.
-			C->rispondi = TRUE;
+			rispondi = TRUE;
 		}
 		/// impostazione del PWM ed invio del comando
-		setXPWM(C, PWM);
+		//setXPWM(C, PWM);
 	break;
 	}
 	return 0;

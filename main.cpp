@@ -91,7 +91,7 @@ int main(void) {
 	/// servono differenti PID, almeno uno per la rotazione ed uno per lo spostamento
 	/// per la rotazione sarebbero interessante usarne 2, uno per la ortazione soft ed uno per la rotazione
 	/// brusca.
-	//pid CTRL[3], * pidPtr;
+	ControlloPID cPid[3], *pidPtr;
 	/// descrittore della sintassi dei comandi
 	syn_stat synSTATO;
 	/// modulo zigbee per telemetria
@@ -257,7 +257,9 @@ int main(void) {
 		/*    *****     */
 		// controllo di messaggio sulla seriale 1 (ricevuto comando da rasp
 		if (READ_PTR1 != RX_PTR1){
+			/// analizza il comando e imposta il valore dell'oggetto CMD (comando)
 			 parse(&synSTATO, &CMD);
+			 /// aggiorna il buffer
 			 READ_PTR1++;
 			 READ_PTR1 &= 0xF;
 		}
@@ -274,12 +276,13 @@ int main(void) {
 //			pidPtr->rispondi = FALSE;
 //		}
 //
-//		if (procCom == 1 ){
-//			//UARTCharPutNonBlocking(UART1_BASE, 'c');
-//			procCom = 0;
-//			contatore++;
-//			lampeggio_led++;
-//
+		/// aggiorna il PID ogni tick del timer che sono 10ms
+		if (procCom == 1 ){
+			//UARTCharPutNonBlocking(UART1_BASE, 'c');
+			procCom = 0;
+			contatore++;
+			lampeggio_led++;
+		}
 //
 //			if(lampeggio_led >= 50)
 //			{

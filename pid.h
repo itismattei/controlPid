@@ -13,6 +13,8 @@
 #include "pwm/pwm.h"
 #include "adc/adc.h"
 #include <stdint.h>
+#include "Giroscopio.h"
+#include "distMis.h"
 
 #define			AVANZA			0
 #define			RUOTA			1
@@ -20,19 +22,22 @@
 
 class comando{
 public:
-	comando(){azione = false; isRun = false;}
+	comando(){azione = false; isRun = false; finished = false;}
 
 	bool azione;			//indica se e' un comando di azione
 	bool isRun;				// indica se il comando sta andando
+	bool finished;			// indica se il comando e' giunto al termine
+	int numPid;				// numero del PID attivo
 };
 
-class PID{
+class ControlloPID{
 public:
-	PID(){;}
+	ControlloPID(){;}
 
 	void setupPID(int type);
 	void setKpid(float, float, float);
 	void integra(float tick);
+	int Run(Giroscopio *G, pwm *PWM, distMis *distanza);
 
 	float 		kp;
 	float 		kd;
