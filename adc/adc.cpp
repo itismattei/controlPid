@@ -33,13 +33,8 @@
 #define ADC_SSDC                (ADC_O_SSDC0 - ADC_O_SSMUX0)
 
 
-void initAdc(volatile distanza *d){
-	int i;
-	for (i = 0; i < 6; i++){
-		d->misSens[i] = 0.0;
-		d->d_mm[i] = 0;
-		d->dI[i] = 0;
-	}
+void initAdc(volatile distMis *d){
+
 	initHW_ADC();
 	/// setta ad on al presenza e funzionalita' del sensore
 	d->run = true;
@@ -95,7 +90,7 @@ int32_t ADCSequenceData_Get(uint32_t ui32Base, uint32_t ui32SequenceNum, uint32_
 
 extern  distanza *dPtr;
 
-#include "../distMis.h"
+
 extern  distMis *distMisPtr;
 
 volatile extern  int ADCflag;

@@ -10,6 +10,7 @@
 
 //#include "../accel/accel.h"
 #include <stdint.h>
+#include "../distMis.h"
 
 
 ///
@@ -39,7 +40,7 @@ typedef struct _cinematica{
 extern "C" {
 #endif
 
-void initAdc(volatile distanza *);
+void initAdc(volatile distMis *);
 void initHW_ADC(void);
 
 #ifdef __cplusplus

@@ -56,6 +56,12 @@ void distMis::rawTomm(){
 	float f, d;
 	float m[4] = {5.60984E-05, 6.55586E-05, 1.07152e-4, 0.0 };
 	float q[4] = {0.01611, 0.005897452, -0.08579, 0.0};
+	float a[3] = {1e-8, 4e-5, 0.024};
+	float b[3] = {6e-9, 5e-5, 0.0099};
+	float c[3] = {2e-9, 2e-6, 0.0063};
+	float g[3] = {7e-9, -1e-5, 0.0238};
+	float e[3] = {1e-7, -2e-4, 0.1085};
+
 //	m[0] = 5.60984E-05;
 //	m[1] = 6.55586E-05;
 //	m[2] = 1.07152e-4;
@@ -67,32 +73,52 @@ void distMis::rawTomm(){
 
 	/// conversione del dato grezzo in cm
 	for (int i = 0; i < 6; i++){
-		/// distnza superiori a 40cm non vengono calcolate
-		if (dI[i] < 400)
-			dI[i] = 400;
-		if (dI[i] < 970){
-			/// si usa la prima retta interpolante
-			f = m[0] * dI[i] + q[0];
-		}
-		else if (dI[i] < 2050){
-			/// intervallo 5 - 7 cm
-			f = m[1] * dI[i] + q[1];
+		/// per i sensori 2 e 5 vanno bene
+		if (i ==2 || i == 5){
+			/// distnza superiori a 40cm non vengono calcolate
+			if (dI[i] < 400)
+				dI[i] = 400;
+			if (dI[i] < 970){
+				/// si usa la prima retta interpolante
+				f = m[0] * dI[i] + q[0];
 			}
-			else if (dI[i] < 3745){
-				/// intervallo 5 - 3.5 cm
-				f = m[2] * dI[i] + q[2];
+			else if (dI[i] < 2050){
+				/// intervallo 5 - 7 cm
+				f = m[1] * dI[i] + q[1];
 				}
-//				else if (dI[i] < 3711){
-//					f = m[3] * dI[i] + q[3];
-//				}
+				else if (dI[i] < 3745){
+					/// intervallo 5 - 3.5 cm
+					f = m[2] * dI[i] + q[2];
+					}
+	//				else if (dI[i] < 3711){
+	//					f = m[3] * dI[i] + q[3];
+	//				}
 
-		if (dI[i] >= 3745){
-			/// valori minori di 3.5cm non hanno senso
-			dI[i] = 3745;
-			f =  m[2] * 3711.0 + q[2];
+			if (dI[i] >= 3745){
+				/// valori minori di 3.5cm non hanno senso
+				dI[i] = 3745;
+				f =  m[2] * 3711.0 + q[2];
+			}
+
 		}
 
-		/// la distanza (in cm) e' 1 / f
+		if (i == 1)
+			f = a[0]*dI[i]*dI[i] + a[1] * dI[i] + a[2];
+		if (i == 4)
+			f = b[0]*dI[i]*dI[i] + b[1] * dI[i] + b[2];
+		if (i == 3){
+			/// il sensore viene interpolato con 3 spezzoni di parabola
+			if (dI[i] < 940){
+				f = c[0]*dI[i]*dI[i] + c[1] * dI[i] + c[2];
+			}
+			else {if (dI[i] < 1170)
+					f = e[0]*dI[i]*dI[i] + e[1] * dI[i] + e[2];
+				   else
+					f = g[0]*dI[i]*dI[i] + g[1] * dI[i] + g[2];
+			}
+		}
+
+ 		/// la distanza (in cm) e' 1 / f
 		d = 1 / f * 10;			/// distanza in mm
 
 		d_mm[i] = (int) d;

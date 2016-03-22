@@ -18,10 +18,10 @@
 #include "Giroscopio.h"
 
 typedef struct _glb{
-	gyro 		*gPtr;
+	//gyro 		*gPtr;
 	temperatura *tempPtr;
 	colore 		*colPtr;
-	distanza 	*distPtr;
+	//distanza 	*distPtr;
 	cinematica 	*cinPtr;
 	qei 		*qeiPtr;
 	survivor 	*surPtr;
@@ -58,7 +58,7 @@ void rispondiComando(syn_stat *sSTAT, glb *);
 void inviaSensore(syn_stat *,  glb*);
 
 void dati_a_struttura(gyro *, distanza *, cinematica *, colore *, temperatura* ,survivor *, dati *);
-void datiRaccolti(distanza *D, cinematica *CIN, colore *COL, temperatura *TEMP, survivor *SUR, distMis *DIS, Giroscopio *GYRO, glb *GLB );
+void datiRaccolti(cinematica *CIN, colore *COL, temperatura *TEMP, survivor *SUR, distMis *DIS, Giroscopio *GYRO, glb *GLB );
 
 pid * leggiComando(syn_stat *sSTAT, pid CTRL[], pid *p, dati *);
 

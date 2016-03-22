@@ -14,6 +14,7 @@
  *  Ripresa dalla release precedente
  *  alcune prove
  *  In questa release si testa sia il giroscopio che l'accelerometro.
+ *  Si testano anche i sensori di distanza (5 sensori)
  */
 
 
@@ -65,7 +66,7 @@ volatile int ADCflag = 0;
 extern volatile uint8_t uart1buffer[16], RX_PTR1, READ_PTR1;
 
 volatile distanza *dPtr;
-/// puntatore globale per scrivere dentro usando la routine di servizio delle interruzioni
+/// puntatore globale per scrivere dentro la classe distMis usando la routine di servizio delle interruzioni
 volatile distMis *distMisPtr;
 void *servo;
 temperatura *TEMPptr;
@@ -75,7 +76,7 @@ int main(void) {
 	volatile uint32_t valore = 0, i, blink = 0, contatore, lampeggio_led;
 	volatile int32_t arrot;
 	volatile int16_t val1 = 0, x, y, z;
-	distanza DIST;
+	//distanza DIST;
 	distMis  MISURE;
 	distMisPtr = &MISURE;
 	//--------------------------//
@@ -113,7 +114,7 @@ int main(void) {
 	/// disabilita le interruzioni
 	DI();
 	//pidPtr = CTRL;
-	dPtr = &DIST;
+	//dPtr = &DIST;
 
 
 	TEMPptr =  &TEMP;
@@ -127,7 +128,7 @@ int main(void) {
 	//passaggio degli indirizzi delle strutture alla struttura generale
 	//dati_a_struttura(&G, &DIST, &CIN, &COL, &TEMP, &SUR, &DATA);
 	/// l'oggetto COLLECTDATA (glb) e' una struttara che contiene i puntatori alle strutture e classi del progetto
-	datiRaccolti(&DIST, &CIN, &COL, &TEMP, &SUR, &MISURE, &Rot, &COLLECTDATA);
+	datiRaccolti(&CIN, &COL, &TEMP, &SUR, &MISURE, &Rot, &COLLECTDATA);
 
 	/// setup di base
 	setupMCU();
@@ -162,7 +163,7 @@ int main(void) {
 	// TODO: //pwmServoInit (&pwmServi);
 	/// inizializza l'adc e lo prepara a funzionare ad interruzioni.
 
-	initAdc(&DIST);
+	initAdc(distMisPtr);
 	PRINTF("inizializzato ADC\n");
 	/// reset dell'automa di analisi della sintassi
 	resetAutoma(&synSTATO);
@@ -336,9 +337,8 @@ int main(void) {
 				//	MISURE.dI[i] = DIST.dI[i];
 #ifdef _DEBUG_
 				for(int i = 1; i < 6; i++){
-					if (i == 3)
-						continue;
-					PRINTF("val%d: %d \t", i, DIST.dI[i]);
+
+					PRINTF("val%d: %d \t", i, MISURE.dI[i]);
 
 				}
 				PRINTF("\n");
@@ -349,8 +349,8 @@ int main(void) {
 #ifdef _DEBUG_
 				/// ricopia nella struttare DIST:
 				for(int attesa = 1; attesa < 6; attesa++){
-					if (attesa == 3)
-						continue;
+					//if (attesa == 3)
+					//	continue;
 					PRINTF("mm(%d): %d \t", attesa, MISURE.d_mm[attesa]);
 				}
 				PRINTF("\nTemperatura %d\n", Rot.getTemp());

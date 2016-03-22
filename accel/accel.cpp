@@ -26,16 +26,27 @@ void accelerometro::testAccel(){
 
 	volatile uint32_t valore;
 
-	I2CSend(ACCEL_ADDR, 2, CTRL_REG1_A, ZaxEN + YaxEN + XaxEN);
-	/// legge il registro di controllo 1 che dovrebbe contenere 0x07
 	valore = I2CReceive(ACCEL_ADDR, CTRL_REG1_A);
-	if ((valore & 0xFF) == 7){
-		PRINTF("Accelereometro OK! %d\n", valore);
-		isPresent =  true;
-		blinkRedLed();
-	}
-	else
+	if (valore == 0xFFFF){
+		/// non c'e' il modulo
+		PRINTF("Accelereometro non presente \n");
 		isPresent = false;
+		return;
+	}
+	else{
+		I2CSend(ACCEL_ADDR, 2, CTRL_REG1_A, ZaxEN + YaxEN + XaxEN);
+		/// legge il registro di controllo 1 che dovrebbe contenere 0x07
+		valore = I2CReceive(ACCEL_ADDR, CTRL_REG1_A);
+		if ((valore & 0xFF) == 7){
+			PRINTF("Accelereometro OK! %d\n", valore);
+			isPresent =  true;
+			blinkRedLed();
+		}
+		else{
+			isPresent = false;
+			PRINTF("Accelereometro ROTTO! %d\n", valore);
+		}
+	}
 }
 
 ///

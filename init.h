@@ -7,7 +7,7 @@
 
 #include <stdint.h>
 //#include "pid.h"
-#include "adc/adc.h"
+//#include "adc/adc.h"
 #include "sens_col_ir/sens.h"
 #include "qei.h"
 #include "gyro_f.h"
@@ -68,8 +68,8 @@ typedef struct _dati{
 	gyro 		*gPtr;
 	temperatura *tempPtr;
 	colore 		*colPtr;
-	distanza 	*distPtr;
-	cinematica 	*cinPtr;
+	//distanza 	*distPtr;
+	//cinematica 	*cinPtr;
 	qei 		*qeiPtr;
 	survivor 	*surPtr;
 } dati;
