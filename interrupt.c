@@ -39,7 +39,7 @@ void UART1IntHandler(void)
     // Clear the asserted interrupts.
     //
     ROM_UARTIntClear(UART1_BASE, ui32Status);
-    PRINTF("INT:\n");
+    //PRINTF("INT:\n");
     //
     // Loop while there are characters in the receive FIFO.
     //
