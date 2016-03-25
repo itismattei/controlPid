@@ -20,7 +20,7 @@
 #include "uartp/uartstdio.h"
 #include "pid.h"
 
-extern volatile uint8_t uart1buffer[16], RX_PTR1, READ_PTR1;
+extern volatile uint8_t uart1buffer[], RX_PTR1, READ_PTR1;
 
 void resetAutoma(syn_stat * STATO){
 	STATO->ST = 0;

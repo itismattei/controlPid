@@ -262,7 +262,7 @@ int main(void) {
 			 parse(&synSTATO, &CMD);
 			 /// aggiorna il buffer
 			 READ_PTR1++;
-			 READ_PTR1 &= 0xF;
+			 READ_PTR1 &= DIM_READ_BUFF - 1;
 		}
 		if (synSTATO.valid == VALIDO && synSTATO.token != ERRORE){
 			/// il comandoche e' stato analizzato ha prodotto un risultat adeguato

@@ -25,7 +25,7 @@
 
 ///
 /// routine di servizio della uart1 (usata per comunicare con la tiva)
-volatile uint8_t uart1buffer[16], RX_PTR1 = 0, READ_PTR1 = 0;
+volatile uint8_t uart1buffer[], RX_PTR1 = 0, READ_PTR1 = 0;
 
 void UART1IntHandler(void)
 {
