@@ -17,7 +17,7 @@
 #define INIT_H_
 
 
-#define 	DIM_READ_BUFF		16
+#define 	DIM_READ_BUFF1		64
 #define		CHECK_SUM			0xA9
 
 //#############
@@ -51,7 +51,7 @@
 /// struttura che analizza la frase e ne mantiene il token del comando
 typedef struct _syn_stat{
 	int ST;
-	uint8_t 	cmd[4];			/// lunghezza del comando fissa: 4 bytes
+	uint8_t 	cmd[8];			/// lunghezza del comando fissa: 4 bytes (se ne usano 8 per sviluppi futuri)
 	uint8_t 	l_cmd;			/// lunghezza in bytes del comando
 	uint8_t		check;			/// checksum del comando
 	uint8_t 	token;			/// valore numerico del comando
