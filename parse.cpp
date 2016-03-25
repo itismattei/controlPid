@@ -20,8 +20,20 @@
 #include "uartp/uartstdio.h"
 #include "pid.h"
 
-extern volatile uint8_t uart1buffer[16], RX_PTR1, READ_PTR1;
+extern volatile uint8_t uart1buffer[], RX_PTR1, READ_PTR1;
 
+
+///
+/// funzioncina che stampa il valore ricevuto dal sensore della tiva
+void printSensorValue(syn_stat *STATO){
+	PRINTF("S%d: ", STATO->cmd[0]);
+	int16_t valore;
+	valore = (STATO->cmd[1] << 8) + STATO->cmd[2];
+	PRINTF("%d \t", valore);
+}
+
+///
+///  imposta l'automa nella condizione iniziale.
 void resetAutoma(syn_stat * STATO){
 	STATO->ST = 0;
 	STATO->cmd[0] = STATO->cmd[1] = 0;
@@ -44,51 +56,42 @@ void parse(syn_stat *STATO, comando *cmdPtr){
 	switch(STATO->ST){
 	case 0:
 		STATO->check = 0;
-		if (STATO->cmd[0] >64 && STATO->cmd[0] < 91 ){
-			/// una lettera MAIUSCOLA e quindi un comando di azione da raspberry
-			STATO->l_cmd = 4;
-			STATO->ST = 1;
-			STATO->check = STATO->cmd[0];
-		}
-		/*else if(STATO->cmd[0] <= 16){
-			/// comando di richiesta dati lungo due caratteri
-			STATO->l_cmd = 2;
-			STATO->ST = 1;
-		}*/
+
+
+		STATO->l_cmd = 5;
+		STATO->ST = 1;
+		STATO->check = STATO->cmd[0];
+
 	break;
 
 	case 1:
 
 		STATO->check ^= STATO->cmd[1];
 		STATO->ST = 2;
-		/// si analizza il checksum e poi si esegue il comando
-		/*if (STATO->cmd[0] ^ CHECK_SUM == STATO->cmd[1]){
-			// ok
-			convertToToken(STATO);
-			// resetta l'automa
-			resetAutoma(STATO);
-				if(STATO->token != ERRORE)
-			/// il comando e' ora valido
-			STATO->valid = VALIDO;
-		}
-*/
+
 	break;
 
 	case 2:
+		STATO->check ^= STATO->cmd[2];
+		STATO->ST = 3;
+	break;
+
+
+	case 3:
 		STATO->check ^= CHECK_SUM;
-		if(STATO->check == STATO->cmd[2]){
+		if(STATO->check == STATO->cmd[3]){
 			/// ok, il messaggio e' valido
-			convertToToken(STATO, cmdPtr);
+			printSensorValue(STATO);
 			/// il comando e' ora valido
 			STATO->valid = VALIDO;
-			STATO->ST = 3;
+			STATO->ST = 4;
 		}
 		else
 			STATO->ST = 0;
 
 	break;
 
-	case 3:
+	case 4:
 		// resetta l'automa e rimette lo stato a NON_VALIDO
 		/// l'invio del comando e' fatto di 4 bytes e quindi passa di qui quando e' arrivato il IV byte cioe' quello
 		/// del terminatore
@@ -170,7 +173,7 @@ pid * leggiComando(syn_stat *sSTAT, pid CTRL[], pid *p, dati *data){
 		/// e se si', li invia al parser, che restituisce in synSTATO il token del comando
 		//parse(sSTAT);
 		READ_PTR1++;
-		READ_PTR1 &= DIM_READ_BUFF - 1;
+		READ_PTR1 &= DIM_READ_BUFF1 - 1;
 	}
 	/// controlla il time out del comando e se scaduto si ferma
 	if (sSTAT->tick > TIMEOUT_CMD){

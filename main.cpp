@@ -14,7 +14,7 @@
  *  Ripresa dalla release precedente
  *  alcune prove
  *  In questa release si testa sia il giroscopio che l'accelerometro.
- *  Si testano anche i sensori di distanza (5 sensori)
+ *  SCHEDA MASTER che invia i comandi allo slave: servee a provare il protocollo di comunicazione
  */
 
 
@@ -145,23 +145,18 @@ int main(void) {
 	InitI2C0();
 	/// messaggio d'inizio
 	PRINTF("inizializzato I2C\n");
-	/// inizializza il giroscopio con banda a 190Hz invece cha a 95Hz
-	Rot.initGyro(ODR_190 | Z_AXIS);
+
 	//initGyro(&G, Z_AXIS);
 	tick = 0;
 	/// inizializza il timer 0 e genera un tick da 10 ms
 	initTimer0(INT_STEP_10_MS, &G);
 	PRINTF("inizializzato TIMER0\n");
-	/// imposta il passo di integrazione per il calcolo dell'angolo
-	Rot.tick = (INT_STEP_10_MS / 1000.0) ;
+
 	/// inizializza il timer 1
 	//initTimer1(100);
 	/// inizializza il contatore della persistenza del comando
 	synSTATO.tick = 0;
-	/// inizializza il pwm
-	//pwmMotInit(&PWM);
-	// TODO: //pwmServoInit (&pwmServi);
-	/// inizializza l'adc e lo prepara a funzionare ad interruzioni.
+
 
 	initAdc(distMisPtr);
 	PRINTF("inizializzato ADC\n");
@@ -169,91 +164,16 @@ int main(void) {
 	resetAutoma(&synSTATO);
 	PRINTF("inizializzato automa comandi\n");
 
-	//servo = (pwm *) &pwmServi;
-	/// inizializzazione accelerometro
-	A.testAccel();
-	if (A.isPresent == true)
-		/// imposta l'accelerometro
-		A.impostaAccel();
-	/// iniziailizzazione del lettore encoder
-	//qei_init(&QEI);
+
 
 	/// abilita le interruzioni
 	EI();
 	PRINTF("abilitate interruzioni\n");
-	/// attende che il sensore vada a regime
-	//if (G.IsPresent == OK){
-	if (Rot.IsPresent == OK){
-		PRINTF("\nAzzeramento assi giroscopio\n");
-		while (blink < 70){
-			if (procCom == 1){
-				procCom = 0;
-				blink++;
-			}
-		}
-		blink = 0;
-		/// azzeramento degli assi
-		//azzeraAssi(&G);
-		Rot.azzeraAssi();
-#ifdef _DEBUG_
-		PRINTF("media: ");
-		printFloat(Rot.media, 4);
-		PRINTF("\nm: ");
-		printFloat(Rot.m, 4);
-		PRINTF("\nq: ");
-		printFloat(Rot.q, 4);
-		PRINTF("\n");
-#endif
-	}
 
-	/// test della presenza del modulo zig-bee
-	/// il modulo zig-be si attiva con al sequnza '+++' e risponde con 'OK' (maiuscolo)
-//	if (testXbee() == 0){
-//		// ok;
-//		XB.present = 1;
-//		PRINTF("Modulo xbee presente.\n");
-//	}
-//	else{
-//		XB.present = 0;
-//		PRINTF("Modulo xbee non presente.\n");
-//	}
-//
-//	pwm_power(&PWM);
 	contatore = 0;
-
-	//// inizializza l'accelrometro
-	//stato =  writeI2CByte(CTRL_REG1_A, ODR1 + ODR0 + ZaxEN + YaxEN + XaxEN);
-	// scrivo nel registro 0x20 il valore 0x0F, cioe' banda minima, modulo on e assi on
-	/// sintassi: indirizzo slave, num parm, indirizzo reg, valore da scrivere
-	//I2CSend(ACCEL_ADDR, 2, CTRL_REG1_A, ODR1 + ODR0 + ZaxEN + YaxEN + XaxEN);
-//	A.isPresent = testAccel();
-//	if (A.isPresent)
-//		impostaAccel(&A);
-//
-//	/// taratura sul sensore di luminosita'
-//	whiteBal(&COL);
-//	/// taratura del sensore di temepratura
-//	taraturaTemp(&TEMP);
-//
-//	///
-//	qei_test(&QEI);
-	/// task principale
-	int tempCont = 0;
+	volatile uint8_t numSens, sblocco = 0;
 	while(1){
 
-		if (HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_0 << 2))) != GPIO_PIN_0){
-			PRINTF("Azzeramento assi \n");
-			Rot.azzeraAssi();
-			PRINTF("media:\t ");
-			printFloat(Rot.media, 4);
-			PRINTF("\nm:\t ");
-			printFloat(Rot.m, 4);
-			PRINTF("\nq:\t ");
-			printFloat(Rot.q, 4);
-			PRINTF("\n");
-			//Rot.yawF = 0.0;
-			tempCont = 0;
-		}
 		///extern volatile uint8_t uart1buffer[16], RX_PTR1, READ_PTR1;
 		/*    *****     */
 		// controllo di messaggio sulla seriale 1 (ricevuto comando da rasp
@@ -262,158 +182,54 @@ int main(void) {
 			 parse(&synSTATO, &CMD);
 			 /// aggiorna il buffer
 			 READ_PTR1++;
-			 READ_PTR1 &= 0xF;
+			 READ_PTR1 &= DIM_READ_BUFF1 - 1;
 		}
-		if (synSTATO.valid == VALIDO && synSTATO.token != ERRORE){
-			/// il comandoche e' stato analizzato ha prodotto un risultat adeguato
-			rispondiComando(&synSTATO, &COLLECTDATA);
-			/// avendo terminato la risposta, la validità dell'automa
-			/// va rimossa.
-			synSTATO.valid = NON_VALIDO;
-		}
-		/// invia la risposta per i comandi di rotazione, quando sono stati eseguiti
-//		if(pidPtr->rispondi == TRUE){
-//			rispostaRotazione(pidPtr, &synSTATO);
-//			pidPtr->rispondi = FALSE;
+//		if (synSTATO.valid == VALIDO && synSTATO.token != ERRORE){
+//			/// il comandoche e' stato analizzato ha prodotto un risultat adeguato
+//			rispondiComando(&synSTATO, &COLLECTDATA);
+//			/// avendo terminato la risposta, la validità dell'automa
+//			/// va rimossa.
+//			synSTATO.valid = NON_VALIDO;
 //		}
-//
-		/// aggiorna il PID ogni tick del timer che sono 10ms
-		if (procCom == 1 ){
-			//UARTCharPutNonBlocking(UART1_BASE, 'c');
+
+		if (procCom == 1){
+			/// ciclo da 10 ms
 			procCom = 0;
-			contatore++;
-			lampeggio_led++;
+
+			if (sblocco == 1 && numSens < 6){
+
+				numSens++;
+				uint8_t buff[8], check = 0;
+				buff[0] = 'D';
+				buff[1] = numSens;
+				check ^= buff[0];
+				check ^= buff[1];
+				check ^= CHECK_SUM;
+				buff[2] = check;
+				for (uint8_t i= 0; i < 3; i++)
+					ROM_UARTCharPut(UART1_BASE, buff[i]);
+
+				/// infine invia il terminatore di stringa '*'
+				ROM_UARTCharPut(UART1_BASE, '*');
+
+			}
+			else
+				sblocco = 0;
 		}
-//
-//			if(lampeggio_led >= 50)
-//			{
-//				lampeggio_led = 0;
-//
-//				 if(DATA.surPtr->isSurvivor == TRUE )
-//				{
-//					if(HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GREEN_LED << 2))) != GREEN_LED )
-//						HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (RED_LED << 2))) = 0;
-//
-//					HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GREEN_LED | RED_LED << 2))) ^=  GREEN_LED | RED_LED;
-//
-//
-//				}
-//
-//				HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GREEN_LED << 2))) ^=  GREEN_LED;
-//			}
-//
-//
-//			/*  LETTURA DEL COMANDO */
-//
-//			/// restituisce l'indirizzo del PID da utilizzare nel successivo processo di calcolo
-//			pidPtr =  leggiComando(&synSTATO, CTRL, pidPtr, &DATA);
+		/// lampeggio ed interrogazione dei 5 sensori.
+		if (tick >= 100){
+			PRINTF("\n----\n");
+			///
+			/// accende il pin PB5
+			HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_5 << 2))) |=  GPIO_PIN_5;
+			tick = 0;
+			HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_3 << 2))) ^=  GPIO_PIN_3;
+			/// invia i bytes di richiesta dei sensori di distanza 1,2,3,4,5
+			/// invia tutti i caratteri nella stringa
+			numSens = 0;
+			sblocco = 1;
 
-			/* LETTURA SENSORI  */
-
-
-			/// effettua i calcoli solo se il giroscopio e' presente
-			/// TODO: il PID viene calcolato ongi 10ms oppure ogni 20ms? Come è meglio?
-
-
-			/* misura gli encoder e calcola spostamenti e velocità */
-			/* misura i sensori di distanza */
-			if (tick >= 100){
-
-				/// TODO controllare se riesce a funzionare mentre legge le accelerazioni su I2C
-				ROM_ADCProcessorTrigger(ADC0_BASE, 0);
-				/// accende il pin PB5
-				HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_5 << 2))) |=  GPIO_PIN_5;
-				tick = 0;
-				HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_3 << 2))) ^=  GPIO_PIN_3;
-			}
-
-			if(ADCflag == 1){
-				/// arrivata una nuova conversione AD
-				ADCflag = 0;
-				/// i dati grezzi vongono copiati nella classe distMis.
-				/// verificato il funzionamento del puntatore in adc.cpp
-				/// le due righe successive possono essere tolte.
-				//for (int i = 0; i < 6; i++)
-				//	MISURE.dI[i] = DIST.dI[i];
-#ifdef _DEBUG_
-				for(int i = 1; i < 6; i++){
-
-					PRINTF("val%d: %d \t", i, MISURE.dI[i]);
-
-				}
-				PRINTF("\n");
-
-#endif
-				/// converte la misure grezza in mm
-				MISURE.rawTomm();
-#ifdef _DEBUG_
-				/// ricopia nella struttare DIST:
-				for(int attesa = 1; attesa < 6; attesa++){
-					//if (attesa == 3)
-					//	continue;
-					PRINTF("mm(%d): %d \t", attesa, MISURE.d_mm[attesa]);
-				}
-				PRINTF("\n");
-				//PRINTF("Temperatura %d\n", Rot.getTemp());
-#endif
-			}
-
-
-
-			/// misura i dati forniti dall'accelerometro se disponibili
-//			if(A.isPresent)
-//				misuraAccelerazioni(&A);
-			/// le misure del giroscopio invece sono effettuate solo dall'apposito pid
-			if (procCom == 1 ){
-				contatore++;
-				procCom = 0;
-				if (Rot.IsPresent == OK){
-					/// aggiorna l'angolo di yaw
-					Rot.misuraAngoli();
-#ifdef _DEBUG_
-					if(contatore >= 100){
-						contatore = 0;
-						PRINTF("%d\tasse z: %d\t",tempCont++, Rot.yaw);
-						printFloat(Rot.yawF, 4);
-						PRINTF("\t");
-						printFloat(Rot.yawF0, 4);
-						if (A.isPresent == true){
-							PRINTF("\t");
-							A.misuraAccelerazioni();
-						}
-						PRINTF("\n");
-					}
-#endif
-				}
-			}
-			/*if(G.IsPresent == OK)
-				if( contatore == 1){
-					/// ogni 10 ms effettua il calcolo del PID
-					contatore = 0;
-					HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_0 << 2))) |=  GPIO_PIN_0;
-					PID(&G, pidPtr, &PWM, &CIN);
-					setXPWM(&CTRL[1], &PWM);
-					procCom = 0;
-					HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_0 << 2))) &=  ~GPIO_PIN_0;
-					blink++;
-					/// lampeggio del led con periodo di 2 s.
-					if (blink >= 100){
-						HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + ((GPIO_PIN_2 | GPIO_PIN_1) << 2))) = 0;
-						HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_3 << 2))) ^= GPIO_PIN_3;
-						blink = 0;
-					}
-				///provvede ad integrare la misura della velcita' angolare ogni 10 ms
-				//misuraAngoli(&G);
-				//PRINTF("asse x: %d\t", G.pitch);
-				//PRINTF("\tasse y: %d\t", G.roll);
-				//PRINTF("\tasse z: %d\n", G.yaw);
-				//PRINTF("uscita PID: %d\n", C.uscita);
-			}*/
-
-			/* RISPOSTA AL COMANDO */
-			//inviaSensore(&synSTATO, &DATA);
-
-		//}
+		}
 	}
 }
 
