@@ -353,7 +353,8 @@ int main(void) {
 					//	continue;
 					PRINTF("mm(%d): %d \t", attesa, MISURE.d_mm[attesa]);
 				}
-				PRINTF("\nTemperatura %d\n", Rot.getTemp());
+				PRINTF("\n");
+				//PRINTF("Temperatura %d\n", Rot.getTemp());
 #endif
 			}
 
