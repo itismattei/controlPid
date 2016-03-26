@@ -277,42 +277,14 @@ int main(void) {
 //			pidPtr->rispondi = FALSE;
 //		}
 //
-		/// aggiorna il PID ogni tick del timer che sono 10ms
-		if (procCom == 1 ){
-			//UARTCharPutNonBlocking(UART1_BASE, 'c');
-			procCom = 0;
-			contatore++;
-			lampeggio_led++;
-		}
-//
-//			if(lampeggio_led >= 50)
-//			{
-//				lampeggio_led = 0;
-//
-//				 if(DATA.surPtr->isSurvivor == TRUE )
-//				{
-//					if(HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GREEN_LED << 2))) != GREEN_LED )
-//						HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (RED_LED << 2))) = 0;
-//
-//					HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GREEN_LED | RED_LED << 2))) ^=  GREEN_LED | RED_LED;
-//
-//
-//				}
-//
-//				HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GREEN_LED << 2))) ^=  GREEN_LED;
-//			}
-//
-//
-//			/*  LETTURA DEL COMANDO */
-//
-//			/// restituisce l'indirizzo del PID da utilizzare nel successivo processo di calcolo
-//			pidPtr =  leggiComando(&synSTATO, CTRL, pidPtr, &DATA);
+//		/// aggiorna il PID ogni tick del timer che sono 10ms
+//		if (procCom == 1 ){
+//			//UARTCharPutNonBlocking(UART1_BASE, 'c');
+//			procCom = 0;
+//			contatore++;
+//			lampeggio_led++;
+//		}
 
-			/* LETTURA SENSORI  */
-
-
-			/// effettua i calcoli solo se il giroscopio e' presente
-			/// TODO: il PID viene calcolato ongi 10ms oppure ogni 20ms? Come è meglio?
 
 
 			/* misura gli encoder e calcola spostamenti e velocità */
@@ -320,44 +292,12 @@ int main(void) {
 			if (tick >= 100){
 
 				/// TODO controllare se riesce a funzionare mentre legge le accelerazioni su I2C
-				ROM_ADCProcessorTrigger(ADC0_BASE, 0);
+				//ROM_ADCProcessorTrigger(ADC0_BASE, 0);
 				/// accende il pin PB5
 				HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_5 << 2))) |=  GPIO_PIN_5;
 				tick = 0;
 				HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_3 << 2))) ^=  GPIO_PIN_3;
 			}
-
-			if(ADCflag == 1){
-				/// arrivata una nuova conversione AD
-				ADCflag = 0;
-				/// i dati grezzi vongono copiati nella classe distMis.
-				/// verificato il funzionamento del puntatore in adc.cpp
-				/// le due righe successive possono essere tolte.
-				//for (int i = 0; i < 6; i++)
-				//	MISURE.dI[i] = DIST.dI[i];
-#ifdef _DEBUG_
-				for(int i = 1; i < 6; i++){
-
-					PRINTF("val%d: %d \t", i, MISURE.dI[i]);
-
-				}
-				PRINTF("\n");
-
-#endif
-				/// converte la misure grezza in mm
-				MISURE.rawTomm();
-#ifdef _DEBUG_
-				/// ricopia nella struttare DIST:
-				for(int attesa = 1; attesa < 6; attesa++){
-					//if (attesa == 3)
-					//	continue;
-					PRINTF("mm(%d): %d \t", attesa, MISURE.d_mm[attesa]);
-				}
-				PRINTF("\nTemperatura %d\n", Rot.getTemp());
-#endif
-			}
-
-
 
 			/// misura i dati forniti dall'accelerometro se disponibili
 //			if(A.isPresent)
