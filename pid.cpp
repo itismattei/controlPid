@@ -138,12 +138,13 @@ int ControlloPID::Run(Giroscopio *G, pwm *PWM, distMis *DISTANZA){
 		/// prestare attenzione al segnale d'errore che poi andra' rimosso
 		/// dal PWM perche' i motori, a differenza della regolazione della velocita' dovranno
 		/// fermarsi.
+		G->IsRotating = 1;
 		G->misuraAngoli();
 		e[1] = (float) (valFin - G->yaw);
 		/// calcola l'integrale numerico del PID
 		integra(G->tick);
 		//TODO: adesso si deve mandare il comando al PWM
-
+		G->IsRotating = 0;
 	break;
 
 	case RUOTA_SU_ASSE:

@@ -62,6 +62,7 @@ public:
 	float kz, ky, kx;
 	/// temepratura
 	int temp;
+	/// viene attiato dal pid durante la rotazione in modo da non resettare il giroscopio.
 	char IsRotating;
 private:
 	uint16_t posizione;
