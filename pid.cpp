@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include "pid.h"
 #include "pwm\pwm.h"
-#include "init.h"
+
 
 
 void rispostaRotazione(pid *, syn_stat *);
@@ -219,3 +219,113 @@ void integra(pid *C, float tick){
 	//aggiornamento dell'errore
 	C->e[0] = C->e[1];
 }
+
+
+///
+/// impsotazione dei puntatori ai trasduttori
+void comando::setUptrasducers(Giroscopio *G, pwm *p, distMis *dist){
+	gPtr 		= G;
+	PWM 		= p;
+	distanza 	= dist;
+}
+
+///
+/// esegue il pid selezionato
+int comando::RUN(ControlloPID *p, syn_stat *s){
+	/// controlla il time out del comando e se scaduto si ferma
+	if (s->tick > TIMEOUT_CMD){
+		/// in caso di timeout nella persistenza del comando si deve fermare
+		/// quale era o erano i pid attivo/i?
+		s->token = STOP;
+		s->valid = NON_VALIDO;
+
+		/// deve anche mettere i pid in stato disattivo (.attivo = false)
+		(p + numPid)->attivo = false;
+	}
+	else{
+		/// agggiorna il contatore di persistenza.
+		s->tick++;
+		float soglia = 0.05;
+		/// controllare se arriva un puntatore nullo per il pid, generato da una condizione di time out
+		/// si ricorda che l'errore nel comando  non annulla un comando in esecuzione.
+	//	if (C == NULL) {
+	//		C->attivo = false;
+	//		(C + 1)->attivo= false;
+	//		(C + 2)->attivo= false;
+	//		/// stop al pwm
+	//		PWM->delta_1 = PWM->delta_2 = 0;
+	//		pwm_power(PWM);
+	//		/// spento il PWM esce con codice di errore
+	//		return -1;
+	//	}
+
+		/// seleziona il tipo di PID
+		switch(numPid){
+		case AVANZA:
+			//provvede a misurare la velocita'
+			//misuraVelocità()
+			p->e[1] = (float) ((float)p->valFin - distanza->vel);
+			/// se l'errore e' minore di una soglia, vuoil dire che e' a regime e
+			/// quindi inutile integrare ulteriormente.
+			if (abs(p->e[1]) > soglia  ){
+				/// calcola l'integrale numerico del PID
+				p->integra(gPtr->tick);
+				/// avanti oppure indietro
+				if(p->e[1] > 0.0)
+					/// avanti
+					PWM->dir_1 = PWM->dir_2 = 1;
+				else
+					/// indietro
+					PWM->dir_1 = PWM->dir_2 = 2;
+				/// impostazione del PWM ed invio del comando
+				//setXPWM(C, PWM);
+			}
+			else
+				p->attivo = false;
+
+		break;
+
+		case RUOTA:
+			///provvede ad integrare la misura della velcita' angolare
+			/// prestare attenzione al segnale d'errore che poi andra' rimosso
+			/// dal PWM perche' i motori, a differenza della regolazione della velocita' dovranno
+			/// fermarsi.
+			gPtr->misuraAngoli();
+			p->e[1] = (float) (p->valFin - gPtr->yaw);
+			/// calcola l'integrale numerico del PID
+			p->integra(gPtr->tick);
+			//TODO: adesso si deve mandare il comando al PWM
+
+		break;
+
+		case RUOTA_SU_ASSE:
+			gPtr->misuraAngoli();
+			p->e[1] = (float) (p->valFin - gPtr->yaw);
+			/// calcola l'integrale numerico del PID
+			p->integra(gPtr->tick);
+			if (p->e[1] > 0.0){
+				///ruota in senso antiorario
+				PWM->dir_1 = 1;
+				PWM->dir_2 = 2;
+			}
+			else{
+				/// in senso orario
+				PWM->dir_1 = 2;
+				PWM->dir_2 = 1;
+			}
+			///
+			if(p->e[1] > -1.0 && p->e[1] < 1.0){
+				/// si può pensare che il comando sia stato eseguito e completato e quindi si puo' comunicare
+				/// questo evento.
+				p->rispondi = TRUE;
+			}
+			/// impostazione del PWM ed invio del comando
+			//setXPWM(C, PWM);
+		break;
+		}
+		return 0;
+	}
+}
+
+
+

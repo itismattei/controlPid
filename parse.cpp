@@ -33,7 +33,7 @@ void resetAutoma(syn_stat * STATO){
 ///
 /// analizza il comando che e' arrivato
 ///
-void parse(syn_stat *STATO, comando *cmdPtr){
+void parse(syn_stat *STATO, comando *cmdPtr, syntaxStatus *synPtr){
 
 
 	STATO->cmd[STATO->ST] = uart1buffer[READ_PTR1];
@@ -107,22 +107,27 @@ void convertToToken(syn_stat *STATO, comando *cmdPtr){
 	case 'F':
 		STATO->token = AVANTI;
 		cmdPtr->azione = true;
+		cmdPtr->numPid = 0;
 	break;
 	case 'B':
 		STATO->token = INDIETRO;
 		cmdPtr->azione = true;
+		cmdPtr->numPid = 0;
 	break;
 	case 'S':
 		STATO->token = STOP;
 		cmdPtr->azione = true;
+		cmdPtr->numPid = -1;
 	break;
 	case 'R':
 		STATO->token = DESTRA;
 		cmdPtr->azione = true;
+		cmdPtr->numPid = 1;
 	break;
 	case 'L':
 		STATO->token = SINISTRA;
 		cmdPtr->azione = true;
+		cmdPtr->numPid = 2;
 	break;
 	case 'I':
 		STATO->token = GIRA_INDIETRO;
@@ -145,6 +150,7 @@ void convertToToken(syn_stat *STATO, comando *cmdPtr){
 	default:
 		/// se nessun comando e'giusto produce un errore.
 		STATO->token = ERRORE;
+		cmdPtr->numPid = -1;
 	break;
 	}
 
@@ -157,6 +163,7 @@ void convertToToken(syn_stat *STATO, comando *cmdPtr){
 	STATO->tick = 0;
 
 }
+
 
 ///
 /// legge il comando e restituisce, quando il comando e' valido il puntatore al pid di interesse

@@ -31,17 +31,29 @@ typedef struct _glb{
 
 class syntaxStatus{
 public:
-	syntaxStatus(){valore = 0;}
+	syntaxStatus(){valore = 0; tick = 0;}
 
 	int valore;
+	int ST;
+	uint8_t 	cmd[4];			/// lunghezza del comando fissa: 4 bytes
+	uint8_t 	l_cmd;			/// lunghezza in bytes del comando
+	uint8_t		check;			/// checksum del comando
+	uint8_t 	token;			/// valore numerico del comando
+	uint8_t 	tick;			/// tempo di persistenza del comando
+	uint16_t	valid;			/// stato di validita' del comando
+	uint8_t		buff_reply[8];	/// buffer della risposta
+	uint8_t		dato_valido;	/// validita' della risposta del sensore
+	uint8_t		suspend_reply;	/// usata per i comandi che necessitano di risposta alla fine
 };
+
+
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void parse(syn_stat *,  comando *);
-void convertToToken(syn_stat *, comando *);
+void parse(syn_stat *,  comando *, syntaxStatus *);
+void convertToToken(syn_stat *, comando * );
 /// reset dell'automa (o inizializzazione)
 void resetAutoma(syn_stat * STATO);
 void initModule();
@@ -61,5 +73,6 @@ void dati_a_struttura(gyro *, distanza *, cinematica *, colore *, temperatura* ,
 void datiRaccolti(cinematica *CIN, colore *COL, temperatura *TEMP, survivor *SUR, distMis *DIS, Giroscopio *GYRO, glb *GLB );
 
 pid * leggiComando(syn_stat *sSTAT, pid CTRL[], pid *p, dati *);
+void EseguiPID(syn_stat *sSTAT, ControlloPID *);
 
 #endif /* PARSE_H_ */

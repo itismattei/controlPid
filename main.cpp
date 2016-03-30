@@ -76,6 +76,7 @@ int main(void) {
 	volatile uint32_t valore = 0, i, blink = 0, contatore, lampeggio_led;
 	volatile int32_t arrot;
 	volatile int16_t val1 = 0, x, y, z;
+	syntaxStatus synStat;
 	//distanza DIST;
 	distMis  MISURE;
 	distMisPtr = &MISURE;
@@ -259,7 +260,7 @@ int main(void) {
 		// controllo di messaggio sulla seriale 1 (ricevuto comando da rasp
 		if (READ_PTR1 != RX_PTR1){
 			/// analizza il comando e imposta il valore dell'oggetto CMD (comando)
-			 parse(&synSTATO, &CMD);
+			 parse(&synSTATO, &CMD, & synStat);
 			 /// aggiorna il buffer
 			 READ_PTR1++;
 			 READ_PTR1 &= DIM_READ_BUFF - 1;
@@ -283,7 +284,7 @@ int main(void) {
 			procCom = 0;
 			contatore++;
 			lampeggio_led++;
-		}
+
 //
 //			if(lampeggio_led >= 50)
 //			{
@@ -307,7 +308,9 @@ int main(void) {
 //
 //			/// restituisce l'indirizzo del PID da utilizzare nel successivo processo di calcolo
 //			pidPtr =  leggiComando(&synSTATO, CTRL, pidPtr, &DATA);
+			CMD.RUN(cPid, &synSTATO);
 
+		}
 			/* LETTURA SENSORI  */
 
 

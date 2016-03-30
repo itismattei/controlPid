@@ -15,19 +15,28 @@
 #include <stdint.h>
 #include "Giroscopio.h"
 #include "distMis.h"
+#include "init.h"
 
 #define			AVANZA			0
 #define			RUOTA			1
 #define			RUOTA_SU_ASSE	2
 
+class ControlloPID;
+
 class comando{
 public:
 	comando(){azione = false; isRun = false; finished = false;}
+	int RUN(ControlloPID *, syn_stat *);
+	void setUptrasducers(Giroscopio	*gPtr, pwm	*PWM, distMis *distanza);
 
 	bool azione;			//indica se e' un comando di azione
 	bool isRun;				// indica se il comando sta andando
 	bool finished;			// indica se il comando e' giunto al termine
 	int numPid;				// numero del PID attivo
+	int token;				// numero del comando
+	Giroscopio 	*gPtr;
+	pwm			*PWM;
+	distMis		*distanza;
 };
 
 class ControlloPID{
@@ -66,6 +75,7 @@ typedef struct _pid{
 	bool 		attivo;		/// indica se il pid agisce o e' disattivato.
 	uint8_t		rispondi;	/// flag che indica che occorre fornire risposta, per i comandi di tipo rotazione
 } pid;
+
 
 #ifdef __cplusplus
 extern "C" {
