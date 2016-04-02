@@ -266,6 +266,47 @@ int main(void) {
 //			pidPtr->rispondi = FALSE;
 //		}
 //
+
+			/* LETTURA SENSORI  */
+
+
+			/// effettua i calcoli solo se il giroscopio e' presente
+			/// TODO: il PID viene calcolato ongi 10ms oppure ogni 20ms? Come è meglio?
+
+
+			/* misura gli encoder e calcola spostamenti e velocità */
+			/* misura i sensori di distanza */
+			if (tick >= 100){
+
+//				/// TODO controllare se riesce a funzionare mentre legge le accelerazioni su I2C
+				ROM_ADCProcessorTrigger(ADC0_BASE, 0);
+//				/// accende il pin PB5
+				qei_test(&QEI);
+				HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_5 << 2))) |=  GPIO_PIN_5;
+				tick = 0;
+				HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_3 << 2))) ^=  GPIO_PIN_3;
+			}
+
+//		
+#ifdef _DEBUG_
+				for(int i = 1; i < 6; i++){
+
+					PRINTF("val%d: %d \t", i, MISURE.dI[i]);
+				}
+				PRINTF("\n");
+//
+#endif
+//				/// converte la misure grazza in mm
+				MISURE.rawTomm();
+#ifdef _DEBUG_
+//				/// ricopia nella struttare DIST:
+				for(int attesa = 1; attesa < 6; attesa++){
+//					if (attesa == 3)
+//						continue;
+					PRINTF("mm(%d): %d \t", attesa, MISURE.d_mm[attesa]);
+				}
+
+#endif
 		/// aggiorna il PID ogni tick del timer che sono 10ms
 		if (procCom == 1 ){
 			//UARTCharPutNonBlocking(UART1_BASE, 'c');
@@ -298,85 +339,29 @@ int main(void) {
 //			pidPtr =  leggiComando(&synSTATO, CTRL, pidPtr, &DATA);
 			CMD.RUN(cPid, &synSTATO);
 
-		}
-			/* LETTURA SENSORI  */
 
-
-			/// effettua i calcoli solo se il giroscopio e' presente
-			/// TODO: il PID viene calcolato ongi 10ms oppure ogni 20ms? Come è meglio?
-
-
-			/* misura gli encoder e calcola spostamenti e velocità */
-			/* misura i sensori di distanza */
-			if (tick >= 100){
-
-//				/// TODO controllare se riesce a funzionare mentre legge le accelerazioni su I2C
-				ROM_ADCProcessorTrigger(ADC0_BASE, 0);
-//				/// accende il pin PB5
-				qei_test(&QEI);
-				HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_5 << 2))) |=  GPIO_PIN_5;
-				tick = 0;
-				HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_3 << 2))) ^=  GPIO_PIN_3;
-			}
-
-//			if(ADCflag == 1){
-//				/// arrivata una nuova conversione AD
-//				ADCflag = 0;
-				/// i dati grezzi vongono copiati nella classe distMis.
-				/// verificato il funzionamento del puntatore in adc.cpp
-				/// le due righe successive possono essere tolte.
-				//for (int i = 0; i < 6; i++)
-				//	MISURE.dI[i] = DIST.dI[i];
-//		
-#ifdef _DEBUG_
-				for(int i = 1; i < 6; i++){
-
-					PRINTF("val%d: %d \t", i, MISURE.dI[i]);
-				}
-//				PRINTF("\n");
-//
-#endif
-//				/// converte la misure grazza in mm
-				MISURE.rawTomm();
-#ifdef _DEBUG_
-//				/// ricopia nella struttare DIST:
-				for(int attesa = 1; attesa < 6; attesa++){
-//					if (attesa == 3)
-//						continue;
-					PRINTF("mm(%d): %d \t", attesa, MISURE.d_mm[attesa]);
-				}
-//				PRINTF("\n********\n");
-#endif
-//			}
-
-
-
-			/// misura i dati forniti dall'accelerometro se disponibili
-//			if(A.isPresent)
-//				misuraAccelerazioni(&A);
 			/// le misure del giroscopio invece sono effettuate solo dall'apposito pid
-			if (procCom == 1 ){
-				contatore++;
-				procCom = 0;
-				if (Rot.IsPresent == OK){
-					/// aggiorna l'angolo di yaw
-					Rot.misuraAngoli();
+
+			if (Rot.IsPresent == OK){
+				/// aggiorna l'angolo di yaw
+				Rot.misuraAngoli();
 #ifdef _DEBUG_
-					if(contatore >= 100){
-						contatore = 0;
-						PRINTF("%d\tasse z: %d\t",tempCont++, Rot.yaw);
-						printFloat(Rot.yawF, 4);
+				if(contatore >= 100){
+					contatore = 0;
+					PRINTF("%d\tasse z: %d\t",tempCont++, Rot.yaw);
+					printFloat(Rot.yawF, 4);
+					PRINTF("\t");
+					printFloat(Rot.yawF0, 4);
+					if (A.isPresent == true){
 						PRINTF("\t");
-						printFloat(Rot.yawF0, 4);
-						if (A.isPresent == true){
-							PRINTF("\t");
-							A.misuraAccelerazioni();
-						}
-						PRINTF("\n");
+						A.misuraAccelerazioni();
 					}
-#endif
+					PRINTF("\n");
+					PRINTF("Temperatura %d\n", Rot.getTemp());
 				}
+#endif
 			}
+		}
 			/*if(G.IsPresent == OK)
 				if( contatore == 1){
 					/// ogni 10 ms effettua il calcolo del PID
