@@ -32,7 +32,6 @@ typedef struct _qei{
 
 
 
-
 void QEI0IntHandler();
 void QEI1IntHandler();
 void UnlockPD7();

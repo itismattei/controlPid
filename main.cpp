@@ -55,6 +55,7 @@
 #include "distMis.h"
 #include "Giroscopio.h"
 #include "parse.h"
+#include "encQuad.h"
 
 
 
@@ -85,6 +86,7 @@ int main(void) {
 	///definizione strutture/////
 	//-------------------------//
 
+	encQuad ENC0, ENC1;
 	//volatile double d = 1.9845637456;
 	gyro G;
 	Giroscopio Rot;
@@ -179,7 +181,8 @@ int main(void) {
 		A.impostaAccel();
 	/// iniziailizzazione del lettore encoder
 	qei_init(&QEI);
-
+	ENC0.setAddr(QEI0_BASE);
+	ENC1.setAddr(QEI1_BASE);
 	/// abilita le interruzioni
 	EI();
 	PRINTF("abilitate interruzioni\n");
