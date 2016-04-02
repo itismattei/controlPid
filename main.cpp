@@ -315,7 +315,6 @@ int main(void) {
 			procCom = 0;
 			contatore++;
 			lampeggio_led++;
-
 //
 //			if(lampeggio_led >= 50)
 //			{
@@ -340,8 +339,6 @@ int main(void) {
 //			/// restituisce l'indirizzo del PID da utilizzare nel successivo processo di calcolo
 //			pidPtr =  leggiComando(&synSTATO, CTRL, pidPtr, &DATA);
 			CMD.RUN(cPid, &synSTATO);
-
-
 			/// le misure del giroscopio invece sono effettuate solo dall'apposito pid
 
 			if (Rot.IsPresent == OK){

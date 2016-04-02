@@ -28,6 +28,8 @@ Giroscopio::Giroscopio() {
 	// TODO Auto-generated constructor stub
 	tempReg = 0;
 	posizione = 0;
+	yawF0 = 0.0;
+	IsRotating = 0;
 }
 
 Giroscopio::~Giroscopio() {
@@ -72,7 +74,7 @@ void Giroscopio::azzeraAssi(){
 		/// asse z ON
 
 		media = 0;
-		while(conteggio < maxDimBuff){
+		while(conteggio < numSampleBias){
 			/// effettua 32 letture e calcola la media
 			valore = I2CReceive(GYRO_ADDR,STATUS_REG);
 			//PRINTF("REG_STAT 0x%x\n", valore);
@@ -87,10 +89,10 @@ void Giroscopio::azzeraAssi(){
 				for (int i = 0; i < 50000; i++);
 			}
 		}
-		media /= maxDimBuff;
+		media /= numSampleBias;
 
 		//printAsseZ(64);
-		minQuad(buffX, buffValori, maxDimBuff, &m, &q);
+		minQuad(buffX, buffValori, numSampleBias, &m, &q);
 		z0 = (int16_t) media;
 		//tempReg = 0;
 	break;
@@ -138,7 +140,7 @@ void Giroscopio::setupAssi(char stato){
 	pitchF = rollF = yawF = pitchP = rollP = yawP = 0.0;
 	gradiSec = 0;
 	/// trovato empiricamente
-	kz = 1.1688;
+	kz = 1.140;
 	/// lo stato e' cosi' interpretato: bit0: x; bit1: y; bit2: z.
 	/// scrivo nel registro 0x20 il valore 0x0C, cioe' banda minima, modulo on e assi on
 	/// sintassi: indirizzo slave, num parm, indirizzo reg, valore da scrivere
@@ -192,23 +194,26 @@ void Giroscopio::misuraAngoli(){
 			f *= tick;
 			yawF0 += f;
 #endif
-//			if (tempoDiReset >= 1000){
-/// TODO: SE NON STA RUOTANDO POTREBBE EFFETTUARE UN AZZERAMENTO ASSI
+			if (tempoDiReset >= 1000 && IsRotating == 0){
+// TODO: SE NON STA RUOTANDO POTREBBE EFFETTUARE UN AZZERAMENTO ASSI
 
-//				/// sono passati 10 secondi e dovrebbe ricalcolare l'offset degli assi
-//				/// dovrebbe calcolare se G->yawF è cambiato di almeno 1 grado rispetto ai 5 secondi precedenti
-//				/// se non è cambiato dovrebbe azzerare la parte frazionaria
-//				if ((yawF - yawP < 1.0) && (yawF - yawP > -1.0)){
-//					/// dopo 5 secondi non ho avuto variazioni significative e quindi ho integrato l'errore del
-//					/// sensore
-//					yawF = yawP;
-//				}
-//				else{
-//					tmp = (int16_t)yawF;
-//					yawP = (float) tmp;
-//				}
-//				tempoDiReset = 0;
-//			}
+				/// sono passati 10 secondi e dovrebbe ricalcolare l'offset degli assi
+				/// dovrebbe calcolare se G->yawF è cambiato di almeno 1 grado rispetto ai 5 secondi precedenti
+				/// se non è cambiato dovrebbe azzerare la parte frazionaria
+				if ((yawF - yawP < 1.0) && (yawF - yawP > -1.0)){
+					/// dopo 5 secondi non ho avuto variazioni significative e quindi ho integrato l'errore del
+					/// sensore
+					yawF = yawP;
+					PRINTF("\nazzeramento\n");
+				}
+				else{
+					tmp = (int16_t)yawF;
+					yawP = (float) tmp;
+					PRINTF("\noffset\n");
+					azzeraAssi();
+				}
+				tempoDiReset = 0;
+			}
 			/// riporta il valore ad intero
 			yaw = (int16_t) yawF;
 		}
