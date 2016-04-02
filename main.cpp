@@ -108,7 +108,7 @@ int main(void) {
 	/// informazioni sul sopravvissuto
 	survivor SUR;
 	//inizializzazione struttura per qei
-	//qei QEI;
+	qei QEI;
 	/// oggetto che riallinea il mezzo
 	allineamento AL;
 
@@ -177,7 +177,7 @@ int main(void) {
 		/// imposta l'accelerometro
 		A.impostaAccel();
 	/// iniziailizzazione del lettore encoder
-	//qei_init(&QEI);
+	qei_init(&QEI);
 
 	/// abilita le interruzioni
 	EI();
@@ -308,45 +308,46 @@ int main(void) {
 
 			/* misura gli encoder e calcola spostamenti e velocità */
 			/* misura i sensori di distanza */
-			if (tick >= 100){
+			if (tick >= 50){
 
-				/// TODO controllare se riesce a funzionare mentre legge le accelerazioni su I2C
-				ROM_ADCProcessorTrigger(ADC0_BASE, 0);
-				/// accende il pin PB5
+//				/// TODO controllare se riesce a funzionare mentre legge le accelerazioni su I2C
+//				ROM_ADCProcessorTrigger(ADC0_BASE, 0);
+//				/// accende il pin PB5
+				qei_test(&QEI);
 				HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_5 << 2))) |=  GPIO_PIN_5;
 				tick = 0;
 				HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_3 << 2))) ^=  GPIO_PIN_3;
 			}
 
-			if(ADCflag == 1){
-				/// arrivata una nuova conversione AD
-				ADCflag = 0;
+//			if(ADCflag == 1){
+//				/// arrivata una nuova conversione AD
+//				ADCflag = 0;
 				/// i dati grezzi vongono copiati nella classe distMis.
 				/// verificato il funzionamento del puntatore in adc.cpp
 				/// le due righe successive possono essere tolte.
 				//for (int i = 0; i < 6; i++)
 				//	MISURE.dI[i] = DIST.dI[i];
+//		
 #ifdef _DEBUG_
 				for(int i = 1; i < 6; i++){
 
 					PRINTF("val%d: %d \t", i, MISURE.dI[i]);
-
 				}
-				PRINTF("\n");
-
-#endif
-				/// converte la misure grezza in mm
-				MISURE.rawTomm();
-#ifdef _DEBUG_
-				/// ricopia nella struttare DIST:
-				for(int attesa = 1; attesa < 6; attesa++){
-					//if (attesa == 3)
-					//	continue;
-					PRINTF("mm(%d): %d \t", attesa, MISURE.d_mm[attesa]);
-				}
-				PRINTF("\nTemperatura %d\n", Rot.getTemp());
-#endif
-			}
+//				PRINTF("\n");
+//
+//#endif
+//				/// converte la misure grazza in mm
+//				MISURE.rawTomm();
+//#ifdef _DEBUG_
+//				/// ricopia nella struttare DIST:
+//				for(int attesa = 1; attesa < 6; attesa++){
+//					if (attesa == 3)
+//						continue;
+//					PRINTF("mm(%d): %d \t", attesa, MISURE.d_mm[attesa]);
+//				}
+//				PRINTF("\n********\n");
+//#endif
+//			}
 
 
 
