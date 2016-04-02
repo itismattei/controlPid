@@ -308,10 +308,10 @@ int main(void) {
 
 			/* misura gli encoder e calcola spostamenti e velocità */
 			/* misura i sensori di distanza */
-			if (tick >= 50){
+			if (tick >= 100){
 
 //				/// TODO controllare se riesce a funzionare mentre legge le accelerazioni su I2C
-//				ROM_ADCProcessorTrigger(ADC0_BASE, 0);
+				ROM_ADCProcessorTrigger(ADC0_BASE, 0);
 //				/// accende il pin PB5
 				qei_test(&QEI);
 				HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_5 << 2))) |=  GPIO_PIN_5;
@@ -335,18 +335,18 @@ int main(void) {
 				}
 //				PRINTF("\n");
 //
-//#endif
+#endif
 //				/// converte la misure grazza in mm
-//				MISURE.rawTomm();
-//#ifdef _DEBUG_
+				MISURE.rawTomm();
+#ifdef _DEBUG_
 //				/// ricopia nella struttare DIST:
-//				for(int attesa = 1; attesa < 6; attesa++){
+				for(int attesa = 1; attesa < 6; attesa++){
 //					if (attesa == 3)
 //						continue;
-//					PRINTF("mm(%d): %d \t", attesa, MISURE.d_mm[attesa]);
-//				}
+					PRINTF("mm(%d): %d \t", attesa, MISURE.d_mm[attesa]);
+				}
 //				PRINTF("\n********\n");
-//#endif
+#endif
 //			}
 
 
