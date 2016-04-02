@@ -15,6 +15,7 @@
  *  alcune prove
  *  In questa release si testa sia il giroscopio che l'accelerometro.
  *  Si testano anche i sensori di distanza (5 sensori)
+ *  Release con STAMPA DEI SENSORI DI DISTANZA.
  */
 
 
@@ -285,7 +286,7 @@ int main(void) {
 				HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_5 << 2))) |=  GPIO_PIN_5;
 				tick = 0;
 				HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_3 << 2))) ^=  GPIO_PIN_3;
-			}
+
 
 //		
 #ifdef _DEBUG_
@@ -305,6 +306,7 @@ int main(void) {
 //						continue;
 					PRINTF("mm(%d): %d \t", attesa, MISURE.d_mm[attesa]);
 				}
+			}
 
 #endif
 		/// aggiorna il PID ogni tick del timer che sono 10ms

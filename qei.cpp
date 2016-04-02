@@ -245,15 +245,16 @@ void qei_test(qei *p)
 		p->vel_2 =  QEIVelocityGet(QEI1_BASE);
 		p->dir_2 = QEIDirectionGet(QEI1_BASE);
 
-
-			PRINTF("Posizione 1: %d \t", p->pos_1);
-			PRINTF("Posizione 2: %d \n", p->pos_2);
-			PRINTF("direzione 1: %d \n", p->dir_1);
-			PRINTF("Velocita 1: %d \t", p->vel_1);
-			PRINTF("Velocita 2: %d \n", p->vel_2);
-			PRINTF("direzione 1: %d \t", p->dir_1);
-			PRINTF("direzione 2: %d \n", p->dir_2);
-			PRINTF("\n");
+#ifdef _DEBUG_
+		PRINTF("\nPosizione 1: %d \t", p->pos_1);
+		PRINTF("Posizione 2: %d \n", p->pos_2);
+		PRINTF("direzione 1: %d \n", p->dir_1);
+		PRINTF("Velocita 1: %d \t", p->vel_1);
+		PRINTF("Velocita 2: %d \n", p->vel_2);
+		PRINTF("direzione 1: %d \t", p->dir_1);
+		PRINTF("direzione 2: %d \n", p->dir_2);
+		PRINTF("\n");
+#endif
 }
 
 void qei_data(qei *p)
