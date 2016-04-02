@@ -10,7 +10,8 @@
 
 #include <stdint.h>
 
-#define	maxDimBuff	64
+#define		maxDimBuff		64
+#define		numSampleBias	32
 
 class Giroscopio {
 public:
@@ -61,6 +62,8 @@ public:
 	float kz, ky, kx;
 	/// temepratura
 	int temp;
+	/// viene attiato dal pid durante la rotazione in modo da non resettare il giroscopio.
+	char IsRotating;
 private:
 	uint16_t posizione;
 

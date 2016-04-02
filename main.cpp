@@ -267,11 +267,6 @@ int main(void) {
 //		}
 //
 
-			/* LETTURA SENSORI  */
-
-
-			/// effettua i calcoli solo se il giroscopio e' presente
-			/// TODO: il PID viene calcolato ongi 10ms oppure ogni 20ms? Come è meglio?
 
 
 			/* misura gli encoder e calcola spostamenti e velocità */
@@ -279,7 +274,7 @@ int main(void) {
 			if (tick >= 100){
 
 //				/// TODO controllare se riesce a funzionare mentre legge le accelerazioni su I2C
-				ROM_ADCProcessorTrigger(ADC0_BASE, 0);
+				//ROM_ADCProcessorTrigger(ADC0_BASE, 0);
 //				/// accende il pin PB5
 				qei_test(&QEI);
 				HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_5 << 2))) |=  GPIO_PIN_5;
@@ -288,32 +283,17 @@ int main(void) {
 			}
 
 //		
-#ifdef _DEBUG_
-				for(int i = 1; i < 6; i++){
-
-					PRINTF("val%d: %d \t", i, MISURE.dI[i]);
-				}
-				PRINTF("\n");
-//
-#endif
-//				/// converte la misure grazza in mm
-				MISURE.rawTomm();
-#ifdef _DEBUG_
-//				/// ricopia nella struttare DIST:
-				for(int attesa = 1; attesa < 6; attesa++){
+				/// converte la misure grezza in mm
+				/// ricopia nella struttare DIST:
 //					if (attesa == 3)
 //						continue;
-					PRINTF("mm(%d): %d \t", attesa, MISURE.d_mm[attesa]);
-				}
 
-#endif
 		/// aggiorna il PID ogni tick del timer che sono 10ms
 		if (procCom == 1 ){
 			//UARTCharPutNonBlocking(UART1_BASE, 'c');
 			procCom = 0;
 			contatore++;
 			lampeggio_led++;
-
 //
 //			if(lampeggio_led >= 50)
 //			{
@@ -338,8 +318,6 @@ int main(void) {
 //			/// restituisce l'indirizzo del PID da utilizzare nel successivo processo di calcolo
 //			pidPtr =  leggiComando(&synSTATO, CTRL, pidPtr, &DATA);
 			CMD.RUN(cPid, &synSTATO);
-
-
 			/// le misure del giroscopio invece sono effettuate solo dall'apposito pid
 
 			if (Rot.IsPresent == OK){
