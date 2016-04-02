@@ -15,7 +15,7 @@
  *  alcune prove
  *  In questa release si testa sia il giroscopio che l'accelerometro.
  *  Si testano anche i sensori di distanza (5 sensori)
- *  Release con STAMPA DEI SENSORI DI DISTANZA.
+ *  Release con STAMPA DEI SENSORI DI DISTANZA e QEI.
  */
 
 
