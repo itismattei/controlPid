@@ -240,7 +240,8 @@ int comando::RUN(ControlloPID *p, syn_stat *s){
 		s->valid = NON_VALIDO;
 
 		/// deve anche mettere i pid in stato disattivo (.attivo = false)
-		(p + numPid)->attivo = false;
+		if (numPid > 0 && numPid < 3)
+			(p + numPid)->attivo = false;
 	}
 	else{
 		/// agggiorna il contatore di persistenza.
@@ -321,6 +322,10 @@ int comando::RUN(ControlloPID *p, syn_stat *s){
 			}
 			/// impostazione del PWM ed invio del comando
 			//setXPWM(C, PWM);
+		break;
+
+		default:
+			;
 		break;
 		}
 		return 0;

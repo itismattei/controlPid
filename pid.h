@@ -25,7 +25,7 @@ class ControlloPID;
 
 class comando{
 public:
-	comando(){azione = false; isRun = false; finished = false;}
+	comando(){azione = false; isRun = false; finished = false; numPid = -1;}
 	int RUN(ControlloPID *, syn_stat *);
 	void setUptrasducers(Giroscopio	*gPtr, pwm	*PWM, distMis *distanza);
 

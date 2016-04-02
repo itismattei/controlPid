@@ -242,19 +242,7 @@ int main(void) {
 	int tempCont = 0;
 	while(1){
 
-		if (HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_0 << 2))) != GPIO_PIN_0){
-			PRINTF("Azzeramento assi \n");
-			Rot.azzeraAssi();
-			PRINTF("media:\t ");
-			printFloat(Rot.media, 4);
-			PRINTF("\nm:\t ");
-			printFloat(Rot.m, 4);
-			PRINTF("\nq:\t ");
-			printFloat(Rot.q, 4);
-			PRINTF("\n");
-			//Rot.yawF = 0.0;
-			tempCont = 0;
-		}
+
 		///extern volatile uint8_t uart1buffer[16], RX_PTR1, READ_PTR1;
 		/*    *****     */
 		// controllo di messaggio sulla seriale 1 (ricevuto comando da rasp
