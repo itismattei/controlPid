@@ -21,7 +21,8 @@
 #include "driverlib/gpio.h"
 #include "driverlib/pin_map.h"
 #include "driverlib/rom.h"
-
+#include "tiva_i2c.h"
+#include "i2cTiva.h"
 
 
 
@@ -335,3 +336,8 @@ void  I2CReceiveN(uint8_t slave_addr, uint8_t reg, uint8_t numElem, uint8_t buff
 
 }
 
+
+
+I2C::I2C(uint32_t base){
+	BASE_ADDR = base;
+}
