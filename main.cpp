@@ -56,6 +56,7 @@
 #include "Giroscopio.h"
 #include "parse.h"
 #include "encQuad.h"
+#include "I2C/i2cTiva.h"
 
 
 
@@ -147,6 +148,7 @@ int main(void) {
 	PRINT_WELCOME();
     //inizializzo l'i2c
 	InitI2C0();
+	//I2C TEST(I2C1_BASE, GYRO_ADDR);
 	/// messaggio d'inizio
 	PRINTF("inizializzato I2C\n");
 	/// inizializza il giroscopio con banda a 190Hz invece cha a 95Hz
