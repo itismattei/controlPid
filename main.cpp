@@ -147,13 +147,16 @@ int main(void) {
 	/// messaggio d'inizio
 	PRINT_WELCOME();
     //inizializzo l'i2c
-	InitI2C0();
-	//I2C TEST(I2C1_BASE, GYRO_ADDR);
+	//InitI2C0();
+	I2C TEST(I2C1_BASE, GYRO_ADDR);
 	/// messaggio d'inizio
 	PRINTF("inizializzato I2C\n");
 	/// inizializza il giroscopio con banda a 190Hz invece cha a 95Hz
-	Rot.initGyro(ODR_190 | Z_AXIS);
+	//Rot.initGyro(ODR_190 | Z_AXIS);
 	//initGyro(&G, Z_AXIS);
+	if (TEST.I2CGet(WHO_AM_I) == 0xD4){
+			blinkBlueLed();
+	}
 	tick = 0;
 	/// inizializza il timer 0 e genera un tick da 10 ms
 	initTimer0(INT_STEP_10_MS, &G);
