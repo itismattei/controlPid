@@ -8,6 +8,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include "inc/hw_memmap.h"
 #include "inc/hw_types.h"
 #include "gyro_init.h"
@@ -30,10 +31,12 @@ Giroscopio::Giroscopio() {
 	posizione = 0;
 	yawF0 = 0.0;
 	IsRotating = 0;
+	i2cPtr = NULL;
 }
 
 Giroscopio::~Giroscopio() {
-	// TODO Auto-generated destructor stub
+	// TODO Auto-generated destructor stubù
+	i2cPtr = NULL;
 }
 
 void Giroscopio::azzeraAssi(){
@@ -113,19 +116,36 @@ void Giroscopio::initGyro(char assi){
 	volatile uint32_t valore;
 	IsOn = OFF;
 	yaw = roll = pitch = 0;
-	//chiedo il dato presente nel registro WHO_AM_I
-	if (I2CReceive(GYRO_ADDR, WHO_AM_I) == 0xD4){
-		blinkBlueLed();
-		IsPresent = OK;
-		/// imposta gli assi
-		/// per il drone, stato = ALL (0x7)
-		/// per il rover stato = Z (0x4);
-		setupAssi(assi);
+	if (i2cPtr == NULL){
+		//chiedo il dato presente nel registro WHO_AM_I
+		if (I2CReceive(GYRO_ADDR, WHO_AM_I) == 0xD4){
+			blinkBlueLed();
+			IsPresent = OK;
+			/// imposta gli assi
+			/// per il drone, stato = ALL (0x7)
+			/// per il rover stato = Z (0x4);
+			setupAssi(assi);
+		}
+		else{
+			IsPresent = NOT_PRESENT;
+			PRINTF("Giroscopio non presente\n");
+			return;
+		}
 	}
 	else{
-		IsPresent = NOT_PRESENT;
-		PRINTF("Giroscopio non presente\n");
-		return;
+		if (i2cPtr->I2CGet(WHO_AM_I) == 0xD4){
+			blinkBlueLed();
+			IsPresent = OK;
+			/// imposta gli assi
+			/// per il drone, stato = ALL (0x7)
+			/// per il rover stato = Z (0x4);
+			//setupAssi(assi);
+		}
+		else{
+			IsPresent = NOT_PRESENT;
+			PRINTF("Giroscopio non presente\n");
+			return;
+		}
 	}
 }
 
@@ -145,18 +165,35 @@ void Giroscopio::setupAssi(char stato){
 	/// scrivo nel registro 0x20 il valore 0x0C, cioe' banda minima, modulo on e assi on
 	/// sintassi: indirizzo slave, num parm, indirizzo reg, valore da scrivere
 	mask = 0x08 | stato;
-	I2CSend(GYRO_ADDR, 2, CTRL_REG1, mask);
-	if(I2CReceive(GYRO_ADDR, CTRL_REG1) == mask){
-		//GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, GPIO_PIN_1);
-		IsOn = ON;
-		asseOn = stato & 0x7;
-	}
+	if (i2cPtr == NULL){
+		I2CSend(GYRO_ADDR, 2, CTRL_REG1, mask);
+		if(I2CReceive(GYRO_ADDR, CTRL_REG1) == mask){
+			//GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, GPIO_PIN_1);
+			IsOn = ON;
+			asseOn = stato & 0x7;
+		}
 
-	/// set FS to 500 degree per sec.
-	I2CSend(GYRO_ADDR, 2, CTRL_REG4, FS_250);
-	gradiSec = 250;
-	FS = (float) 250.0 / 32768.0;
-	valore = I2CReceive(GYRO_ADDR,CTRL_REG4);
+		/// set FS to 500 degree per sec.
+		I2CSend(GYRO_ADDR, 2, CTRL_REG4, FS_250);
+		gradiSec = 250;
+		FS = (float) 250.0 / 32768.0;
+		valore = I2CReceive(GYRO_ADDR,CTRL_REG4);
+
+	}
+	else{
+		i2cPtr->I2CPut(2, CTRL_REG1, mask);
+		if(i2cPtr->I2CGet(CTRL_REG1) == mask){
+			//GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, GPIO_PIN_1);
+			IsOn = ON;
+			asseOn = stato & 0x7;
+		}
+		/// set FS to 500 degree per sec.
+		i2cPtr->I2CPut(2, CTRL_REG4, FS_250);
+		gradiSec = 250;
+		FS = (float) 250.0 / 32768.0;
+		valore = i2cPtr->I2CGet(CTRL_REG4);
+
+	}
 	PRINTF("Lettura dal REG4 %d - deg/s %d \n", valore, gradiSec);
 }
 
@@ -307,3 +344,12 @@ void Giroscopio::primoAzzeramento(){
 		PRINTF("\n");
 	}
 }
+
+
+///
+/// collega la porta I2C
+void Giroscopio::attachI2C(I2C * p){
+	i2cPtr = p;
+}
+
+

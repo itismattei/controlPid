@@ -9,6 +9,7 @@
 #define GIROSCOPIO_H_
 
 #include <stdint.h>
+#include "I2C/i2cTiva.h"
 
 #define		maxDimBuff		64
 #define		numSampleBias	32
@@ -25,6 +26,7 @@ public:
 	void printAsseZ(int);
 	int getTemp();
 	void primoAzzeramento(void);
+	void attachI2C(I2C *);
 
 	int16_t buffValori[maxDimBuff];
 	int16_t buffX[maxDimBuff];
@@ -66,6 +68,7 @@ public:
 	char IsRotating;
 private:
 	uint16_t posizione;
+	I2C *i2cPtr;
 
 };
 

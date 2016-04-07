@@ -147,10 +147,12 @@ int main(void) {
 	/// messaggio d'inizio
 	PRINT_WELCOME();
     //inizializzo l'i2c
-	InitI2C0();
-	//I2C TEST(I2C1_BASE, GYRO_ADDR);
+	//InitI2C0();
+	I2C TEST(I2C1_BASE);
 	/// messaggio d'inizio
 	PRINTF("inizializzato I2C\n");
+	TEST.I2CSetSlave_Add(GYRO_ADDR);
+	Rot.attachI2C(&TEST);
 	/// inizializza il giroscopio con banda a 190Hz invece cha a 95Hz
 	Rot.initGyro(ODR_190 | Z_AXIS);
 	//initGyro(&G, Z_AXIS);

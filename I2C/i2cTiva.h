@@ -12,9 +12,10 @@
 class I2C{
 public:
 	I2C(){stato = NON_IMPOSTATA;}
-	I2C(uint32_t, uint8_t);
+	I2C(uint32_t);
 
-	void InitI2C(uint32_t, uint8_t);
+	void InitI2C(uint32_t);
+	void I2CSetSlave_Add(uint8_t sa){SLAVE_ADD = sa;}
 	void I2CGetN(uint8_t reg, uint8_t numElem, uint8_t buff[]);
 	uint32_t I2CGet(uint8_t reg);
 	void I2CPut(uint8_t num_of_args, ...);

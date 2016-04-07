@@ -11,6 +11,7 @@
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <stdarg.h>
 #include "inc/hw_i2c.h"
 #include "inc/hw_memmap.h"
@@ -340,13 +341,13 @@ void  I2CReceiveN(uint8_t slave_addr, uint8_t reg, uint8_t numElem, uint8_t buff
 #define I2C1_BASE               0x40021000  // I2C1
 
 
-I2C::I2C(uint32_t base, uint8_t slave_add){
-	InitI2C(base, slave_add);
+I2C::I2C(uint32_t base){
+	InitI2C(base);
 }
 
-void I2C::InitI2C(uint32_t base, uint8_t slave_add){
+void I2C::InitI2C(uint32_t base){
 	BASE_ADDR = base;
-	SLAVE_ADD = slave_add;
+	SLAVE_ADD = NULL;
 	/// gestisco solo I2C0 ed I2C1
 	stato =IMPOSTATA;
 
