@@ -15,7 +15,7 @@
  *  alcune prove
  *  In questa release si testa sia il giroscopio che l'accelerometro.
  *  Si testano anche i sensori di distanza (5 sensori)
- *  Release con STAMPA DEI SENSORI DI DISTANZA e QEI.
+ *  TEST PWM.
  */
 
 
@@ -57,6 +57,7 @@
 #include "parse.h"
 #include "encQuad.h"
 #include "I2C/i2cTiva.h"
+#include "pwm/motpwm.h"
 
 
 
@@ -74,6 +75,8 @@ volatile distMis *distMisPtr;
 void *servo;
 temperatura *TEMPptr;
 
+
+
 int main(void) {
 	
 	volatile uint32_t valore = 0, i, blink = 0, contatore, lampeggio_led;
@@ -87,6 +90,7 @@ int main(void) {
 	///definizione strutture/////
 	//-------------------------//
 
+	PWM_MOTORI M1, M2;
 	encQuad ENC0, ENC1;
 	//volatile double d = 1.9845637456;
 	gyro G;
@@ -248,6 +252,11 @@ int main(void) {
 //	qei_test(&QEI);
 	/// task principale
 	int tempCont = 0;
+	M1.delta = 80;
+	M1.pwmPower();
+	M2.delta = 80;
+	M2.pwmPower();
+
 	while(1){
 
 
