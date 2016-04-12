@@ -91,6 +91,7 @@ int main(void) {
 	//-------------------------//
 
 	PWM_MOTORI M1, M2;
+	PWM_SERVI S1, S2;
 	encQuad ENC0, ENC1;
 	//volatile double d = 1.9845637456;
 	gyro G;
@@ -256,6 +257,10 @@ int main(void) {
 	M1.pwmPower();
 	M2.delta = 80;
 	M2.pwmPower();
+	S1.Init();
+	S2.Init();
+	S1.MotorGo(45);
+	S2.MotorGo(35);
 
 	while(1){
 

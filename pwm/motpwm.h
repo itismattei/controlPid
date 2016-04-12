@@ -11,19 +11,48 @@
 #include "stdint.h"
 
 class PWM_MOTORI{
-public:
-	PWM_MOTORI(){numPwm ++;}
-	~PWM_MOTORI(){if (numPwm > 0) numPwm --;}
 
-	void Init();
-	void pwmPower();
-	///properties
+public:
+	/// static properties
 	static int numPwm;
+
+public:
+	PWM_MOTORI(){numPwm ++; direction = 1;}
+	virtual ~PWM_MOTORI(){if (numPwm > 0) numPwm --;}
+
+	virtual void Init();
+	virtual void pwmPower();
+	void MotorGo();
+	virtual void MotorStop();
+	inline void setDir(int dir){ direction = dir;}
+
+	///properties
 	int NCont;
 	int delta;
+	/// 1 avanti; -1 indietro
+	int direction;
 	uint32_t numPin;
 };
 
+
+///
+///
+class PWM_SERVI : public PWM_MOTORI{
+
+public:
+	/// static properties
+	static int numServi;
+
+
+public:
+	PWM_SERVI(){numServi++; direction = 1;}
+	~PWM_SERVI(){if (numServi > 0) numServi--;}
+	void Init();
+	void MotorGo(int16_t);
+
+	uint32_t convertDeg2Pwm(int16_t gradi);
+
+};
 
 
 #endif /* MOTPWM_H_ */
