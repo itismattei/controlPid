@@ -254,9 +254,9 @@ int main(void) {
 	/// task principale
 	int tempCont = 0;
 	M1.delta = 80;
-	M1.pwmPower();
+	M1.MotorGo();
 	M2.delta = 80;
-	M2.pwmPower();
+	M2.MotorGo();
 	S1.Init();
 	S2.Init();
 	S1.MotorGo(45);
