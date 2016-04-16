@@ -17,7 +17,7 @@ public:
 	static int numPwm;
 
 public:
-	PWM_MOTORI(){numPwm ++; direction = 1;}
+	PWM_MOTORI(){numPwm ++; direction = 1; numMot = numPwm;}
 	virtual ~PWM_MOTORI(){if (numPwm > 0) numPwm --;}
 
 	virtual void Init();
@@ -32,6 +32,7 @@ public:
 	/// 1 avanti; -1 indietro
 	int direction;
 	uint32_t numPin;
+	uint32_t numMot;
 };
 
 
@@ -45,13 +46,13 @@ public:
 
 
 public:
-	PWM_SERVI(){numServi++; direction = 1;}
+	PWM_SERVI(){numServi++; direction = 1; numS = numServi;}
 	~PWM_SERVI(){if (numServi > 0) numServi--;}
 	void Init();
 	void MotorGo(int16_t);
 
 	uint32_t convertDeg2Pwm(int16_t gradi);
-
+	uint32_t numS;
 };
 
 

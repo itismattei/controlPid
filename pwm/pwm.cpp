@@ -271,7 +271,7 @@ int PWM_SERVI::numServi = 0;
 
 void PWM_MOTORI::Init(){
 
-	if(numPwm == 1){
+	if(numMot == 1){
 		/// per ottenre una frequenza di 50 Hz necessaria ai servi, partendo da 80MHz di clock si deve dividere pe la costante 1.6e6
 		/// che è ottenuta come prodotto tra 50000 (contenuto del registro di fine conteggio a 16 bit della cpu) e 32 (divisore del clock di sistema)
 		/// 80000000 / (50000 * 32) = 50. Infatti il tempo di raggiungere 1600000 conteggi  e' di 20 ms
@@ -405,7 +405,7 @@ void PWM_MOTORI::pwmPower(){
 ///
 /// muove il motore
 void PWM_MOTORI::MotorGo(){
-	switch (numPwm){
+	switch (numMot){
 	case 1:
 		if (direction == 1){
 			//PWMOutputInvert(PWM0_BASE, PWM_OUT_5_BIT, false);
@@ -438,7 +438,7 @@ void PWM_MOTORI::MotorGo(){
 ///
 /// inizializzazione per i  servi
 void PWM_SERVI::Init(){
-	if(numServi == 1){
+	if(numS == 1){
 		/// per ottenre una frequenza di 50 Hz necessaria ai servi, partendo da 80MHz di clock si deve dividere pe la costante 1.6e6
 		/// che è ottenuta come prodotto tra 50000 (contenuto del registro di fine conteggio a 16 bit della cpu) e 32 (divisore del clock di sistema)
 		/// 80000000 / (50000 * 32) = 50. Infatti il tempo di raggiungere 1600000 conteggi  e' di 20 ms
@@ -468,7 +468,7 @@ void PWM_SERVI::Init(){
 //		ROM_GPIOPinTypeGPIOOutput(GPIO_PORTB_BASE, GPIO_PIN_4 | GPIO_PIN_5);
 
 	    ROM_SysCtlPWMClockSet(SYSCTL_PWMDIV_32);  //divisore per 32
-	    ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_PWM1); //modulo pwm numero 0
+	    ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_PWM1); //modulo pwm numero 1
 
 	    //Configure PE5 Pins as PWM
 	    ROM_GPIOPinConfigure(GPIO_PF2_M1PWM6);  //generatore 3

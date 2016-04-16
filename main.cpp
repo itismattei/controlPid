@@ -152,12 +152,12 @@ int main(void) {
 	/// messaggio d'inizio
 	PRINT_WELCOME();
     //inizializzo l'i2c
-	//InitI2C0();
-	I2C TEST(I2C1_BASE);
+	InitI2C0();
+	//I2C TEST(I2C1_BASE);
 	/// messaggio d'inizio
 	PRINTF("inizializzato I2C\n");
-	TEST.I2CSetSlave_Add(GYRO_ADDR);
-	Rot.attachI2C(&TEST);
+	//TEST.I2CSetSlave_Add(GYRO_ADDR);
+	//Rot.attachI2C(&TEST);
 	/// inizializza il giroscopio con banda a 190Hz invece cha a 95Hz
 	Rot.initGyro(ODR_190 | Z_AXIS);
 	//initGyro(&G, Z_AXIS);
@@ -184,10 +184,10 @@ int main(void) {
 
 	//servo = (pwm *) &pwmServi;
 	/// inizializzazione accelerometro
-	A.testAccel();
-	if (A.isPresent == true)
-		/// imposta l'accelerometro
-		A.impostaAccel();
+//	A.testAccel();
+//	if (A.isPresent == true)
+//		/// imposta l'accelerometro
+//		A.impostaAccel();
 	/// iniziailizzazione del lettore encoder
 	qei_init(&QEI);
 	ENC0.setAddr(QEI0_BASE);
@@ -253,8 +253,12 @@ int main(void) {
 //	qei_test(&QEI);
 	/// task principale
 	int tempCont = 0;
+
+	M1.Init();
 	M1.delta = 80;
 	M1.MotorGo();
+
+	M2.Init();
 	M2.delta = 80;
 	M2.MotorGo();
 	S1.Init();
@@ -303,7 +307,7 @@ int main(void) {
 //				/// TODO controllare se riesce a funzionare mentre legge le accelerazioni su I2C
 				ROM_ADCProcessorTrigger(ADC0_BASE, 0);
 //				/// accende il pin PB5
-				qei_test(&QEI);
+				//qei_test(&QEI);
 				HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_5 << 2))) |=  GPIO_PIN_5;
 				tick = 0;
 				HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_3 << 2))) ^=  GPIO_PIN_3;
