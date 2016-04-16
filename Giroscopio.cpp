@@ -46,50 +46,98 @@ void Giroscopio::azzeraAssi(){
 	uint32_t i ;
 	int16_t x = 0, y = 0, z = 0;
 	uint8_t buffer3A[8];
+
 	switch(asseOn){
+
 	case ALL_AXIS:
 		/// assi ON
-		while(conteggio < 32){
-			/// effettua 32 letture e calcola la media
-			valore = I2CReceive(GYRO_ADDR,STATUS_REG);
-			//PRINTF("REG_STAT 0x%x\n", valore);
-			if (valore != 0){
-				/// tutti gli assi on
-				I2CReceiveN(GYRO_ADDR,OUT_X_L | MUL_READ , 6, buffer);
-				x += (int16_t)((buffer3A[1]<< 8) + buffer3A[0]);
-				y += (int)((buffer3A[3]<< 8) + buffer3A[2]);
-				z += (int)((buffer3A[5]<< 8) + buffer3A[4]);
-				conteggio++;
-				for (i = 0; i < 50000; i++);
+		if (i2cPtr == NULL){
+			while(conteggio < 32){
+				/// effettua 32 letture e calcola la media
+				valore = I2CReceive(GYRO_ADDR,STATUS_REG);
+				//PRINTF("REG_STAT 0x%x\n", valore);
+				if (valore != 0){
+					/// tutti gli assi on
+					I2CReceiveN(GYRO_ADDR,OUT_X_L | MUL_READ , 6, buffer);
+					x += (int16_t)((buffer3A[1]<< 8) + buffer3A[0]);
+					y += (int)((buffer3A[3]<< 8) + buffer3A[2]);
+					z += (int)((buffer3A[5]<< 8) + buffer3A[4]);
+					conteggio++;
+					for (i = 0; i < 50000; i++);
+				}
 			}
+			/// calcola la media: divide  per 32
+			x /= 32;
+			y /= 32;
+			z /= 32;
+			/// assegna il valore nella struct G
+			x0 = x;
+			y0 = y;
+			z0 = z;
 		}
-		/// calcola la media: divide  per 32
-		x /= 32;
-		y /= 32;
-		z /= 32;
-		/// assegna il valore nella struct G
-		x0 = x;
-		y0 = y;
-		z0 = z;
+		else{
+			while(conteggio < 32){
+				/// effettua 32 letture e calcola la media+
+				valore = i2cPtr->I2CGet(STATUS_REG);
+				//PRINTF("REG_STAT 0x%x\n", valore);
+				if (valore != 0){
+					/// tutti gli assi on
+					i2cPtr->I2CGetN(OUT_X_L | MUL_READ , 6, buffer);
+					x += (int16_t)((buffer3A[1]<< 8) + buffer3A[0]);
+					y += (int)((buffer3A[3]<< 8) + buffer3A[2]);
+					z += (int)((buffer3A[5]<< 8) + buffer3A[4]);
+					conteggio++;
+					for (i = 0; i < 50000; i++);
+				}
+			}
+			/// calcola la media: divide  per 32
+			x /= 32;
+			y /= 32;
+			z /= 32;
+			/// assegna il valore nella struct G
+			x0 = x;
+			y0 = y;
+			z0 = z;
+		}
 	break;
 
 	case Z_AXIS:
 		/// asse z ON
-
 		media = 0;
-		while(conteggio < numSampleBias){
-			/// effettua 32 letture e calcola la media
-			valore = I2CReceive(GYRO_ADDR,STATUS_REG);
-			//PRINTF("REG_STAT 0x%x\n", valore);
-			if (valore != 0){
-				/// asse z ON
-				I2CReceiveN(GYRO_ADDR,OUT_Z_L | MUL_READ , 2, buffer);
-				buffValori[conteggio] = (int16_t)((buffer[1]<< 8) + buffer[0]);
-				buffX[conteggio] = conteggio;
-				media += buffValori[conteggio];
-				//z += (int16_t )((buffer[1]<< 8) + buffer[0]);
-				conteggio++;
-				for (int i = 0; i < 50000; i++);
+
+		if (i2cPtr == NULL){
+
+			while(conteggio < numSampleBias){
+				/// effettua 32 letture e calcola la media
+				valore = I2CReceive(GYRO_ADDR,STATUS_REG);
+				//PRINTF("REG_STAT 0x%x\n", valore);
+				if (valore != 0){
+					/// asse z ON
+					I2CReceiveN(GYRO_ADDR,OUT_Z_L | MUL_READ , 2, buffer);
+					buffValori[conteggio] = (int16_t)((buffer[1]<< 8) + buffer[0]);
+					buffX[conteggio] = conteggio;
+					media += buffValori[conteggio];
+					//z += (int16_t )((buffer[1]<< 8) + buffer[0]);
+					conteggio++;
+					for (int i = 0; i < 50000; i++);
+				}
+			}
+		}
+		else{
+			while(conteggio < numSampleBias){
+				/// effettua 32 letture e calcola la media
+				valore = i2cPtr->I2CGet(STATUS_REG);
+				//PRINTF("REG_STAT 0x%x\n", valore);
+				if (valore != 0){
+					/// asse z ON
+					i2cPtr->I2CGetN(OUT_X_L | MUL_READ , 2, buffer);
+					buffValori[conteggio] = (int16_t)((buffer[1]<< 8) + buffer[0]);
+					buffX[conteggio] = conteggio;
+					media += buffValori[conteggio];
+					//z += (int16_t )((buffer[1]<< 8) + buffer[0]);
+					conteggio++;
+					for (int i = 0; i < 50000; i++);
+				}
 			}
 		}
 		media /= numSampleBias;
@@ -100,6 +148,7 @@ void Giroscopio::azzeraAssi(){
 		//tempReg = 0;
 	break;
 	}
+
 }
 
 
@@ -213,7 +262,10 @@ void Giroscopio::misuraAngoli(){
 		/// legge i dati da tutti i registri del giroscopio
 		/// stato = readI2C_N_Byte(OUT_X_L_M, 6, buff);			/// compass
 		if ((asseOn & Z_AXIS) == Z_AXIS){
-			I2CReceiveN(GYRO_ADDR, OUT_Z_L | MUL_READ , 2, buffer);
+			if(i2cPtr == NULL)
+				I2CReceiveN(GYRO_ADDR, OUT_Z_L | MUL_READ , 2, buffer);
+			else
+				i2cPtr->I2CGetN(OUT_Z_L | MUL_READ , 2, buffer);
 			z = (int16_t)((buffer[1]<< 8) + buffer[0]);
 			tmp = z;
 			z = z - z0;
@@ -256,7 +308,10 @@ void Giroscopio::misuraAngoli(){
 		}
 
 		if((asseOn & ALL_AXIS) == ALL_AXIS){
-			I2CReceiveN(GYRO_ADDR, OUT_X_L | MUL_READ , 6, buffer);
+			if(i2cPtr == NULL)
+				I2CReceiveN(GYRO_ADDR, OUT_X_L | MUL_READ , 6, buffer);
+			else
+				i2cPtr->I2CGetN(OUT_X_L | MUL_READ , 6, buffer);
 			x = (int16_t)((buffer[1]<< 8) + buffer[0]) - x0;
 			y = (int)((buffer[3]<< 8) + buffer[2]) -  y0;
 			z = (int)((buffer[5]<< 8) + buffer[4]) -  z0;
@@ -303,7 +358,10 @@ void Giroscopio::misuraAngoli(){
 int Giroscopio::getTemp(){
 
 	int8_t ris;
-	ris = I2CReceive(GYRO_ADDR, OUT_TEMP);
+	if (i2cPtr == NULL)
+		ris = I2CReceive(GYRO_ADDR, OUT_TEMP);
+	else
+		i2cPtr->I2CGet(OUT_TEMP);
 	/// la temperatura dovrebbe avere 25° come punto unito
 	/// cioe' 25 gradi = 0x19 nel sensore e poi
 	/// la retta ha t = -1 * x + 45  cioe':
