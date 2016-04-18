@@ -153,14 +153,15 @@ int main(void) {
 	PRINT_WELCOME();
     //inizializzo l'i2c
 	//InitI2C0();
-	I2C TEST(I2C0_BASE);
+	//I2C TEST(I2C0_BASE);
+	I2C TEST(I2C1_BASE);
 	/// messaggio d'inizio
 	PRINTF("inizializzato I2C\n");
 	//TEST.I2CSetSlave_Add(GYRO_ADDR);
 	//Rot.attachI2C(&TEST);
 	/// inizializza il giroscopio con banda a 190Hz invece cha a 95Hz
 
-	Rot.attachI2C(&TEST);
+	Rot.attachI2C(&TEST, GYRO_ADDR);
 	Rot.initGyro(ODR_190 | Z_AXIS);
 	//initGyro(&G, Z_AXIS);
 	tick = 0;
@@ -257,11 +258,11 @@ int main(void) {
 	int tempCont = 0;
 
 	M1.Init();
-	M1.delta = 80;
+	M1.delta = 10;
 	M1.MotorGo();
 
 	M2.Init();
-	M2.delta = 80;
+	M2.delta = 10;
 	M2.MotorGo();
 	//S1.Init();
 	//S2.Init();
@@ -305,7 +306,10 @@ int main(void) {
 			/* misura gli encoder e calcola spostamenti e velocità */
 			/* misura i sensori di distanza */
 			if (tick >= 100){
-
+				M1.delta += 10;
+				if (M1.delta > 90)
+					M1.delta = 10;
+				M1.MotorGo();
 //				/// TODO controllare se riesce a funzionare mentre legge le accelerazioni su I2C
 				ROM_ADCProcessorTrigger(ADC0_BASE, 0);
 //				/// accende il pin PB5
@@ -368,25 +372,25 @@ int main(void) {
 			CMD.RUN(cPid, &synSTATO);
 			/// le misure del giroscopio invece sono effettuate solo dall'apposito pid
 
-			if (Rot.IsPresent == OK){
-				/// aggiorna l'angolo di yaw
-				Rot.misuraAngoli();
-#ifdef _DEBUG_
-				if(contatore >= 100){
-					contatore = 0;
-					PRINTF("%d\tasse z: %d\t",tempCont++, Rot.yaw);
-					printFloat(Rot.yawF, 4);
-					PRINTF("\t");
-					printFloat(Rot.yawF0, 4);
-					if (A.isPresent == true){
-						PRINTF("\t");
-						A.misuraAccelerazioni();
-					}
-					PRINTF("\n");
-					PRINTF("Temperatura %d\n", Rot.getTemp());
-				}
-#endif
-			}
+//			if (Rot.IsPresent == OK){
+//				/// aggiorna l'angolo di yaw
+//				Rot.misuraAngoli();
+//#ifdef _DEBUG_
+//				if(contatore >= 100){
+//					contatore = 0;
+//					PRINTF("%d\tasse z: %d\t",tempCont++, Rot.yaw);
+//					printFloat(Rot.yawF, 4);
+//					PRINTF("\t");
+//					printFloat(Rot.yawF0, 4);
+//					if (A.isPresent == true){
+//						PRINTF("\t");
+//						A.misuraAccelerazioni();
+//					}
+//					PRINTF("\n");
+//					PRINTF("Temperatura %d\n", Rot.getTemp());
+//				}
+//#endif
+//			}
 		}
 			/*if(G.IsPresent == OK)
 				if( contatore == 1){

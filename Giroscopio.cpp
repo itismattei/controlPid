@@ -406,8 +406,9 @@ void Giroscopio::primoAzzeramento(){
 
 ///
 /// collega la porta I2C
-void Giroscopio::attachI2C(I2C * p){
+void Giroscopio::attachI2C(I2C * p, uint8_t sa){
 	i2cPtr = p;
+	i2cPtr->I2CSetSlave_Add(sa);
 }
 
 
