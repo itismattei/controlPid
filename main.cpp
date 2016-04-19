@@ -309,11 +309,11 @@ int main(void) {
 				M1.delta += 10;
 				if (M1.delta > 90)
 					M1.delta = 10;
-				M1.MotorGo();
+				//M1.MotorGo();
 				M2.delta += 10;
 				if (M2.delta > 90)
 					M2.delta = 10;
-				M2.MotorGo();
+				//M2.MotorGo();
 				PRINTF("pwm1: %d", M1.delta);
 				PRINTF("\t");
 				PRINTF("pwm2: %d\n", M2.delta);
@@ -354,8 +354,36 @@ int main(void) {
 			//UARTCharPutNonBlocking(UART1_BASE, 'c');
 			procCom = 0;
 			contatore++;
-			lampeggio_led++;
+			//lampeggio_led++;
+			if (Rot.IsPresent == OK){
+				/// aggiorna l'angolo di yaw
+				Rot.misuraAngoli();
+#ifdef _DEBUG_
+				if(contatore >= 100){
+					contatore = 0;
+					PRINTF("%d\tasse z: %d\t",tempCont++, Rot.yaw);
+					printFloat(Rot.yawF, 4);
+					PRINTF("\t");
+					printFloat(Rot.yawF0, 4);
+//					if (A.isPresent == true){
+//						PRINTF("\t");
+//						A.misuraAccelerazioni();
+//					}
+					PRINTF("\n");
+				}
+#endif
+			}
 //
+			/*
+			 *
+			 * 			if (procCom == 1 ){
+				contatore++;
+				procCom = 0;
+
+			}
+			 * */
+
+
 //			if(lampeggio_led >= 50)
 //			{
 //				lampeggio_led = 0;
