@@ -11,8 +11,8 @@
 #include <stdint.h>
 #include "I2C/i2cTiva.h"
 
-#define		maxDimBuff		64
-#define		numSampleBias	32
+#define		maxDimBuff		256
+#define		numSampleBias	128
 
 class Giroscopio {
 public:
