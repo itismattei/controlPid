@@ -256,7 +256,13 @@ void Giroscopio::misuraAngoli(){
 	int16_t z, x, y, tmp;
 	uint8_t buffer[8];
 	float f, DPS = FS;
-	valore = I2CReceive(GYRO_ADDR, STATUS_REG);
+	/// controlla se c'e' la classe I2C oppure e' il vecchio metodo,
+	/// cioe' la classe Giroscopio gestisce il bus.
+	if(i2cPtr == NULL)
+		valore = I2CReceive(GYRO_ADDR, STATUS_REG);
+	else
+		valore = i2cPtr->I2CGet(STATUS_REG);
+
 	if (valore != 0){
 		tempoDiReset++;
 		/// legge i dati da tutti i registri del giroscopio

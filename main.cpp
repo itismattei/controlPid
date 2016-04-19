@@ -258,11 +258,11 @@ int main(void) {
 	int tempCont = 0;
 
 	M1.Init();
-	M1.delta = 10;
+	M1.delta = 0;
 	M1.MotorGo();
 
 	M2.Init();
-	M2.delta = 10;
+	M2.delta = 0;
 	M2.MotorGo();
 	//S1.Init();
 	//S2.Init();
@@ -310,6 +310,14 @@ int main(void) {
 				if (M1.delta > 90)
 					M1.delta = 10;
 				M1.MotorGo();
+				M2.delta += 10;
+				if (M2.delta > 90)
+					M2.delta = 10;
+				M2.MotorGo();
+				PRINTF("pwm1: %d", M1.delta);
+				PRINTF("\t");
+				PRINTF("pwm2: %d\n", M2.delta);
+
 //				/// TODO controllare se riesce a funzionare mentre legge le accelerazioni su I2C
 				ROM_ADCProcessorTrigger(ADC0_BASE, 0);
 //				/// accende il pin PB5
@@ -320,7 +328,7 @@ int main(void) {
 
 
 //		
-#ifdef _DEBUG_
+#ifndef _DEBUG_
 				for(int i = 1; i < 6; i++){
 
 					PRINTF("val%d: %d \t", i, MISURE.dI[i]);
@@ -330,16 +338,17 @@ int main(void) {
 #endif
 //				/// converte la misure grazza in mm
 				MISURE.rawTomm();
-#ifdef _DEBUG_
+#ifndef _DEBUG_
 //				/// ricopia nella struttare DIST:
 				for(int attesa = 1; attesa < 6; attesa++){
 //					if (attesa == 3)
 //						continue;
 					PRINTF("mm(%d): %d \t", attesa, MISURE.d_mm[attesa]);
 				}
+#endif
 			}
 
-#endif
+
 		/// aggiorna il PID ogni tick del timer che sono 10ms
 		if (procCom == 1 ){
 			//UARTCharPutNonBlocking(UART1_BASE, 'c');
