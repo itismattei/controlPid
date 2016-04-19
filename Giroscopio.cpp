@@ -108,7 +108,7 @@ void Giroscopio::azzeraAssi(){
 		if (i2cPtr == NULL){
 
 			while(conteggio < numSampleBias){
-				/// effettua 32 letture e calcola la media
+				/// effettua numSampleBias letture e calcola la media
 				valore = I2CReceive(GYRO_ADDR,STATUS_REG);
 				//PRINTF("REG_STAT 0x%x\n", valore);
 				if (valore != 0){
@@ -125,12 +125,12 @@ void Giroscopio::azzeraAssi(){
 		}
 		else{
 			while(conteggio < numSampleBias){
-				/// effettua 32 letture e calcola la media
+				/// effettua numSampleBias letture e calcola la media
 				valore = i2cPtr->I2CGet(STATUS_REG);
 				//PRINTF("REG_STAT 0x%x\n", valore);
 				if (valore != 0){
 					/// asse z ON
-					i2cPtr->I2CGetN(OUT_X_L | MUL_READ , 2, buffer);
+					i2cPtr->I2CGetN(OUT_Z_L | MUL_READ , 2, buffer);
 					buffValori[conteggio] = (int16_t)((buffer[1]<< 8) + buffer[0]);
 					buffX[conteggio] = conteggio;
 					media += buffValori[conteggio];

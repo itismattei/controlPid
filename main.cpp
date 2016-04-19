@@ -153,8 +153,8 @@ int main(void) {
 	PRINT_WELCOME();
     //inizializzo l'i2c
 	//InitI2C0();
-	//I2C TEST(I2C0_BASE);
-	I2C TEST(I2C1_BASE);
+	I2C TEST(I2C0_BASE);
+	//I2C TEST(I2C1_BASE);
 	/// messaggio d'inizio
 	PRINTF("inizializzato I2C\n");
 	//TEST.I2CSetSlave_Add(GYRO_ADDR);
