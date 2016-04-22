@@ -70,7 +70,7 @@ void rispondiComando(syn_stat *sSTAT, glb *);
 void inviaSensore(syn_stat *,  glb*);
 
 void dati_a_struttura(gyro *, distanza *, cinematica *, colore *, temperatura* ,survivor *, dati *);
-void datiRaccolti(cinematica *CIN, colore *COL, temperatura *TEMP, survivor *SUR, distMis *DIS, Giroscopio *GYRO, glb *GLB );
+void datiRaccolti(cinematica *CIN, temperatura *TEMP, survivor *SUR, distMis *DIS, Giroscopio *GYRO, glb *GLB );
 
 pid * leggiComando(syn_stat *sSTAT, pid CTRL[], pid *p, dati *);
 void EseguiPID(syn_stat *sSTAT, ControlloPID *);

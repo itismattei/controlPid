@@ -43,22 +43,22 @@ void normalizzaColori(colore *colPtr){
 ///
 /// taratura del sensore
 
-void whiteBal(colore *COL){
+int readCol(void){
 	volatile uint32_t i = 0;
 	/// accende il dispositivo
-	HWREG(GPIO_PORTD_BASE + (GPIO_O_DATA + (GPIO_PIN_0 << 2))) = GPIO_PIN_0;
+	HWREG(GPIO_PORTA_BASE + (GPIO_O_DATA + (GPIO_PIN_2 << 2))) = GPIO_PIN_2;
 	//breve attesa
 	for (i = 0; i < 1000; i++);
 	/// avvia il timer che genera la finestra da 10 ms
 	TimerEnable(TIMER4_BASE, TIMER_A);
 	/// abilita le interruzioni sul pin PD1, che verrano contate
-	GPIOIntEnable(GPIO_PORTD_BASE, GPIO_INT_PIN_1);
+	GPIOIntEnable(GPIO_PORTA_BASE, GPIO_INT_PIN_3);
 	/// attende la fine del campionamento.
 	while(procCom4 == 0);
 	/// deve campionare
 	procCom4 = 0;
 	/// in contLiggthPwm c'e' la lettura dei conteggio del sensore:
-	COL->luminanza = contLightPwm;
+	return contLightPwm;
 	/*contatore = 1;
 	while (contatore == 1);
 	/// entrato qui vuol dire che sto leggendo il sensore di colore
@@ -109,7 +109,7 @@ void readTemp(temperatura *tempPtr){
 /// inizializza il sensore di colore
 void initLightSens(void){
 
-	/// S2 è collegato a PC4, S3 e' collegato a PC7
+	/// S2 è collegato +5, S3 e' collegato a 0: sensibile al bianco
 	/// S0-S1 sono collegati a +5V e abilitano il sensore alla massima potenza
 	ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);
     /// settaggio PC7 e PC4 con corrente di 2mA
@@ -159,6 +159,62 @@ void initLightSens(void){
     //
     ROM_IntEnable(INT_GPIOD);
 }
+
+///
+/// inizializza il sensore di colore
+void initLightSens1(void){
+
+	/// S2 è collegato +5, S3 e' collegato a 0: sensibile al bianco
+	/// S0-S1 sono collegati a +5V e abilitano il sensore alla massima potenza
+//	ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);
+//    /// settaggio PC7 e PC4 con corrente di 2mA
+//
+//    ROM_GPIOPadConfigSet(GPIO_PORTC_BASE, GPIO_PIN_7 | GPIO_PIN_4, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD);
+//    //
+//    // Make the pin(s) be outputs.
+//    //
+//    ROM_GPIODirModeSet(GPIO_PORTC_BASE, GPIO_PIN_7 | GPIO_PIN_4, GPIO_DIR_MODE_OUT);
+//    /// accende PC4 e PC7.
+//    HWREG(GPIO_PORTC_BASE + (GPIO_O_DATA + ((GPIO_PIN_7 | GPIO_PIN_4) << 2))) =  GPIO_PIN_7 | GPIO_PIN_4;
+
+    /// abilita i pin della PORTAA
+    ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
+
+    /// settaggio PA2 con corrente di 12mA
+
+    ROM_GPIOPadConfigSet(GPIO_PORTA_BASE, GPIO_PIN_2, GPIO_STRENGTH_8MA, GPIO_PIN_TYPE_STD);
+    //
+    // Make the pin(s) be outputs.
+    //
+    GPIODirModeSet(GPIO_PORTA_BASE, GPIO_PIN_2, GPIO_DIR_MODE_OUT);
+    /// accende PA2
+    HWREG(GPIO_PORTA_BASE + (GPIO_O_DATA + (GPIO_PIN_2 << 2))) = GPIO_PIN_2;
+    /// Spegne PA2.
+    HWREG(GPIO_PORTA_BASE + (GPIO_O_DATA + (GPIO_PIN_2 << 2))) =  0;
+    //
+    //setup of interrupt on PA3
+    //
+    //TODO: verificare se serve la resistenza di pull-up, in caso chiamare GPIOPadConfigSet DOPO di aver chiamto GPIOPinTypeInput
+    ROM_GPIOPinTypeGPIOInput(GPIO_PORTA_BASE, GPIO_PIN_3);
+    //GPIOIntTypeSet(GPIO_PORTD_BASE, GPIO_PIN_1, GPIO_BOTH_EDGES);
+    ROM_GPIOIntTypeSet(GPIO_PORTA_BASE, GPIO_PIN_3, GPIO_RISING_EDGE);
+    // abilita l'interruzione a livello di periferica
+
+    //GPIOIntEnable(GPIO_PORTD_BASE, GPIO_INT_PIN_1);
+    //verificare se la funzione è necessaria
+    //GPIOIntRegister(GPIO_PORTD_BASE, *IntGPIOd);
+    //
+	// Set the interrupt priorities so they are all equal.
+	//
+	ROM_IntPrioritySet(INT_GPIOA, 0x00);
+	/// disabilita la generazione di interruzioni da parte del pin PD1
+	GPIOIntDisable(GPIO_PORTA_BASE, GPIO_INT_PIN_3);
+    //
+    // Enable the interrupts at CPU controller level.
+    //
+    ROM_IntEnable(INT_GPIOA);
+}
+
 
 ///
 ///  abilitazione timer 4, usato per generare la finestra di lettura del sensore di luminosita'.

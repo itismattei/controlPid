@@ -82,7 +82,9 @@ void IntGPIOd(void){
 }
 
 void IntGpioA(void){
-	;
+
+	GPIOIntClear(GPIO_PORTA_BASE, GPIO_INT_PIN_3);
+	contLightPwm++;
 }
 
 extern volatile int procCom4;
@@ -96,13 +98,13 @@ void Timer4ISR(void){
 	/// pulisce le interruzione del timer4
 	ROM_TimerIntClear(TIMER4_BASE, TIMER_TIMA_TIMEOUT);
 	/// disabilita la porta D a generare interruzioni
-	GPIOIntDisable(GPIO_PORTD_BASE, GPIO_INT_PIN_1);
+	GPIOIntDisable(GPIO_PORTA_BASE, GPIO_INT_PIN_3);
 	/// disabilita il timer 4
 	TimerDisable(TIMER4_BASE, TIMER_A);
 	/// segnala lo scadere del timer
 	procCom4 = 1;
 	/// spento il dispositivo
-	HWREG(GPIO_PORTD_BASE + (GPIO_O_DATA + (GPIO_PIN_0 << 2))) = 0;
+	HWREG(GPIO_PORTA_BASE + (GPIO_O_DATA + (GPIO_PIN_2 << 2))) = 0;
 }
 
 

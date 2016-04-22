@@ -92,6 +92,7 @@ int main(void) {
 
 	PWM_MOTORI M1, M2;
 	//PWM_SERVI S1, S2;
+
 	encQuad ENC0, ENC1;
 	//volatile double d = 1.9845637456;
 	gyro G;
@@ -110,7 +111,7 @@ int main(void) {
 	/// pwm servi e motori
 	pwm PWM, pwmServi;
 	/// struttura del sensore di colore
-	colore COL;
+	Colour CL;
 	/// sensore di temperatura ad infrarossi
 	temperatura TEMP;
 	//TEMPER sensIR;
@@ -138,7 +139,7 @@ int main(void) {
 	//passaggio degli indirizzi delle strutture alla struttura generale
 	//dati_a_struttura(&G, &DIST, &CIN, &COL, &TEMP, &SUR, &DATA);
 	/// l'oggetto COLLECTDATA (glb) e' una struttara che contiene i puntatori alle strutture e classi del progetto
-	datiRaccolti(&CIN, &COL, &TEMP, &SUR, &MISURE, &Rot, &COLLECTDATA);
+	datiRaccolti(&CIN, &TEMP, &SUR, &MISURE, &Rot, &COLLECTDATA);
 
 	/// setup di base
 	setupMCU();
@@ -269,6 +270,10 @@ int main(void) {
 	//S1.MotorGo(45);
 	//S2.MotorGo(35);
 
+	CL.Init();
+	CL.WhiteBalance();
+	//initLightSens1();
+	//whiteBal(&COL);
 	while(1){
 
 

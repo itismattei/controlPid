@@ -27,12 +27,12 @@ void dati_a_struttura(gyro *G, distanza *D, cinematica *CIN, colore *COL, temper
 }
 
 
-void datiRaccolti(cinematica *CIN, colore *COL, temperatura *TEMP, survivor *SUR, distMis *DIS, Giroscopio *GYRO, glb *GLB ){
+void datiRaccolti(cinematica *CIN, temperatura *TEMP, survivor *SUR, distMis *DIS, Giroscopio *GYRO, glb *GLB ){
 
 	GLB->surPtr 	= SUR;
 
 	GLB->cinPtr 	= CIN;
-	GLB->colPtr 	= COL;
+	//GLB->colPtr 	= COL;
 	//GLB->distPtr 	= D;
 	GLB->tempPtr 	= TEMP;
 	GLB->DSTptr 	= DIS;
