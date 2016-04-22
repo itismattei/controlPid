@@ -81,6 +81,9 @@ void IntGPIOd(void){
 //    GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_2, 0);
 }
 
+void IntGpioA(void){
+	;
+}
 
 extern volatile int procCom4;
 

@@ -84,3 +84,11 @@ void accelerometro::misuraAccelerazioni(){
 		///PRINTF("acc x %d\t acc y %d\t acc z %d\n", x, y, z);
 	}
 }
+
+
+void accelerometro::attach(I2C * p, uint8_t sa){
+	i2cPtr = p;
+	i2cPtr->I2CSetSlave_Add(sa);
+}
+
+

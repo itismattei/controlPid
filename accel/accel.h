@@ -3,6 +3,9 @@
 #ifndef _ACCEL1_H_
 #define _ACCEL1_H_
 
+#include "../I2C/i2cTiva.h"
+#include <stdint.h>
+
 ///////////////////////////////////////////////
 ///// ADDRESS
 ///////////////////////////////////////////////
@@ -53,9 +56,11 @@ public:
 	void impostaAccel();
 	void misuraAccelerazioni();
 	void testAccel();
+	void attach(I2C *, uint8_t);
 
 	float 	a[3];			/// valori di accelerazione lungo i 3 assi
 	bool  	isPresent;		/// presenza dell'accelerometro
+	I2C		*i2cPtr;
 
 
 };

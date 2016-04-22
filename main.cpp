@@ -329,7 +329,7 @@ int main(void) {
 
 //		
 #ifndef _DEBUG_
-				for(int i = 1; i < 6; i++){
+				for(int i = 0; i < 6; i++){
 
 					PRINTF("val%d: %d \t", i, MISURE.dI[i]);
 				}
@@ -340,7 +340,7 @@ int main(void) {
 				MISURE.rawTomm();
 #ifndef _DEBUG_
 //				/// ricopia nella struttare DIST:
-				for(int attesa = 1; attesa < 6; attesa++){
+				for(int attesa = 0; attesa < 6; attesa++){
 //					if (attesa == 3)
 //						continue;
 					PRINTF("mm(%d): %d \t", attesa, MISURE.d_mm[attesa]);

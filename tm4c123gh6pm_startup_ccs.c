@@ -54,6 +54,8 @@ extern void Timer1ISR(void);
 extern void UART1IntHandler(void);
 //extern void PortF_ISR(void);
 extern void IntGPIOd(void);
+extern void IntGpioA(void);
+
 extern void Timer1ISR(void);
 extern void Timer4ISR(void);
 /// gestisce l'adc sul sequencer 0
@@ -93,7 +95,7 @@ void (* const g_pfnVectors[])(void) =
     0,                                      // Reserved
     IntDefaultHandler,                      // The PendSV handler
     IntDefaultHandler,                      // The SysTick handler
-    IntDefaultHandler,                      // GPIO Port A
+    IntGpioA,                      // GPIO Port A
     IntDefaultHandler,                      // GPIO Port B
     IntDefaultHandler,                      // GPIO Port C
     IntGPIOd,                      // GPIO Port D
