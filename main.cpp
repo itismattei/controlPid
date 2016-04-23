@@ -70,6 +70,7 @@ volatile int ADCDataReadyFlag = 0;
 extern volatile uint8_t uart1buffer[16], RX_PTR1, READ_PTR1;
 
 volatile distanza *dPtr;
+volatile PWM_SERVI *sensPtr;
 /// puntatore globale per scrivere dentro la classe distMis usando la routine di servizio delle interruzioni
 volatile distMis *distMisPtr;
 void *servo;
@@ -90,10 +91,10 @@ int main(void) {
 	///definizione strutture/////
 	//-------------------------//
 	/// imposta il livello di soglia della batteria a 2600
-	power BATT(2600);
+	power BATT(1900);
 	PWM_MOTORI M1, M2;
-	PWM_SERVI S1, S2;
-
+	PWM_SERVI KIT, SENSORE;
+	sensPtr = &SENSORE;
 	encQuad ENC0, ENC1;
 	//volatile double d = 1.9845637456;
 	gyro G;
@@ -109,8 +110,7 @@ int main(void) {
 	syn_stat synSTATO;
 	/// modulo zigbee per telemetria
 	//xbee XB;
-	/// pwm servi e motori
-	pwm PWM, pwmServi;
+
 	/// struttura del sensore di colore
 	Colour CL;
 	/// sensore di temperatura ad infrarossi
@@ -266,10 +266,10 @@ int main(void) {
 	M2.Init();
 	M2.delta = 0;
 	M2.MotorGo();
-	S1.Init();
-	S2.Init();
-	S1.MotorGo(-70);
-	S2.MotorGo(70);
+	KIT.Init();
+	SENSORE.Init();
+	KIT.MotorGo(0);
+	SENSORE.MotorGo(0);
 
 	CL.Init();
 	CL.WhiteBalance();
@@ -354,9 +354,12 @@ int main(void) {
 			ROM_ADCProcessorTrigger(ADC0_BASE, 0);
 //				/// accende il pin PB5
 			//qei_test(&QEI);
-			HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_5 << 2))) |=  GPIO_PIN_5;
-
-			HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_3 << 2))) ^=  GPIO_PIN_3;
+			//HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_5 << 2))) |=  GPIO_PIN_5;
+			if (BATT.battLevel > BATT.safeLevel)
+				HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_3 << 2))) ^=  GPIO_PIN_3;
+			else
+				/// segnala che la batteria sta finendo, facendo lampeggiare il rosso
+				HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_1 << 2))) ^=  GPIO_PIN_1;
 
 
 #ifdef _DEBUG_
@@ -380,18 +383,26 @@ int main(void) {
 
 #ifndef _DEBUG_
 
-				contatore = 0;
-				PRINTF("%d\tasse z: %d\t",tempCont++, Rot.yaw);
-				printFloat(Rot.yawF, 4);
-				PRINTF("\t");
-				printFloat(Rot.yawF0, 4);
+			contatore = 0;
+			PRINTF("%d\tasse z: %d\t",tempCont++, Rot.yaw);
+			printFloat(Rot.yawF, 4);
+			PRINTF("\t");
+			printFloat(Rot.yawF0, 4);
 //					if (A.isPresent == true){
 //						PRINTF("\t");
 //						A.misuraAccelerazioni();
 //					}
-				PRINTF("\n");
+			PRINTF("\n");
 
 #endif
+			if (ADCDataReadyFlag == 1){
+				/// c'e' un dato campionato pronto, ad esempio la batteria, e viene copiato
+				ADCDataReadyFlag = 0;
+				BATT.battLevel = MISURE.dI[5];
+#ifdef _DEBUG_
+				PRINTF("Liv batteria: %d\n", BATT.battLevel);
+#endif
+			}
 			//// reset del contatore
 			tick100 = 0;
 		}

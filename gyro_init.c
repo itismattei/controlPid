@@ -37,7 +37,7 @@ void blinkBlueLed(){
 
 void blinkRedLed(){
 	volatile uint32_t i;
-	/// per segnalalre la presenza del giroscopio lampeggia 2 volte
+	/// per segnalalre la presenza dell'accelerometro lampeggia 2 volte
 	GPIOPinWrite(GPIO_PORTF_BASE, RED_LED, RED_LED);
 	for (i = 3000000; i > 0; i--);
 	GPIOPinWrite(GPIO_PORTF_BASE, RED_LED, 0);

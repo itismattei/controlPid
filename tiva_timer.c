@@ -36,37 +36,15 @@ void Timer0ISR(void){
     //
     ROM_TimerIntClear(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
 
-    //
-    // Toggle the flag for the first timer.
-    //
-    ///HWREGBITW(&g_ui32Flags, 0) ^= 1;
-
-    //PIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_2, GPIO_PIN_2);
-
+    /// updates timer counters
     procCom = 1;
     tick10++;
     tick100++;
-//    if ((tick % 50) == 0){
-//		uint8_t valore = 0;
-//		uart1buffer[RX_PTR1++] = 'D';
-//		valore += 'D';
-//		uart1buffer[RX_PTR1++] = 1;
-//		valore += 1;
-//		valore ^= 0xA9;
-//		uart1buffer[RX_PTR1++] = valore;
-//		uart1buffer[RX_PTR1++] = '*';
-//		RX_PTR1 &= 0xF;
-//	 }
 
-    //
-    // Use the flags to Toggle the LED for this timer
-    //
-    //GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, g_ui32Flags << 1);
-
-    //
-    // Update the interrupt status on the display.
-    //
 }
+
+///
+/// potrebbe non servire!!!
 
 void Timer1ISR (void)
 {
@@ -81,12 +59,12 @@ void Timer1ISR (void)
 		if(servo->delta_2 == 10)
 		{
 			servo->delta_2 = 5;
-			pwmPowerA7(servo, -90 );
+			//pwmPowerA7(servo, -90 );
 		}
 		else
 		{
 			servo->delta_2 = 10;
-			pwmPowerA7(servo, 90 );
+			//pwmPowerA7(servo, 90 );
 		}
 	}
 
@@ -163,6 +141,9 @@ void initTimer0(int interval, gyro *G){
 }
 
 
+///
+/// per comandare il motore di rotazione del sensore sembrerebbe superfluo,
+/// in quanto può essere chiamato all'interno dello schedulatore dei vari tempi.
 
 void initTimer1(int interval){
     //

@@ -60,31 +60,6 @@ void ControlloPID::integra(float tick){
 	e[0] = e[1];
 }
 
-/// impostazioni dei PID presenti
-//void setupPID(pid C[]){
-//	///
-//	/// inizializza i coeficienti del pid
-//	int i;
-//	for (i = 0; i < 3; i++)
-//		setKpid(&C[i], 1.1, 2.1, 0.5);
-//	/// impostazione del tipo di PID
-//
-//	C[0].tipo = AVANZA;
-//	C[1].tipo = RUOTA;
-//	C[2].tipo = RUOTA_SU_ASSE;
-//}
-
-///
-/// imposta i coefficienti del PID su valori standard
-//void setKpid(pid *C, float kp, float kd, float ki){
-//	C->kp = kp;
-//	C->kd = kd;
-//	C->ki = ki;
-//	/// imposta anche i valori inziali della derivata ed integrale
-//	C->I = 0.0;
-//	C->d = 0.0;
-//}
-
 
 ///
 /// funzione che legge il sensore e calcola il nuovo valore
@@ -193,7 +168,7 @@ void setXPWM(pid *C, pwm *PWM){
 		PWM->delta_2 = (uint32_t)valore;
 	}
 	/// invia i valori al registro del PWM
-	pwm_power(PWM);
+	//pwm_power(PWM);
 
 }
 
