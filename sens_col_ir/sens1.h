@@ -58,13 +58,20 @@ int readCol(void);
 
 class Colour{
 public:
-	Colour(){ luminanza = 0;}
+	Colour(){ luminanza = 0; bianco = 0;}
 
 	inline void Init(){ initLightSens1(); initTimer4(10);}
+	/// legge il valore di luminanza
 	inline int read(){ return readCol(); }
+	/// legge il valore di luminanza
 	inline int get(void){ return luminanza; }
+	/// restituisce il valore del bianco
+	inline int getWhite(void){ return bianco; }
 	inline void set(int v){ luminanza = v; }
-	inline void WhiteBalance(){ set(read()); }
+	//Imposta il livello di bianco, ipotizzando che all'inizio la paistrella sia bianca.
+	inline void WhiteBalance(){ bianco = read(); }
+
+	/// proprieta'
 	int rosso;
 	int verde;
 	int blu;

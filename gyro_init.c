@@ -176,7 +176,7 @@ void setupMCU(void){
 	//
 	// Set the pin direction and mode.
 	//
-	/// PF4 in ingresso
+	/// PF4 e PF0 in ingresso
 	HWREG(GPIO_PORTF_BASE + GPIO_O_DIR) 	&= ~GPIO_PIN_4;
 	HWREG(GPIO_PORTF_BASE + GPIO_O_LOCK) 	= GPIO_LOCK_KEY;
 	HWREG(GPIO_PORTF_BASE + GPIO_O_CR)		= 0xFF;
@@ -201,7 +201,7 @@ void setupMCU(void){
 	/// attesa per l'attuazione delle impostazioni
 	valore = 10;
 	while(--valore);
-	while(HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_4 << 2))) == GPIO_PIN_4);
+	while(HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_0 << 2))) == GPIO_PIN_0);
 	//while(HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_0 << 2))) == GPIO_PIN_0);
 
 

@@ -21,7 +21,7 @@
 #include "sens_col_ir/sens.h"
 
 
-extern volatile int procCom, tick;
+extern volatile int procCom, tick10, tick100;
 extern pwm *servo;
 extern temperatura * TEMPptr;
 
@@ -44,7 +44,8 @@ void Timer0ISR(void){
     //PIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_2, GPIO_PIN_2);
 
     procCom = 1;
-    tick++;
+    tick10++;
+    tick100++;
 //    if ((tick % 50) == 0){
 //		uint8_t valore = 0;
 //		uart1buffer[RX_PTR1++] = 'D';

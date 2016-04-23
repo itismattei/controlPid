@@ -44,7 +44,7 @@ void normalizzaColori(colore *colPtr){
 /// taratura del sensore
 
 int readCol(void){
-	volatile uint32_t i = 0;
+	volatile uint32_t i = 0, tmp;
 	/// accende il dispositivo
 	HWREG(GPIO_PORTA_BASE + (GPIO_O_DATA + (GPIO_PIN_2 << 2))) = GPIO_PIN_2;
 	//breve attesa
@@ -55,10 +55,12 @@ int readCol(void){
 	GPIOIntEnable(GPIO_PORTA_BASE, GPIO_INT_PIN_3);
 	/// attende la fine del campionamento.
 	while(procCom4 == 0);
-	/// deve campionare
+	/// ricarica per prossimo campionamento
 	procCom4 = 0;
+	tmp = contLightPwm;
+	contLightPwm = 0;
 	/// in contLiggthPwm c'e' la lettura dei conteggio del sensore:
-	return contLightPwm;
+	return tmp;
 	/*contatore = 1;
 	while (contatore == 1);
 	/// entrato qui vuol dire che sto leggendo il sensore di colore

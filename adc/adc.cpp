@@ -87,13 +87,9 @@ int32_t ADCSequenceData_Get(uint32_t ui32Base, uint32_t ui32SequenceNum, uint32_
     return(ui32Count);
 }
 
-
-extern  distanza *dPtr;
-
-
 extern  distMis *distMisPtr;
 
-volatile extern  int ADCflag;
+volatile extern  int ADCDataReadyFlag;
 volatile uint32_t numByte;
 
 #ifdef __cplusplus
@@ -109,17 +105,8 @@ void adcISR(void){
 	numByte = ADCSequenceData_Get(ADC0_BASE, 0, distMisPtr->dI);    // Read ADC Value.
 	/// finito di trascrivere i dati, spegne il pin di segnalazione
 	HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_5 << 2))) &=  ~GPIO_PIN_5;
-	/// riavvia il campionamento
-	//HWREG(ADC0_BASE + ADC_O_PSSI) |= ((2 & 0xffff0000) | (1 << (2 & 0xf)));
-	///riutilizzo della variabile attesa per stampare a video i dati provenienti dal buffer dell'adc
-//	for(attesa= 1; attesa < 6; attesa++){
-//		PRINTF("val: %d \t", dPtr->dI[attesa]);
-//		misPtr->dI[attesa] = dPtr->dI[attesa];
-//	}
-//	PRINTF("\n");
-//	misPtr->dI[0] = dPtr->dI[0];
-
-	ADCflag = 1;
+	/// segnala la fine della routine di servizio e la disponibilita' dei dati.
+	ADCDataReadyFlag = 1;
 }
 
 

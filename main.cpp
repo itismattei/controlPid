@@ -58,14 +58,14 @@
 #include "encQuad.h"
 #include "I2C/i2cTiva.h"
 #include "pwm/motpwm.h"
-
+#include "power.h"
 
 
 
 /// variabili globali
-volatile int procCom = 0, tick;
+volatile int procCom = 0, tick10, tick100;
 volatile int procCom4 = 0;
-volatile int ADCflag = 0;
+volatile int ADCDataReadyFlag = 0;
 /// buffer per la seriale che riceve i dati dalla raspPi
 extern volatile uint8_t uart1buffer[16], RX_PTR1, READ_PTR1;
 
@@ -89,7 +89,8 @@ int main(void) {
 	//--------------------------//
 	///definizione strutture/////
 	//-------------------------//
-
+	/// imposta il livello di soglia della batteria a 2600
+	power BATT(2600);
 	PWM_MOTORI M1, M2;
 	//PWM_SERVI S1, S2;
 
@@ -165,7 +166,7 @@ int main(void) {
 	Rot.attachI2C(&TEST, GYRO_ADDR);
 	Rot.initGyro(ODR_190 | Z_AXIS);
 	//initGyro(&G, Z_AXIS);
-	tick = 0;
+	tick10 = tick100 = 0;
 	/// inizializza il timer 0 e genera un tick da 10 ms
 	initTimer0(INT_STEP_10_MS, &G);
 	PRINTF("inizializzato TIMER0\n");
@@ -300,60 +301,12 @@ int main(void) {
 //			pidPtr->rispondi = FALSE;
 //		}
 //
+		/*********************/
+		/* AZIONI CADENZATE  */
+		/*********************/
 
-			/* LETTURA SENSORI  */
-
-
-			/// effettua i calcoli solo se il giroscopio e' presente
-			/// TODO: il PID viene calcolato ongi 10ms oppure ogni 20ms? Come è meglio?
-
-
-			/* misura gli encoder e calcola spostamenti e velocità */
-			/* misura i sensori di distanza */
-			if (tick >= 100){
-				M1.delta += 10;
-				if (M1.delta > 90)
-					M1.delta = 10;
-				//M1.MotorGo();
-				M2.delta += 10;
-				if (M2.delta > 90)
-					M2.delta = 10;
-				//M2.MotorGo();
-				PRINTF("pwm1: %d", M1.delta);
-				PRINTF("\t");
-				PRINTF("pwm2: %d\n", M2.delta);
-
-//				/// TODO controllare se riesce a funzionare mentre legge le accelerazioni su I2C
-				ROM_ADCProcessorTrigger(ADC0_BASE, 0);
-//				/// accende il pin PB5
-				//qei_test(&QEI);
-				HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_5 << 2))) |=  GPIO_PIN_5;
-				tick = 0;
-				HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_3 << 2))) ^=  GPIO_PIN_3;
-
-
-//		
-#ifndef _DEBUG_
-				for(int i = 0; i < 6; i++){
-
-					PRINTF("val%d: %d \t", i, MISURE.dI[i]);
-				}
-				PRINTF("\n");
-//
-#endif
-//				/// converte la misure grazza in mm
-				MISURE.rawTomm();
-#ifndef _DEBUG_
-//				/// ricopia nella struttare DIST:
-				for(int attesa = 0; attesa < 6; attesa++){
-//					if (attesa == 3)
-//						continue;
-					PRINTF("mm(%d): %d \t", attesa, MISURE.d_mm[attesa]);
-				}
-#endif
-			}
-
-
+		/////////////////////////////////////
+		/// AZIONI DA COMPIERE OGNI 10 ms ///
 		/// aggiorna il PID ogni tick del timer che sono 10ms
 		if (procCom == 1 ){
 			//UARTCharPutNonBlocking(UART1_BASE, 'c');
@@ -363,77 +316,88 @@ int main(void) {
 			if (Rot.IsPresent == OK){
 				/// aggiorna l'angolo di yaw
 				Rot.misuraAngoli();
-#ifdef _DEBUG_
-				if(contatore >= 100){
-					contatore = 0;
-					PRINTF("%d\tasse z: %d\t",tempCont++, Rot.yaw);
-					printFloat(Rot.yawF, 4);
-					PRINTF("\t");
-					printFloat(Rot.yawF0, 4);
-//					if (A.isPresent == true){
-//						PRINTF("\t");
-//						A.misuraAccelerazioni();
-//					}
-					PRINTF("\n");
-				}
-#endif
-			}
-//
-			/*
-			 *
-			 * 			if (procCom == 1 ){
-				contatore++;
-				procCom = 0;
 
 			}
-			 * */
 
-
-//			if(lampeggio_led >= 50)
-//			{
-//				lampeggio_led = 0;
-//
-//				 if(DATA.surPtr->isSurvivor == TRUE )
-//				{
-//					if(HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GREEN_LED << 2))) != GREEN_LED )
-//						HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (RED_LED << 2))) = 0;
-//
-//					HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GREEN_LED | RED_LED << 2))) ^=  GREEN_LED | RED_LED;
-//
-//
-//				}
-//
-//				HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GREEN_LED << 2))) ^=  GREEN_LED;
-//			}
-//
-//
-//			/*  LETTURA DEL COMANDO */
-//
-//			/// restituisce l'indirizzo del PID da utilizzare nel successivo processo di calcolo
-//			pidPtr =  leggiComando(&synSTATO, CTRL, pidPtr, &DATA);
 			CMD.RUN(cPid, &synSTATO);
 			/// le misure del giroscopio invece sono effettuate solo dall'apposito pid
+		}
+		/// effettua i calcoli solo se il giroscopio e' presente
+		/// TODO: il PID viene calcolato ongi 10ms oppure ogni 20ms? Come è meglio?
 
-//			if (Rot.IsPresent == OK){
-//				/// aggiorna l'angolo di yaw
-//				Rot.misuraAngoli();
-//#ifdef _DEBUG_
-//				if(contatore >= 100){
-//					contatore = 0;
-//					PRINTF("%d\tasse z: %d\t",tempCont++, Rot.yaw);
-//					printFloat(Rot.yawF, 4);
-//					PRINTF("\t");
-//					printFloat(Rot.yawF0, 4);
+		/////////////////////////////////////
+		/// AZIONI DA COMPIERE OGNI 100ms ///
+		if (tick10 >= 10){
+			tick10 = 0;
+		}
+		/* misura gli encoder e calcola spostamenti e velocità */
+		//////////////////////////////////
+		/// AZIONI DA COMPIERE OGNI 1s ///
+		if (tick100 >= 100){
+			M1.delta += 10;
+			if (M1.delta > 90)
+				M1.delta = 10;
+			//M1.MotorGo();
+			M2.delta += 10;
+			if (M2.delta > 90)
+				M2.delta = 10;
+			//M2.MotorGo();
+//				PRINTF("pwm1: %d", M1.delta);
+//				PRINTF("\t");
+//				PRINTF("pwm2: %d\n", M2.delta);
+
+			PRINTF("Col: %d\t Bianco: %d\n", CL.read(), CL.getWhite());
+//				/// TODO controllare se riesce a funzionare mentre legge le accelerazioni su I2C
+			/// avvia il campionamento degli ADC. I dati vengono posti nell'oggetto MISURE dalla routine di servizio
+			/// dell'interruzione AD.
+			/// Ricordarsi: il dato n.6 e'lo stato della batteria
+			ROM_ADCProcessorTrigger(ADC0_BASE, 0);
+//				/// accende il pin PB5
+			//qei_test(&QEI);
+			HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_5 << 2))) |=  GPIO_PIN_5;
+
+			HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_3 << 2))) ^=  GPIO_PIN_3;
+
+
+#ifdef _DEBUG_
+			for(int i = 0; i < 6; i++){
+
+				PRINTF("val%d: %d \t", i, MISURE.dI[i]);
+			}
+			PRINTF("\n");
+//
+#endif
+//				/// converte la misure grazza in mm
+			MISURE.rawTomm();
+#ifndef _DEBUG_
+//				/// ricopia nella struttare DIST:
+			for(int attesa = 0; attesa < 6; attesa++){
+//					if (attesa == 3)
+//						continue;
+				PRINTF("mm(%d): %d \t", attesa, MISURE.d_mm[attesa]);
+			}
+#endif
+
+#ifndef _DEBUG_
+
+				contatore = 0;
+				PRINTF("%d\tasse z: %d\t",tempCont++, Rot.yaw);
+				printFloat(Rot.yawF, 4);
+				PRINTF("\t");
+				printFloat(Rot.yawF0, 4);
 //					if (A.isPresent == true){
 //						PRINTF("\t");
 //						A.misuraAccelerazioni();
 //					}
-//					PRINTF("\n");
-//					PRINTF("Temperatura %d\n", Rot.getTemp());
-//				}
-//#endif
-//			}
+				PRINTF("\n");
+
+#endif
+			//// reset del contatore
+			tick100 = 0;
 		}
+
+
+
 			/*if(G.IsPresent == OK)
 				if( contatore == 1){
 					/// ogni 10 ms effettua il calcolo del PID
