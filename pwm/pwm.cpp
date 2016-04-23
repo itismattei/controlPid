@@ -24,26 +24,7 @@
 #include "motpwm.h"
 
 
-///******************************************
-/*				PIN PWM
- *
- * 		Tiva		MOTORE destro				L293(pin)
- *
- * 	PB4(M0PWM2)				delta_1				chip enable 1 (1)
- * 		PB6				In_1				input 1(2)
- * 		PB7				In_2				input 2(9)
- * 		 -				dir_1					-
- *
- *
- * 		Tiva		MOTORE sinistro				L293(pin)
- *
- * 	PB5(M0PWM3)			delta_2				chip enable 2 (11)
- * 		PA3				In_3				input 3(12)
- * 		PA2				In_4				input 4(19)
- * 		 -				dir_2					 -
- *
- *
- *******************************************///
+
 
 #define IN1 	GPIO_PIN_6		//PB6
 #define IN2 	GPIO_PIN_7		//PB7
@@ -274,7 +255,7 @@ void PWM_MOTORI::Init(){
 	if(numMot == 1){
 		/// per ottenre una frequenza di 50 Hz necessaria ai servi, partendo da 80MHz di clock si deve dividere pe la costante 1.6e6
 		/// che è ottenuta come prodotto tra 50000 (contenuto del registro di fine conteggio a 16 bit della cpu) e 32 (divisore del clock di sistema)
-		/// 80000000 / (50000 * 32) = 50. Infatti il tempo di raggiungere 1600000 conteggi  e' di 20 ms
+		/// 80000000 / (50 * 32) = 50000. Infatti il tempo di raggiungere 1600000 conteggi  e' di 20 ms
 		/// Per ottenre una frequenza di 8kHz occorre invece dividere il clock per la costante 10000 = 32 * 312.5 e quindi il fine conteggio
 		/// dovra' essere 312. Ci'o significa che la granularità del PWM e' di 1/312 = 0.32% inferiore a quanto riloevabile dai motori
 		/// I valori sono quindi: 80000000 / (8000 * 32) = 80000000 / 256000 e quindi il fine conteggio e' 312.5
@@ -437,121 +418,91 @@ void PWM_MOTORI::MotorGo(){
 
 ///
 /// inizializzazione per i  servi
+/// vengono posti sui pin PD0 e PD1, col generatore PWM n. 1 con periodo di 20ms
 void PWM_SERVI::Init(){
-	if(numS == 1){
+
+	NCont = ROM_SysCtlClockGet() / 1600;
+    delta = 0;
+
+    if(numS == 1){
 		/// per ottenre una frequenza di 50 Hz necessaria ai servi, partendo da 80MHz di clock si deve dividere pe la costante 1.6e6
 		/// che è ottenuta come prodotto tra 50000 (contenuto del registro di fine conteggio a 16 bit della cpu) e 32 (divisore del clock di sistema)
-		/// 80000000 / (50000 * 32) = 50. Infatti il tempo di raggiungere 1600000 conteggi  e' di 20 ms
-		/// Per ottenre una frequenza di 8kHz occorre invece dividere il clock per la costante 10000 = 32 * 312.5 e quindi il fine conteggio
-		/// dovra' essere 312. Ci'o significa che la granularità del PWM e' di 1/312 = 0.32% inferiore a quanto riloevabile dai motori
-		/// I valori sono quindi: 80000000 / (8000 * 32) = 80000000 / 256000 e quindi il fine conteggio e' 312.5
-	    NCont = ROM_SysCtlClockGet() / 1600000;
-	    delta = 0;
+		/// 80000000 / (50 * 32) = 50000. Infatti il tempo di raggiungere 1600000 conteggi  e' di 20 ms
 
 		/// Abilita le porte usate dal PWM, e per il comando della direzione dei motori,
 		/// anche se potrebbero gia' esserlo stato inaltre parti del programma
-	    /// il primo pwm motori deve abilitare PF2
-		ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
+	    /// il primo pwm motori deve abilitare PD0
+		ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD);
 		/// mentre PE4 e' una uscita digitale che combianta con il segnale PWM stabilisce la potenza al motore ed il verso di rotazione
 		/// In pratica se PE4 = '0' e PE5 ha un PWM, supponendo che il motore giri in senso orario, allora
 		/// quando PE4 = '1' e PE5 ha lo stesso PWM ma con polarita' invertita, il motore ruota in senso orario.
-
-		ROM_GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_2);
+		ROM_GPIOPinTypeGPIOOutput(GPIO_PORTD_BASE, GPIO_PIN_0);
 
 		/// azzeramento delle uscite dei pin
-		HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_2) << 2)) =  0;
-		//HWREG(GPIO_PORTA_BASE + (GPIO_O_DATA + (GPIO_PIN_3 | GPIO_PIN_2) << 2)) =  0;
-//	    //
-//	    // Enable the GPIO port B
-//	    //
-//		ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOB);
-//		ROM_GPIOPinTypeGPIOOutput(GPIO_PORTB_BASE, GPIO_PIN_4 | GPIO_PIN_5);
+		HWREG(GPIO_PORTD_BASE + (GPIO_O_DATA + (GPIO_PIN_0) << 2)) =  0;
 
 	    ROM_SysCtlPWMClockSet(SYSCTL_PWMDIV_32);  //divisore per 32
 	    ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_PWM1); //modulo pwm numero 1
 
-	    //Configure PE5 Pins as PWM
-	    ROM_GPIOPinConfigure(GPIO_PF2_M1PWM6);  //generatore 3
-	    //ROM_GPIOPinConfigure(GPIO_PB4_M0PWM2); // generatore 1
-	    ///PE5 e' il modulo 1, mentre PB4 e' il modulo 2 del L298
-	    ROM_GPIOPinTypePWM(GPIO_PORTF_BASE, GPIO_PIN_2);
+	    //Configure PD0 Pins as PWM
+	    ROM_GPIOPinConfigure(GPIO_PD0_M1PWM0);  //modulo 1 generatore 0
 
+	    ROM_GPIOPinTypePWM(GPIO_PORTD_BASE, GPIO_PIN_0);
 
-	    //il generatore e' il numero 3
-	    ROM_PWMGenConfigure(PWM0_BASE, PWM_GEN_3, PWM_GEN_MODE_UP_DOWN | PWM_GEN_MODE_NO_SYNC);
+	    //il generatore e' il numero 0
+	    ROM_PWMGenConfigure(PWM1_BASE, PWM_GEN_0, PWM_GEN_MODE_UP_DOWN | PWM_GEN_MODE_NO_SYNC);
 
 	    //Imposta il periodo del PWM rispetto al clock
-	    ROM_PWMGenPeriodSet(PWM1_BASE, PWM_GEN_3, NCont);
+	    ROM_PWMGenPeriodSet(PWM1_BASE, PWM_GEN_0, NCont);
 
 	    // Enable the PWM generator
-	    ROM_PWMGenEnable(PWM1_BASE, PWM_GEN_3);
+	    ROM_PWMGenEnable(PWM1_BASE, PWM_GEN_0);
 
 	    // Turn on the Output pins (quello di M1PWM6)
-	    ROM_PWMOutputState(PWM1_BASE, PWM_OUT_6_BIT, true);
+	    ROM_PWMOutputState(PWM1_BASE, PWM_OUT_0_BIT, true);
 	    /// PWM non invertito
-	    ROM_PWMOutputInvert(PWM1_BASE, PWM_OUT_6_BIT, false);
+	    ROM_PWMOutputInvert(PWM1_BASE, PWM_OUT_0_BIT, false);
 
 	    /// spegne i PWM
-	    numPin = PWM_OUT_2;
+	    numPin = PWM_OUT_0;
 	    MotorStop();
 
 	}
 	else{
 		/// per ottenre una frequenza di 50 Hz necessaria ai servi, partendo da 80MHz di clock si deve dividere pe la costante 1.6e6
 		/// che è ottenuta come prodotto tra 50000 (contenuto del registro di fine conteggio a 16 bit della cpu) e 32 (divisore del clock di sistema)
-		/// 80000000 / (50000 * 32) = 50. Infatti il tempo di raggiungere 1600000 conteggi  e' di 20 ms
-		/// Per ottenre una frequenza di 8kHz occorre invece dividere il clock per la costante 10000 = 32 * 312.5 e quindi il fine conteggio
-		/// dovra' essere 312. Ci'o significa che la granularità del PWM e' di 1/312 = 0.32% inferiore a quanto riloevabile dai motori
-		/// I valori sono quindi: 80000000 / (8000 * 32) = 80000000 / 256000 e quindi il fine conteggio e' 312.5
-		NCont = ROM_SysCtlClockGet() / 1600000;
-		delta = 0;
+		/// 80000000 / (50 * 32) = 50000. Infatti il tempo di raggiungere 1600000 conteggi  e' di 20 ms
 
-		/// Abilita le porte usate dal PWM, e per il comando della direzione dei motori,
-		/// anche se potrebbero gia' esserlo stato inaltre parti del programma
-		/// il secondo pwm motori deve abilitare PB4
-		//ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOB);
-		/// mentre PE4 e' una uscita digitale che combianta con il segnale PWM stabilisce la potenza al motore ed il verso di rotazione
-		/// In pratica se PA5 = '0' e PB4 ha un PWM, supponendo che il motore giri in senso orario, allora
-		/// quando PA5 = '1' e PB4 ha lo stesso PWM ma con polarita' invertita, il motore ruota in senso orario.
-
-		ROM_GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_3);
+		ROM_GPIOPinTypeGPIOOutput(GPIO_PORTD_BASE, GPIO_PIN_1);
 
 		/// azzeramento delle uscite dei pin
-		HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_3) << 2)) =  0;
-		//HWREG(GPIO_PORTA_BASE + (GPIO_O_DATA + (GPIO_PIN_3 | GPIO_PIN_2) << 2)) =  0;
-//	    //
-//	    // Enable the GPIO port B
-//	    //
-//		ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOB);
-//		ROM_GPIOPinTypeGPIOOutput(GPIO_PORTB_BASE, GPIO_PIN_4 | GPIO_PIN_5);
-
-		ROM_SysCtlPWMClockSet(SYSCTL_PWMDIV_32);  //divisore per 32
-		//ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_PWM1); //modulo pwm numero 0
+		HWREG(GPIO_PORTD_BASE + (GPIO_O_DATA + (GPIO_PIN_1) << 2)) =  0;
+		//ROM_SysCtlPWMClockSet(SYSCTL_PWMDIV_32);  //divisore per 32
+		//ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_PWM1); //modulo pwm numero 1
 
 		//Configure PF3 Pins as PWM
 		//ROM_GPIOPinConfigure(GPIO_PB4_M0PWM5);  //generatore 1
-		ROM_GPIOPinConfigure(GPIO_PF3_M1PWM7); // generatore 1
-		///PE5 e' il modulo 1, mentre PB4 e' il modulo 2 del L298
-		ROM_GPIOPinTypePWM(GPIO_PORTF_BASE, GPIO_PIN_3);
+		ROM_GPIOPinConfigure(GPIO_PD1_M1PWM1); // generatore 1
 
+		ROM_GPIOPinTypePWM(GPIO_PORTD_BASE, GPIO_PIN_1);
 
-		//il generatore e' il numero 3
-		//ROM_PWMGenConfigure(PWM1_BASE, PWM_GEN_3, PWM_GEN_MODE_UP_DOWN | PWM_GEN_MODE_NO_SYNC);
+	    //il generatore e' il numero 1
+	    ROM_PWMGenConfigure(PWM1_BASE, PWM_GEN_1, PWM_GEN_MODE_UP_DOWN | PWM_GEN_MODE_NO_SYNC);
 
-		//Imposta il periodo del PWM rispetto al clock
-		//ROM_PWMGenPeriodSet(PWM1_BASE, PWM_GEN_3, NCont);
+	    //Imposta il periodo del PWM rispetto al clock
+	    ROM_PWMGenPeriodSet(PWM1_BASE, PWM_GEN_1, NCont);
 
-		// Enable the PWM generator
-		//ROM_PWMGenEnable(PWM1_BASE, PWM_GEN_3);
+	    // Enable the PWM generator
+	    ROM_PWMGenEnable(PWM1_BASE, PWM_GEN_1);
 
 		// Turn on the Output pins (quello di M0PWM2)
-		ROM_PWMOutputState(PWM1_BASE, PWM_OUT_7_BIT, true);
+		ROM_PWMOutputState(PWM1_BASE, PWM_OUT_1_BIT, true);
 		/// VA FATTO L'OR CON L'ALTRO PIN????
 		/// PWM non invertito
-		ROM_PWMOutputInvert(PWM1_BASE, PWM_OUT_7_BIT, false);
+		ROM_PWMOutputInvert(PWM1_BASE, PWM_OUT_1_BIT, false);
 
 		/// spegne i PWM
-		numPin = PWM_OUT_3;
+		numPin = PWM_OUT_1;
 		MotorStop();
 
 	}
@@ -559,20 +510,34 @@ void PWM_SERVI::Init(){
 
 
 void PWM_SERVI::MotorGo(int16_t gradi){
-	switch (numServi){
+	switch (numS){
 	///
 	/// attiva il motore su PA6 lo scarico del kit
 	uint32_t valFin;
 	case 1:
 
 		valFin = convertDeg2Pwm(gradi);
-		ROM_PWMPulseWidthSet(PWM1_BASE, PWM_OUT_2, valFin / 100);    //delta_1 e' del servo di movimento dello scrico del rescue kit
+		ROM_PWMPulseWidthSet(PWM1_BASE, PWM_OUT_0, valFin / 100);
 	break;
 
 	case 2:
 
 		valFin = convertDeg2Pwm(gradi);
-		ROM_PWMPulseWidthSet(PWM1_BASE, PWM_OUT_3, valFin / 100);    //delta_1 e' del servo di movimento dello scrico del rescue kit
+		ROM_PWMPulseWidthSet(PWM1_BASE, PWM_OUT_1, valFin / 100);
+	}
+}
+
+
+void PWM_SERVI::MotorStop(){
+	switch (numServi){
+	///
+	/// Spegne il pwm corrispondente
+	case 1:
+		ROM_PWMPulseWidthSet(PWM1_BASE, PWM_OUT_0, 0);
+	break;
+
+	case 2:
+		ROM_PWMPulseWidthSet(PWM1_BASE, PWM_OUT_1, 0);
 	}
 }
 

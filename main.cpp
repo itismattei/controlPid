@@ -92,7 +92,7 @@ int main(void) {
 	/// imposta il livello di soglia della batteria a 2600
 	power BATT(2600);
 	PWM_MOTORI M1, M2;
-	//PWM_SERVI S1, S2;
+	PWM_SERVI S1, S2;
 
 	encQuad ENC0, ENC1;
 	//volatile double d = 1.9845637456;
@@ -266,10 +266,10 @@ int main(void) {
 	M2.Init();
 	M2.delta = 0;
 	M2.MotorGo();
-	//S1.Init();
-	//S2.Init();
-	//S1.MotorGo(45);
-	//S2.MotorGo(35);
+	S1.Init();
+	S2.Init();
+	S1.MotorGo(-70);
+	S2.MotorGo(70);
 
 	CL.Init();
 	CL.WhiteBalance();

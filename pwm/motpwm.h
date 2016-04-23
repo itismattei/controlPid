@@ -18,12 +18,12 @@ public:
 
 public:
 	PWM_MOTORI(){numPwm ++; direction = 1; numMot = numPwm;}
-	virtual ~PWM_MOTORI(){if (numPwm > 0) numPwm --;}
+	~PWM_MOTORI(){if (numPwm > 0) numPwm --;}
 
-	virtual void Init();
-	virtual void pwmPower();
+	void Init();
+	void pwmPower();
 	void MotorGo();
-	virtual void MotorStop();
+	void MotorStop();
 	inline void setDir(int dir){ direction = dir;}
 
 	///properties
@@ -38,7 +38,9 @@ public:
 
 ///
 ///
-class PWM_SERVI : public PWM_MOTORI{
+/// classe che gestisce i due motori servi
+/// vengono posti sui pin PD0 e PD1, col generatore PWM n. 1 con periodo di 20ms
+class PWM_SERVI {
 
 public:
 	/// static properties
@@ -46,13 +48,18 @@ public:
 
 
 public:
-	PWM_SERVI(){numServi++; direction = 1; numS = numServi;}
+	PWM_SERVI(){numServi++; numS = numServi;}
 	~PWM_SERVI(){if (numServi > 0) numServi--;}
 	void Init();
 	void MotorGo(int16_t);
+	void MotorStop(void);
 
 	uint32_t convertDeg2Pwm(int16_t gradi);
+	///properties
+	int NCont;
+	int delta;
 	uint32_t numS;
+	uint32_t numPin;
 };
 
 

@@ -109,58 +109,58 @@ void readTemp(temperatura *tempPtr){
 
 ///
 /// inizializza il sensore di colore
-void initLightSens(void){
+//void initLightSens(void){
 
-	/// S2 è collegato +5, S3 e' collegato a 0: sensibile al bianco
-	/// S0-S1 sono collegati a +5V e abilitano il sensore alla massima potenza
-	ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);
-    /// settaggio PC7 e PC4 con corrente di 2mA
-
-    ROM_GPIOPadConfigSet(GPIO_PORTC_BASE, GPIO_PIN_7 | GPIO_PIN_4, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD);
-    //
-    // Make the pin(s) be outputs.
-    //
-    ROM_GPIODirModeSet(GPIO_PORTC_BASE, GPIO_PIN_7 | GPIO_PIN_4, GPIO_DIR_MODE_OUT);
-    /// accende PC4 e PC7.
-    HWREG(GPIO_PORTC_BASE + (GPIO_O_DATA + ((GPIO_PIN_7 | GPIO_PIN_4) << 2))) =  GPIO_PIN_7 | GPIO_PIN_4;
-
-    /// abilita i pin della PORTAD
-    ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD);
-
-    /// settaggio PD0 con corrente di 12mA
-
-    ROM_GPIOPadConfigSet(GPIO_PORTD_BASE, GPIO_PIN_0, GPIO_STRENGTH_12MA, GPIO_PIN_TYPE_STD);
-    //
-    // Make the pin(s) be outputs.
-    //
-    GPIODirModeSet(GPIO_PORTD_BASE, GPIO_PIN_0, GPIO_DIR_MODE_OUT);
-    /// accende PD0
-    HWREG(GPIO_PORTD_BASE + (GPIO_O_DATA + (GPIO_PIN_0 << 2))) = GPIO_PIN_0;
-    /// Spegne PD0.
-    HWREG(GPIO_PORTD_BASE + (GPIO_O_DATA + (GPIO_PIN_0 << 2))) =  0;
-    //
-    //setup of interrupt on PD1
-    //
-    //TODO: verificare se serve la resistenza di pull-up, in caso chiamare GPIOPadConfigSet DOPO di aver chiamto GPIOPinTypeInput
-    ROM_GPIOPinTypeGPIOInput(GPIO_PORTD_BASE, GPIO_PIN_1);
-    //GPIOIntTypeSet(GPIO_PORTD_BASE, GPIO_PIN_1, GPIO_BOTH_EDGES);
-    ROM_GPIOIntTypeSet(GPIO_PORTD_BASE, GPIO_PIN_1, GPIO_RISING_EDGE);
-    // abilita l'interruzione a livello di periferica
-
-    //GPIOIntEnable(GPIO_PORTD_BASE, GPIO_INT_PIN_1);
-    //verificare se la funzione è necessaria
-    //GPIOIntRegister(GPIO_PORTD_BASE, *IntGPIOd);
-    //
-	// Set the interrupt priorities so they are all equal.
-	//
-	ROM_IntPrioritySet(INT_GPIOD, 0x00);
-	/// disabilita la generazione di interruzioni da parte del pin PD1
-	GPIOIntDisable(GPIO_PORTD_BASE, GPIO_INT_PIN_1);
-    //
-    // Enable the interrupts at CPU controller level.
-    //
-    ROM_IntEnable(INT_GPIOD);
-}
+//	/// S2 è collegato +5, S3 e' collegato a 0: sensibile al bianco
+//	/// S0-S1 sono collegati a +5V e abilitano il sensore alla massima potenza
+//	ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);
+//    /// settaggio PC7 e PC4 con corrente di 2mA
+//
+//    ROM_GPIOPadConfigSet(GPIO_PORTC_BASE, GPIO_PIN_7 | GPIO_PIN_4, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD);
+//    //
+//    // Make the pin(s) be outputs.
+//    //
+//    ROM_GPIODirModeSet(GPIO_PORTC_BASE, GPIO_PIN_7 | GPIO_PIN_4, GPIO_DIR_MODE_OUT);
+//    /// accende PC4 e PC7.
+//    HWREG(GPIO_PORTC_BASE + (GPIO_O_DATA + ((GPIO_PIN_7 | GPIO_PIN_4) << 2))) =  GPIO_PIN_7 | GPIO_PIN_4;
+//
+//    /// abilita i pin della PORTAD
+//    ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD);
+//
+//    /// settaggio PD0 con corrente di 12mA
+//
+//    ROM_GPIOPadConfigSet(GPIO_PORTD_BASE, GPIO_PIN_0, GPIO_STRENGTH_12MA, GPIO_PIN_TYPE_STD);
+//    //
+//    // Make the pin(s) be outputs.
+//    //
+//    GPIODirModeSet(GPIO_PORTD_BASE, GPIO_PIN_0, GPIO_DIR_MODE_OUT);
+//    /// accende PD0
+//    HWREG(GPIO_PORTD_BASE + (GPIO_O_DATA + (GPIO_PIN_0 << 2))) = GPIO_PIN_0;
+//    /// Spegne PD0.
+//    HWREG(GPIO_PORTD_BASE + (GPIO_O_DATA + (GPIO_PIN_0 << 2))) =  0;
+//    //
+//    //setup of interrupt on PD1
+//    //
+//    //TODO: verificare se serve la resistenza di pull-up, in caso chiamare GPIOPadConfigSet DOPO di aver chiamto GPIOPinTypeInput
+//    ROM_GPIOPinTypeGPIOInput(GPIO_PORTD_BASE, GPIO_PIN_1);
+//    //GPIOIntTypeSet(GPIO_PORTD_BASE, GPIO_PIN_1, GPIO_BOTH_EDGES);
+//    ROM_GPIOIntTypeSet(GPIO_PORTD_BASE, GPIO_PIN_1, GPIO_RISING_EDGE);
+//    // abilita l'interruzione a livello di periferica
+//
+//    //GPIOIntEnable(GPIO_PORTD_BASE, GPIO_INT_PIN_1);
+//    //verificare se la funzione è necessaria
+//    //GPIOIntRegister(GPIO_PORTD_BASE, *IntGPIOd);
+//    //
+//	// Set the interrupt priorities so they are all equal.
+//	//
+//	ROM_IntPrioritySet(INT_GPIOD, 0x00);
+//	/// disabilita la generazione di interruzioni da parte del pin PD1
+//	GPIOIntDisable(GPIO_PORTD_BASE, GPIO_INT_PIN_1);
+//    //
+//    // Enable the interrupts at CPU controller level.
+//    //
+//    ROM_IntEnable(INT_GPIOD);
+//}
 
 ///
 /// inizializza il sensore di colore
