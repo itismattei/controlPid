@@ -69,7 +69,7 @@ void Timer1ISR (void)
 	}
 
 	//adesso occorre leggere il sensore, passandogli l'opportuno puntatore
-	readTemp(TEMPptr);
+	//readTemp(TEMPptr);
 	/// occorre confrontare la temperatura con il valore di default letto all'inizio.
 	if ((int)(TEMPptr->Temp) > 3 * TEMPptr->T_tar )
 	{

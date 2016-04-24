@@ -180,7 +180,7 @@ void encQuad::qeiInit(){
 
 void encQuad::readPos(){
 
-	;
+	pos = QEIPositionGet(address);
 
 }
 
@@ -192,7 +192,7 @@ void encQuad::readVel(){
 
 void encQuad::readDir(){
 
-	;
+	dir = QEIDirectionGet(address);
 
 }
 

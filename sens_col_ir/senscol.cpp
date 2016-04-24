@@ -74,98 +74,42 @@ int readCol(void){
 
 ///
 /// taratura in un punto noto della temepratura
-void taraturaTemp(temperatura *tempPtr){
-	/// taratura del sensore
-	uint8_t buff[8];
-	uint32_t i;
-	uint16_t valore;
-	float temp;
-	/// temperatura rilevata dal case
-	I2CReceiveN(TEMP_ADDR, 0x06 | 0x20, 3, buff);
-	valore = (buff[1] << 8) + buff[0];
-	temp = (float)valore * 0.02 - 273.15;
-	tempPtr->Tcase = valore;
-	/// breve attesa
-	for (i=0; i < 1000; i++);
-	/// temp rilevata dal sensore
-	I2CReceiveN(TEMP_ADDR, TEMP_REG | 0x20, 3, buff);
-	valore = (buff[1] << 8) + buff[0];
-	temp = (float)valore * 0.02 - 273.15;
-	tempPtr->T_tar = temp;
-	tempPtr->tempRaw = valore;
-	tempPtr->ok = 1;
-}
+//void taraturaTemp(temperatura *tempPtr){
+//	/// taratura del sensore
+//	uint8_t buff[8];
+//	uint32_t i;
+//	uint16_t valore;
+//	float temp;
+//	/// temperatura rilevata dal case
+//	I2CReceiveN(TEMP_ADDR, 0x06 | 0x20, 3, buff);
+//	valore = (buff[1] << 8) + buff[0];
+//	temp = (float)valore * 0.02 - 273.15;
+//	tempPtr->Tcase = valore;
+//	/// breve attesa
+//	for (i=0; i < 1000; i++);
+//	/// temp rilevata dal sensore
+//	I2CReceiveN(TEMP_ADDR, TEMP_REG | 0x20, 3, buff);
+//	valore = (buff[1] << 8) + buff[0];
+//	temp = (float)valore * 0.02 - 273.15;
+//	tempPtr->T_tar = temp;
+//	tempPtr->tempRaw = valore;
+//	tempPtr->ok = 1;
+//}
 
 ///
 /// lettura della temperatura
-void readTemp(temperatura *tempPtr){
-
-	unsigned char buffer[4];
-	//char valore;
-	/// per leggere la temperatura deve chiamare il sensore su I2C
-	I2CReceiveN(TEMP_ADDR, TEMP_REG | 0x20, 3, buffer);
-	tempPtr->tempRaw = (buffer[1] << 8) + buffer[0];
-	tempPtr->Temp = 0.02 * tempPtr->tempRaw  + 273.15;
-	tempPtr->ok = 0;
-}
-
-
-
-
-///
-/// inizializza il sensore di colore
-//void initLightSens(void){
-
-//	/// S2 è collegato +5, S3 e' collegato a 0: sensibile al bianco
-//	/// S0-S1 sono collegati a +5V e abilitano il sensore alla massima potenza
-//	ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);
-//    /// settaggio PC7 e PC4 con corrente di 2mA
+//void readTemp(temperatura *tempPtr){
 //
-//    ROM_GPIOPadConfigSet(GPIO_PORTC_BASE, GPIO_PIN_7 | GPIO_PIN_4, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD);
-//    //
-//    // Make the pin(s) be outputs.
-//    //
-//    ROM_GPIODirModeSet(GPIO_PORTC_BASE, GPIO_PIN_7 | GPIO_PIN_4, GPIO_DIR_MODE_OUT);
-//    /// accende PC4 e PC7.
-//    HWREG(GPIO_PORTC_BASE + (GPIO_O_DATA + ((GPIO_PIN_7 | GPIO_PIN_4) << 2))) =  GPIO_PIN_7 | GPIO_PIN_4;
-//
-//    /// abilita i pin della PORTAD
-//    ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD);
-//
-//    /// settaggio PD0 con corrente di 12mA
-//
-//    ROM_GPIOPadConfigSet(GPIO_PORTD_BASE, GPIO_PIN_0, GPIO_STRENGTH_12MA, GPIO_PIN_TYPE_STD);
-//    //
-//    // Make the pin(s) be outputs.
-//    //
-//    GPIODirModeSet(GPIO_PORTD_BASE, GPIO_PIN_0, GPIO_DIR_MODE_OUT);
-//    /// accende PD0
-//    HWREG(GPIO_PORTD_BASE + (GPIO_O_DATA + (GPIO_PIN_0 << 2))) = GPIO_PIN_0;
-//    /// Spegne PD0.
-//    HWREG(GPIO_PORTD_BASE + (GPIO_O_DATA + (GPIO_PIN_0 << 2))) =  0;
-//    //
-//    //setup of interrupt on PD1
-//    //
-//    //TODO: verificare se serve la resistenza di pull-up, in caso chiamare GPIOPadConfigSet DOPO di aver chiamto GPIOPinTypeInput
-//    ROM_GPIOPinTypeGPIOInput(GPIO_PORTD_BASE, GPIO_PIN_1);
-//    //GPIOIntTypeSet(GPIO_PORTD_BASE, GPIO_PIN_1, GPIO_BOTH_EDGES);
-//    ROM_GPIOIntTypeSet(GPIO_PORTD_BASE, GPIO_PIN_1, GPIO_RISING_EDGE);
-//    // abilita l'interruzione a livello di periferica
-//
-//    //GPIOIntEnable(GPIO_PORTD_BASE, GPIO_INT_PIN_1);
-//    //verificare se la funzione è necessaria
-//    //GPIOIntRegister(GPIO_PORTD_BASE, *IntGPIOd);
-//    //
-//	// Set the interrupt priorities so they are all equal.
-//	//
-//	ROM_IntPrioritySet(INT_GPIOD, 0x00);
-//	/// disabilita la generazione di interruzioni da parte del pin PD1
-//	GPIOIntDisable(GPIO_PORTD_BASE, GPIO_INT_PIN_1);
-//    //
-//    // Enable the interrupts at CPU controller level.
-//    //
-//    ROM_IntEnable(INT_GPIOD);
+//	unsigned char buffer[4];
+//	//char valore;
+//	/// per leggere la temperatura deve chiamare il sensore su I2C
+//	I2CReceiveN(TEMP_ADDR, TEMP_REG | 0x20, 3, buffer);
+//	tempPtr->tempRaw = (buffer[1] << 8) + buffer[0];
+//	tempPtr->Temp = 0.02 * tempPtr->tempRaw  + 273.15;
+//	tempPtr->ok = 0;
 //}
+
+
 
 ///
 /// inizializza il sensore di colore
@@ -255,11 +199,11 @@ void initTimer4(uint8_t ms){
 
 ///
 /// legge il sensore tramite metodo della classe
-void TEMPER::readTemp(){
+float TEMPER::readTemp(){
 
 	unsigned char buffer[4];
 	if (i2cPtr == NULL){
-		PRINTF("registrare il canale I2c per il spirometro\n");
+		PRINTF("registrare il canale I2c per il pirometro\n");
 		return;
 	}
 	//char valore;
@@ -269,6 +213,7 @@ void TEMPER::readTemp(){
 	tempRaw = (buffer[1] << 8) + buffer[0];
 	Temp = 0.02 * tempRaw  + 273.15;
 	ok = 0;
+	return Temp;
 }
 
 ///
@@ -280,7 +225,7 @@ void TEMPER::taraturaTemp(){
 	uint16_t valore;
 	float temp;
 	if (i2cPtr == NULL){
-		PRINTF("registrare il canale I2c per il spirometro\n");
+		PRINTF("registrare il canale I2c per il pirometro\n");
 		return;
 	}
 	/// temperatura rilevata dal case

@@ -15,7 +15,7 @@
  *  alcune prove
  *  In questa release si testa sia il giroscopio che l'accelerometro.
  *  Si testano anche i sensori di distanza (5 sensori)
- *  TEST PWM.
+ *  Versione di PROVA DEI VARI SENSORI ED ATTUATORI
  */
 
 
@@ -175,20 +175,20 @@ int main(void) {
 	PRINT_WELCOME();
 
 	/// MODULO COMUNICAZIONE BUS I2C ///
-    //inizializzo l'i2c
-	//InitI2C0();
 	//I2C TEST(I2C0_BASE);
 	I2C BUS_COMM(I2C1_BASE);
 	/// messaggio d'inizio
 	PRINTF("inizializzato I2C\n");
-	//TEST.I2CSetSlave_Add(GYRO_ADDR);
-	//Rot.attachI2C(&TEST);
+
+
+	/// INIZIALIZZAZIONI MODULI E COLLEGAMENTI AI CANALI DI COMUNICAZIONE
 
 	/// inizializza il giroscopio con banda a 190Hz invece cha a 95Hz
 	Rot.attachI2C(&BUS_COMM, GYRO_ADDR);
 	Rot.initGyro(ODR_190 | Z_AXIS);
 	/// collegato sensore di temperatura al bus I2C
 	sensIR.attachI2C(&BUS_COMM, TEMP_ADDR);
+	sensIR.taraturaTemp();
 	//initGyro(&G, Z_AXIS);
 	tick10 = tick100 = 0;
 	/// inizializza il timer 0 e genera un tick da 10 ms
@@ -210,7 +210,9 @@ int main(void) {
 	/// reset dell'automa di analisi della sintassi
 	resetAutoma(&synSTATO);
 	PRINTF("inizializzato automa comandi\n");
-
+	/// inizializzati i moduli encoder
+	ENC0.qeiInit();
+	ENC1.qeiInit();
 	//servo = (pwm *) &pwmServi;
 	/// inizializzazione accelerometro
 //	A.testAccel();
@@ -297,6 +299,14 @@ int main(void) {
 	CL.WhiteBalance();
 	//initLightSens1();
 	//whiteBal(&COL);
+
+
+	/////////////////////////////////////////////////////////
+	///
+	///      TASK PRINCIPALE
+	///
+	/////////////////////////////////////////////////////////
+
 	while(1){
 
 
@@ -360,16 +370,27 @@ int main(void) {
 		/// AZIONI DA COMPIERE OGNI 1s ///
 		if (tick100 >= 100){
 
+			/// controlla il colore della piastrella sottostante e lo paragona la bianco memorizzato in fase di setup
 			CL.Run();
+#ifdef _DEBUG_
 			PRINTF("Col: %d\t W: %d\n", CL.get(), CL.getWhite());
-			/// controlla se la piastrella e' scura
+#endif
+			/// legge la temperatura del pirometro
+			if(sensIR.readTemp() > sensIR.T_tar + 10.0)
+				/// ha torvato un ferito
+				sensIR.isSurvivor = IS_SURVIVOR;
+			else
+				sensIR.isSurvivor = NO_SURVIVOR;
 			/// TODO controllare se riesce a funzionare mentre legge le accelerazioni su I2C
 			/// avvia il campionamento degli ADC. I dati vengono posti nell'oggetto MISURE dalla routine di servizio
 			/// dell'interruzione AD.
 			/// Ricordarsi: il dato n.6 e'lo stato della batteria
 			ROM_ADCProcessorTrigger(ADC0_BASE, 0);
-//				/// accende il pin PB5
-			//qei_test(&QEI);
+			/// legge gli encoder
+			ENC0.readPos();
+			ENC0.readDir();
+			ENC1.readPos();
+			ENC1.readDir();
 			//HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_5 << 2))) |=  GPIO_PIN_5;
 			if (BATT.battLevel > BATT.safeLevel)
 				HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_3 << 2))) ^=  GPIO_PIN_3;
@@ -386,7 +407,7 @@ int main(void) {
 			PRINTF("\n");
 //
 #endif
-//				/// converte la misure grazza in mm
+//				/// converte la misure grezza in mm
 			MISURE.rawTomm();
 #ifndef _DEBUG_
 //				/// ricopia nella struttare DIST:

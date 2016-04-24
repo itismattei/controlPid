@@ -11,53 +11,36 @@
 #include "../I2C/i2cTiva.h"
 #include <stdint.h>
 
-//typedef struct _temp{
-//	float 	Temp;
-//	int 	tempRaw;
-//	int 	T_tar;
-//	int 	Tcase;
-//	int		ok;
-//} temperatura;
+#define			IS_WALL				0x80
+#define			IS_DARK_TILE		0x08
+#define			IS_SURVIVOR			0x40
+#define			NO_DARK_TILE		0x04
+#define			NO_SURVIVOR			0x20
+#define			GET_WALL			0x81
+#define			GET_DARK_TILE		0x09
+#define			GET_SURVIVOR		0x41
 
 
 
 class TEMPER{
 public:
 
-	TEMPER(){ok = 0; isSurvivor = 0;}
+	TEMPER(){ok = 0; isSurvivor = NO_SURVIVOR;}
 	~TEMPER(){;}
-	void readTemp();
+	float readTemp();
 	float getTemp(){ return Temp; }
 	void taraturaTemp();
 	void attachI2C(I2C *, uint8_t sa);
 
-	float 		Temp;
-	int 		tempRaw;
-	int 		T_tar;
-	int 		Tcase;
-	int			ok;
-	uint16_t 	isSurvivor;
-	I2C* 		i2cPtr;
+	float 		Temp;			/// lettura dal sensore in °C
+	int 		tempRaw;		/// lettura dal sensore
+	float 		T_tar;			/// temperatura dell'ambiente letta dal pirometro
+	int 		Tcase;			///	temperatura del corpo del pirometro
+	int			ok;				/// pirometro tarato
+	uint16_t 	isSurvivor;		/// ha individuato un corpo caldo
+	I2C* 		i2cPtr;			/// puntatore al canale di trasmissione I2C
 
 };
-
-
-//#ifdef __cplusplus
-//extern "C" {
-//#endif
-//
-//
-//void readColourSens(colore *);
-//void taraturaTemp(temperatura *tempPtr);
-//void readTemp(temperatura *tempPtr);
-//
-//void initLightSens1(void);
-//void initTimer4(uint8_t);
-//int readCol(void);
-//
-//#ifdef __cplusplus
-//}
-//#endif
 
 
 #define		IS_DARK		1
