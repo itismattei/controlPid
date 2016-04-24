@@ -37,10 +37,7 @@ typedef struct _colore{
 	int bianco;
 } colore;
 
-/// indica le mattonelle scure da evitare
-typedef struct _tile{
-	char isDark;
-} tile;
+
 
 typedef struct _survivor{
 	///contatore dei sopravvissuti trovati
@@ -63,24 +60,24 @@ typedef struct _temp{
 #define			TEMP_ADDR			0x00
 #define			TEMP_REG			0x07
 
-//#ifdef __cplusplus
-//extern "C" {
-//#endif
-//
-//
-//void readColourSens(colore *);
-//void readTempSens(temperatura *tPtr);
-//void taraturaTemp(temperatura *tempPtr);
-//void readTemp(temperatura *tempPtr);
-//
-//
-//void initLightSens(void);
-//void initTimer4(uint8_t);
-//void whiteBal(colore *);
-//
-//#ifdef __cplusplus
-//}
-//#endif
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
+void readColourSens(colore *);
+void readTempSens(temperatura *tPtr);
+void taraturaTemp(temperatura *tempPtr);
+void readTemp(temperatura *tempPtr);
+
+
+void initLightSens(void);
+void initTimer4(uint8_t);
+void whiteBal(colore *);
+
+#ifdef __cplusplus
+}
+#endif
 
 #define 	SOGLIAFERITO 			600
 #define		SOGLIA_DARK_TILE		-100

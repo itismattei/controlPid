@@ -44,7 +44,7 @@ void Timer0ISR(void){
 }
 
 ///
-/// potrebbe non servire!!!
+/// potrebbe non servire perché si può metterenei task schedulati ogni 100 ms!!!
 
 void Timer1ISR (void)
 {

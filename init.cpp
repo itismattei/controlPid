@@ -9,6 +9,7 @@
 #include "distMis.h"
 #include "Giroscopio.h"
 #include "parse.h"
+#include "sens_col_ir/sens1.h"
 
 
 
@@ -27,14 +28,14 @@ void dati_a_struttura(gyro *G, distanza *D, cinematica *CIN, colore *COL, temper
 }
 
 
-void datiRaccolti(cinematica *CIN, temperatura *TEMP, survivor *SUR, distMis *DIS, Giroscopio *GYRO, glb *GLB ){
+void datiRaccolti(cinematica *CIN, TEMPER *TEMP, survivor *SUR, distMis *DIS, Giroscopio *GYRO, glb *GLB ){
 
 	GLB->surPtr 	= SUR;
 
 	GLB->cinPtr 	= CIN;
 	//GLB->colPtr 	= COL;
 	//GLB->distPtr 	= D;
-	GLB->tempPtr 	= TEMP;
+	GLB->temperat 	= TEMP;
 	GLB->DSTptr 	= DIS;
 	GLB->gyro		= GYRO;
 }

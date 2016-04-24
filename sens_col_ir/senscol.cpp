@@ -9,10 +9,12 @@
 
 #include <math.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include "driverlib/rom.h"
 #include "../i2c/tiva_i2c.h"
 #include "sens.h"
 #include "sens1.h"
+#include "../uartp\uartstdio.h"
 
 extern volatile bool scansione, letturaCampioni;
 extern volatile int contLightPwm;
@@ -106,6 +108,9 @@ void readTemp(temperatura *tempPtr){
 	tempPtr->Temp = 0.02 * tempPtr->tempRaw  + 273.15;
 	tempPtr->ok = 0;
 }
+
+
+
 
 ///
 /// inizializza il sensore di colore
@@ -253,9 +258,14 @@ void initTimer4(uint8_t ms){
 void TEMPER::readTemp(){
 
 	unsigned char buffer[4];
+	if (i2cPtr == NULL){
+		PRINTF("registrare il canale I2c per il spirometro\n");
+		return;
+	}
 	//char valore;
 	/// per leggere la temperatura deve chiamare il sensore su I2C
-	I2CReceiveN(TEMP_ADDR, TEMP_REG | 0x20, 3, buffer);
+	i2cPtr->I2CGetN(TEMP_REG | 0x20, 3, buffer);
+	//I2CReceiveN(TEMP_ADDR, TEMP_REG | 0x20, 3, buffer);
 	tempRaw = (buffer[1] << 8) + buffer[0];
 	Temp = 0.02 * tempRaw  + 273.15;
 	ok = 0;
@@ -269,15 +279,21 @@ void TEMPER::taraturaTemp(){
 	uint32_t i;
 	uint16_t valore;
 	float temp;
+	if (i2cPtr == NULL){
+		PRINTF("registrare il canale I2c per il spirometro\n");
+		return;
+	}
 	/// temperatura rilevata dal case
-	I2CReceiveN(TEMP_ADDR, 0x06 | 0x20, 3, buff);
+	i2cPtr->I2CGetN(0x06 | 0x20, 3 , buff);
+	//I2CReceiveN(TEMP_ADDR, 0x06 | 0x20, 3, buff);
 	valore = (buff[1] << 8) + buff[0];
 	temp = (float)valore * 0.02 - 273.15;
 	Tcase = valore;
 	/// breve attesa
 	for (i=0; i < 1000; i++);
 	/// temp rilevata dal sensore
-	I2CReceiveN(TEMP_ADDR, TEMP_REG | 0x20, 3, buff);
+	i2cPtr->I2CGetN(TEMP_REG | 0x20, 3 , buff);
+	//I2CReceiveN(TEMP_ADDR, TEMP_REG | 0x20, 3, buff);
 	valore = (buff[1] << 8) + buff[0];
 	temp = (float)valore * 0.02 - 273.15;
 	T_tar = temp;
@@ -285,3 +301,27 @@ void TEMPER::taraturaTemp(){
 	ok = 1;
 }
 
+/// collega la porta I2C
+void TEMPER::attachI2C(I2C * p, uint8_t sa){
+	i2cPtr = p;
+	i2cPtr->I2CSetSlave_Add(sa);
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+
+
+COLORE::COLORE(){
+	 luminanza = 0; bianco = 0; piastra.isDark = ISNT_DARK;
+}
+
+void COLORE::Run(){
+	uint32_t lum = read();
+	/// imposta la proprieta' luminanza
+	set(lum);
+	if(lum < getWhite() / 4){
+		piastra.isDark = IS_DARK;
+	}
+	else
+		piastra.isDark = ISNT_DARK;
+}

@@ -84,20 +84,39 @@ int main(void) {
 	volatile int32_t arrot;
 	volatile int16_t val1 = 0, x, y, z;
 	syntaxStatus synStat;
-	//distanza DIST;
-	distMis  MISURE;
-	distMisPtr = &MISURE;
+
 	//--------------------------//
 	///definizione strutture/////
 	//-------------------------//
-	/// imposta il livello di soglia della batteria a 2600
+
+
+	/// MODULO PER LA MISURA DEI SENSORI DI DISTANZA
+	//distanza DIST;
+	distMis  MISURE;
+	distMisPtr = &MISURE;
+
+	/// MODULO DI CONTROLLO DELLA BATTERIA ///
+	/// imposta il livello di soglia della batteria a 1900
 	power BATT(1900);
+
+	/// MODULO PWM PER MOTORI DI SPOSTAMENTO ///
 	PWM_MOTORI M1, M2;
-	PWM_SERVI KIT, SENSORE;
-	sensPtr = &SENSORE;
+
+	/// MODULO PWM PER MOTORI SERVO ///
+	PWM_SERVI KIT, MOT_SENS;
+	sensPtr = &MOT_SENS;
+
+	/// MODULI ENCODER ///
 	encQuad ENC0, ENC1;
+	/// imposta gli indirizzi dei due moduli
+	ENC0.setAddr(QEI0_BASE);
+	ENC1.setAddr(QEI1_BASE);
+
+
 	//volatile double d = 1.9845637456;
 	gyro G;
+
+	/// MODULO INERZIALE  ///
 	Giroscopio Rot;
 	//accelerazione A;
 	accelerometro A;
@@ -111,15 +130,16 @@ int main(void) {
 	/// modulo zigbee per telemetria
 	//xbee XB;
 
-	/// struttura del sensore di colore
-	Colour CL;
-	/// sensore di temperatura ad infrarossi
-	temperatura TEMP;
-	//TEMPER sensIR;
+	/// MODULO SENSORE DI COLORE  ///
+	COLORE CL;
+
+
+	/// MODULO SENSORE DI TEMPERATURA (PIROMETRO) ///
+	TEMPER sensIR;
 	/// informazioni sul sopravvissuto
 	survivor SUR;
 	//inizializzazione struttura per qei
-	qei QEI;
+	//qei QEI;
 	/// oggetto che riallinea il mezzo
 	allineamento AL;
 
@@ -129,7 +149,7 @@ int main(void) {
 	//dPtr = &DIST;
 
 
-	TEMPptr =  &TEMP;
+	//TEMPptr =  &TEMP;
 //	CIN.Aptr = &A;
 //	CIN.distPTR = &DIST;
 //	CIN.vel = 0.0;
@@ -140,7 +160,7 @@ int main(void) {
 	//passaggio degli indirizzi delle strutture alla struttura generale
 	//dati_a_struttura(&G, &DIST, &CIN, &COL, &TEMP, &SUR, &DATA);
 	/// l'oggetto COLLECTDATA (glb) e' una struttara che contiene i puntatori alle strutture e classi del progetto
-	datiRaccolti(&CIN, &TEMP, &SUR, &MISURE, &Rot, &COLLECTDATA);
+	datiRaccolti(&CIN, &sensIR, &SUR, &MISURE, &Rot, &COLLECTDATA);
 
 	/// setup di base
 	setupMCU();
@@ -153,18 +173,22 @@ int main(void) {
 	PRINTF("impostata UART0 per debug\n");
 	/// messaggio d'inizio
 	PRINT_WELCOME();
+
+	/// MODULO COMUNICAZIONE BUS I2C ///
     //inizializzo l'i2c
 	//InitI2C0();
 	//I2C TEST(I2C0_BASE);
-	I2C TEST(I2C1_BASE);
+	I2C BUS_COMM(I2C1_BASE);
 	/// messaggio d'inizio
 	PRINTF("inizializzato I2C\n");
 	//TEST.I2CSetSlave_Add(GYRO_ADDR);
 	//Rot.attachI2C(&TEST);
-	/// inizializza il giroscopio con banda a 190Hz invece cha a 95Hz
 
-	Rot.attachI2C(&TEST, GYRO_ADDR);
+	/// inizializza il giroscopio con banda a 190Hz invece cha a 95Hz
+	Rot.attachI2C(&BUS_COMM, GYRO_ADDR);
 	Rot.initGyro(ODR_190 | Z_AXIS);
+	/// collegato sensore di temperatura al bus I2C
+	sensIR.attachI2C(&BUS_COMM, TEMP_ADDR);
 	//initGyro(&G, Z_AXIS);
 	tick10 = tick100 = 0;
 	/// inizializza il timer 0 e genera un tick da 10 ms
@@ -194,9 +218,7 @@ int main(void) {
 //		/// imposta l'accelerometro
 //		A.impostaAccel();
 	/// iniziailizzazione del lettore encoder
-	qei_init(&QEI);
-	ENC0.setAddr(QEI0_BASE);
-	ENC1.setAddr(QEI1_BASE);
+	//qei_init(&QEI);
 	/// abilita le interruzioni
 	EI();
 	PRINTF("abilitate interruzioni\n");
@@ -267,9 +289,9 @@ int main(void) {
 	M2.delta = 0;
 	M2.MotorGo();
 	KIT.Init();
-	SENSORE.Init();
+	MOT_SENS.Init();
 	KIT.MotorGo(0);
-	SENSORE.MotorGo(0);
+	MOT_SENS.MotorGo(0);
 
 	CL.Init();
 	CL.WhiteBalance();
@@ -278,8 +300,11 @@ int main(void) {
 	while(1){
 
 
-		///extern volatile uint8_t uart1buffer[16], RX_PTR1, READ_PTR1;
-		/*    *****     */
+/************************************************************/
+/*  			ATTIVITA' SVOLTE AD OGNI CICLO				*/
+/************************************************************/
+
+
 		// controllo di messaggio sulla seriale 1 (ricevuto comando da rasp
 		if (READ_PTR1 != RX_PTR1){
 			/// analizza il comando e imposta il valore dell'oggetto CMD (comando)
@@ -334,20 +359,11 @@ int main(void) {
 		//////////////////////////////////
 		/// AZIONI DA COMPIERE OGNI 1s ///
 		if (tick100 >= 100){
-			M1.delta += 10;
-			if (M1.delta > 90)
-				M1.delta = 10;
-			//M1.MotorGo();
-			M2.delta += 10;
-			if (M2.delta > 90)
-				M2.delta = 10;
-			//M2.MotorGo();
-//				PRINTF("pwm1: %d", M1.delta);
-//				PRINTF("\t");
-//				PRINTF("pwm2: %d\n", M2.delta);
 
-			PRINTF("Col: %d\t Bianco: %d\n", CL.read(), CL.getWhite());
-//				/// TODO controllare se riesce a funzionare mentre legge le accelerazioni su I2C
+			CL.Run();
+			PRINTF("Col: %d\t W: %d\n", CL.get(), CL.getWhite());
+			/// controlla se la piastrella e' scura
+			/// TODO controllare se riesce a funzionare mentre legge le accelerazioni su I2C
 			/// avvia il campionamento degli ADC. I dati vengono posti nell'oggetto MISURE dalla routine di servizio
 			/// dell'interruzione AD.
 			/// Ricordarsi: il dato n.6 e'lo stato della batteria

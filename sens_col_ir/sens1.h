@@ -8,6 +8,9 @@
 #ifndef SENS1_H_
 #define SENS1_H_
 
+#include "../I2C/i2cTiva.h"
+#include <stdint.h>
+
 //typedef struct _temp{
 //	float 	Temp;
 //	int 	tempRaw;
@@ -26,6 +29,7 @@ public:
 	void readTemp();
 	float getTemp(){ return Temp; }
 	void taraturaTemp();
+	void attachI2C(I2C *, uint8_t sa);
 
 	float 		Temp;
 	int 		tempRaw;
@@ -33,32 +37,47 @@ public:
 	int 		Tcase;
 	int			ok;
 	uint16_t 	isSurvivor;
+	I2C* 		i2cPtr;
 
 };
 
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+//#ifdef __cplusplus
+//extern "C" {
+//#endif
+//
+//
+//void readColourSens(colore *);
+//void taraturaTemp(temperatura *tempPtr);
+//void readTemp(temperatura *tempPtr);
+//
+//void initLightSens1(void);
+//void initTimer4(uint8_t);
+//int readCol(void);
+//
+//#ifdef __cplusplus
+//}
+//#endif
 
 
-void readColourSens(colore *);
-void taraturaTemp(temperatura *tempPtr);
-void readTemp(temperatura *tempPtr);
+#define		IS_DARK		1
+#define		ISNT_DARK	0
 
 void initLightSens1(void);
-void initTimer4(uint8_t);
 int readCol(void);
 
-#ifdef __cplusplus
-}
-#endif
-
-
-
-class Colour{
+/// indica le mattonelle scure da evitare
+class TILE{
 public:
-	Colour(){ luminanza = 0; bianco = 0;}
+	TILE(){;}
+
+	uint32_t isDark;
+};
+
+
+class COLORE{
+public:
+	COLORE();
 
 	inline void Init(){ initLightSens1(); initTimer4(10);}
 	/// legge il valore di luminanza
@@ -71,12 +90,15 @@ public:
 	//Imposta il livello di bianco, ipotizzando che all'inizio la paistrella sia bianca.
 	inline void WhiteBalance(){ bianco = read(); }
 
+	void Run();
+
 	/// proprieta'
-	int rosso;
-	int verde;
-	int blu;
-	int luminanza;
-	int bianco;
+	int 	rosso;
+	int 	verde;
+	int 	blu;
+	int 	luminanza;
+	int 	bianco;
+	TILE	piastra;
 };
 
 
