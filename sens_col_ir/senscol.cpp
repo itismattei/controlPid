@@ -211,7 +211,7 @@ float TEMPER::readTemp(){
 	i2cPtr->I2CGetN(TEMP_REG | 0x20, 3, buffer);
 	//I2CReceiveN(TEMP_ADDR, TEMP_REG | 0x20, 3, buffer);
 	tempRaw = (buffer[1] << 8) + buffer[0];
-	Temp = 0.02 * tempRaw  + 273.15;
+	Temp = 0.02 * tempRaw  - 273.15;
 	ok = 0;
 	return Temp;
 }

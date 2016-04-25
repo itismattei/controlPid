@@ -279,7 +279,7 @@ int main(void) {
 //	taraturaTemp(&TEMP);
 //
 //	///
-//	qei_test(&QEI);
+	//qei_test(&QEI);
 	/// task principale
 	int tempCont = 0;
 
@@ -292,7 +292,7 @@ int main(void) {
 	M2.MotorGo();
 	KIT.Init();
 	MOT_SENS.Init();
-	KIT.MotorGo(0);
+	KIT.MotorGo(80);
 	MOT_SENS.MotorGo(0);
 
 	CL.Init();
@@ -300,7 +300,7 @@ int main(void) {
 	//initLightSens1();
 	//whiteBal(&COL);
 
-
+	int dir = 1, gradi = 0;
 	/////////////////////////////////////////////////////////
 	///
 	///      TASK PRINCIPALE
@@ -398,9 +398,41 @@ int main(void) {
 				/// segnala che la batteria sta finendo, facendo lampeggiare il rosso
 				HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_1 << 2))) ^=  GPIO_PIN_1;
 
+#ifndef _DEBUG_
+			KIT.scarico();
+#endif
+//			/// qui provo lo scarico del kit.
+//			if (dir == 1){
+//				gradi += 10;
+//				KIT.MotorGo(gradi);
+//				if (gradi >= 80)
+//					dir = -1;
+//			}
+//			else{
+//				gradi -= 10;
+//				KIT.MotorGo(gradi);
+//				if (gradi <= -30)
+//					dir = 1;
+//			}
+
+			/// test sui motori
 
 #ifdef _DEBUG_
-			for(int i = 0; i < 6; i++){
+			if (gradi == 0){
+				M1.delta = M2.delta = 65;
+				M1.MotorGo();
+				M2.MotorGo();
+				gradi = 1;
+			}
+			else{
+				gradi = 0;
+				M1.MotorStop();
+				M2.MotorStop();
+			}
+#endif
+
+#ifdef _DEBUG_
+			for(int i = 0; i < 5; i++){
 
 				PRINTF("val%d: %d \t", i, MISURE.dI[i]);
 			}
@@ -411,7 +443,7 @@ int main(void) {
 			MISURE.rawTomm();
 #ifndef _DEBUG_
 //				/// ricopia nella struttare DIST:
-			for(int attesa = 0; attesa < 6; attesa++){
+			for(int attesa = 0; attesa < 5; attesa++){
 //					if (attesa == 3)
 //						continue;
 				PRINTF("mm(%d): %d \t", attesa, MISURE.d_mm[attesa]);

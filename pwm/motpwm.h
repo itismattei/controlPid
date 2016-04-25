@@ -53,6 +53,7 @@ public:
 	void Init();
 	void MotorGo(int16_t);
 	void MotorStop(void);
+	void scarico(void);
 
 	uint32_t convertDeg2Pwm(int16_t gradi);
 	///properties

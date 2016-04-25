@@ -167,6 +167,9 @@ void PWM_MOTORI::pwmPower(){
 ///
 /// muove il motore
 void PWM_MOTORI::MotorGo(){
+	/// FATTORI DI CORREZIONE DEI MOTORI. SI NOTA CHE IL N.1 VA UN PO' MENO DEL NUMERO 2
+	float f, k;
+	int valPwm;
 	switch (numMot){
 	case 1:
 		if (direction == 1){
@@ -179,7 +182,11 @@ void PWM_MOTORI::MotorGo(){
 			/// imposta il pwm in modalita' negata
 			HWREG(PWM0_BASE + PWM_O_INVERT) |= PWM_OUT_5_BIT;
 		}
-		PWMPulseWidthSet(PWM0_BASE, numPin, NCont * delta / 100);
+		/// correzione
+		k = 1.076;
+		f = NCont * delta * k / 100;
+		valPwm = (int) f;
+		PWMPulseWidthSet(PWM0_BASE, numPin, valPwm);
 	break;
 	case 2:
 		if (direction == 1){
@@ -192,7 +199,10 @@ void PWM_MOTORI::MotorGo(){
 			/// imposta il pwm in modalita' negata
 			HWREG(PWM0_BASE + PWM_O_INVERT) |= PWM_OUT_2_BIT;
 		}
-		PWMPulseWidthSet(PWM0_BASE, numPin, NCont * delta / 100);
+		k = 1.0;
+		f = NCont * delta * k / 100;
+		valPwm = (int) f;
+		PWMPulseWidthSet(PWM0_BASE, numPin, valPwm);
 	break;
 	}
 }
@@ -335,3 +345,8 @@ uint32_t PWM_SERVI::convertDeg2Pwm(int16_t gradi){
 	return valFin;
 }
 
+void PWM_SERVI::scarico(){
+	MotorGo(-30);
+	for (int i = 2000000; i > 0; i--);
+	MotorGo(80);
+}
