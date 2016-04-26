@@ -15,7 +15,8 @@
  *  alcune prove
  *  In questa release si testa sia il giroscopio che l'accelerometro.
  *  Si testano anche i sensori di distanza (5 sensori)
- *  Versione di PROVA DEI VARI SENSORI ED ATTUATORI
+ *
+ *  INSERIMENTO DEL CICLO PRINCIPALE con PID SEMPLIFICATO
  */
 
 
@@ -324,7 +325,7 @@ int main(void) {
 			 READ_PTR1 &= DIM_READ_BUFF - 1;
 		}
 		if (synSTATO.valid == VALIDO && synSTATO.token != ERRORE){
-			/// il comandoche e' stato analizzato ha prodotto un risultat adeguato
+			/// il comandoche e' stato analizzato ha prodotto un risultato adeguato
 			rispondiComando(&synSTATO, &COLLECTDATA);
 			/// avendo terminato la risposta, la validità dell'automa
 			/// va rimossa.
@@ -355,7 +356,7 @@ int main(void) {
 
 			}
 
-			CMD.RUN(cPid, &synSTATO);
+			CMD.RUN(cPid, &synSTATO, &M1, &M2, &Rot);
 			/// le misure del giroscopio invece sono effettuate solo dall'apposito pid
 		}
 		/// effettua i calcoli solo se il giroscopio e' presente

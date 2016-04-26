@@ -123,15 +123,18 @@ void convertToToken(syn_stat *STATO, comando *cmdPtr){
 		STATO->token = DESTRA;
 		cmdPtr->azione = true;
 		cmdPtr->numPid = 1;
+		cmdPtr->valFin -= 90;
 	break;
 	case 'L':
 		STATO->token = SINISTRA;
 		cmdPtr->azione = true;
 		cmdPtr->numPid = 2;
+		cmdPtr->valFin += 90;
 	break;
 	case 'I':
 		STATO->token = GIRA_INDIETRO;
 		cmdPtr->azione = true;
+		/// potrebbe essere un "DESTRA" con valFIn = -180
 	break;
 	case 'G':
 		//// non ancora implementato
@@ -449,6 +452,8 @@ void inviaSensore(syn_stat *sSTAT, glb * collectedD){
 				sSTAT->buff_reply[2] = (int)collectedD->encoder->dist_mm  & 0x00FF;
 				break;
 
+		/// inserire qui il codice per il senspre n. 11: il valore di angolo dell'accelerometro
+		case(11):
 		default:
 			sSTAT->buff_reply[0] = 0;
 			sSTAT->buff_reply[1] = 0;

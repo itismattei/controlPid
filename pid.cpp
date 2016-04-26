@@ -10,6 +10,8 @@
 #include <stdlib.h>
 #include "pid.h"
 #include "pwm\pwm.h"
+#
+#include "init.h"		///serve per le costanti dei token
 
 
 
@@ -66,7 +68,7 @@ void ControlloPID::integra(float tick){
 /// dell'errore dopo l'azione del PID
 /// il PID deve distinguere tra rotazione e movimento lineare e
 /// per questo riceve un vettore di struct di tipo PID
-int ControlloPID::Run(Giroscopio *G, pwm *PWM, distMis *DISTANZA){
+int ControlloPID::Run(Giroscopio *G, PWM_MOTORI *PWM1, PWM_MOTORI * PWM2, distMis *DISTANZA){
 
 	float soglia = 0.05;
 	/// controllare se arriva un puntatore nullo per il pid, generato da una condizione di time out
@@ -87,28 +89,35 @@ int ControlloPID::Run(Giroscopio *G, pwm *PWM, distMis *DISTANZA){
 	case AVANZA:
 		//provvede a misurare la velocita'
 		//misuraVelocità()
-		e[1] = (float) ((float)valFin - DISTANZA->vel);
-		/// se l'errore e' minore di una soglia, vuoil dire che e' a regime e
-		/// quindi inutile integrare ulteriormente.
-		if (abs(e[1]) > soglia  ){
-			/// calcola l'integrale numerico del PID
-			integra(G->tick);
-			/// avanti oppure indietro
-			if(e[1] > 0.0)
-				/// avanti
-				PWM->dir_1 = PWM->dir_2 = 1;
-			else
-				/// indietro
-				PWM->dir_1 = PWM->dir_2 = 2;
-			/// impostazione del PWM ed invio del comando
-			//setXPWM(C, PWM);
-		}
-		else
-			attivo = false;
+//		e[1] = (float) ((float)valFin - DISTANZA->vel);
+//		/// se l'errore e' minore di una soglia, vuoil dire che e' a regime e
+//		/// quindi inutile integrare ulteriormente.
+//		if (abs(e[1]) > soglia  ){
+//			/// calcola l'integrale numerico del PID
+//			integra(G->tick);
+//			/// avanti oppure indietro
+//			if(e[1] > 0.0){
+//				/// avanti
+//				PWM1->direction = 1;
+//				PWM2->direction = 1;
+//			}
+//			else
+//				/// indietro
+//				PWM1->direction = PWM2->direction = 2;
+//			/// impostazione del PWM ed invio del comando
+//			//setXPWM(C, PWM);
+//		}
+//		else
+//			attivo = false;
+		/// MODO SEMPLICE: VA AVANTI
+		PWM1->delta = 65;
+		PWM2->delta = 65;
+		PWM1->MotorGo();
+		PWM2->MotorGo();
 
 	break;
 
-	case RUOTA:
+	case RUOTA_DESTRA:
 		///provvede ad integrare la misura della velcita' angolare
 		/// prestare attenzione al segnale d'errore che poi andra' rimosso
 		/// dal PWM perche' i motori, a differenza della regolazione della velocita' dovranno
@@ -122,20 +131,20 @@ int ControlloPID::Run(Giroscopio *G, pwm *PWM, distMis *DISTANZA){
 		G->IsRotating = 0;
 	break;
 
-	case RUOTA_SU_ASSE:
+	case RUOTA_SINISTRA:
 		G->misuraAngoli();
 		e[1] = (float) (valFin - G->yaw);
 		/// calcola l'integrale numerico del PID
 		integra(G->tick);
 		if (e[1] > 0.0){
 			///ruota in senso antiorario
-			PWM->dir_1 = 1;
-			PWM->dir_2 = 2;
+			PWM1->direction = 1;
+			PWM2->direction = 2;
 		}
 		else{
 			/// in senso orario
-			PWM->dir_1 = 2;
-			PWM->dir_2 = 1;
+			PWM1->direction = 2;
+			PWM2->direction = 1;
 		}
 		///
 		if(e[1] > -1.0 && e[1] < 1.0){
@@ -207,9 +216,9 @@ void comando::setUptrasducers(Giroscopio *G, pwm *p, distMis *dist){
 
 ///
 /// esegue il pid selezionato
-int comando::RUN(ControlloPID *p, syn_stat *s){
+int comando::RUN(ControlloPID *p, syn_stat *s, PWM_MOTORI *PWM1, PWM_MOTORI *PWM2, Giroscopio *G){
 	/// controlla il time out del comando e se scaduto si ferma
-	if (s->tick > TIMEOUT_CMD){
+	if (tick > TIMEOUT_CMD){
 		/// in caso di timeout nella persistenza del comando si deve fermare
 		/// quale era o erano i pid attivo/i?
 		s->token = STOP;
@@ -218,10 +227,14 @@ int comando::RUN(ControlloPID *p, syn_stat *s){
 		/// deve anche mettere i pid in stato disattivo (.attivo = false)
 		if (numPid > 0 && numPid < 3)
 			(p + numPid)->attivo = false;
+		/// se il comando va in timeout, isRun diventa falso
+		isRun = false;
+		PWM1->MotorStop();
+		PWM2->MotorStop();
 	}
 	else{
 		/// agggiorna il contatore di persistenza.
-		s->tick++;
+		tick++;
 		float soglia = 0.05;
 		/// controllare se arriva un puntatore nullo per il pid, generato da una condizione di time out
 		/// si ricorda che l'errore nel comando  non annulla un comando in esecuzione.
@@ -236,76 +249,101 @@ int comando::RUN(ControlloPID *p, syn_stat *s){
 	//		return -1;
 	//	}
 
-		/// seleziona il tipo di PID
+		int val;
+		/// seleziona il tipo di PID. QUESTA E' LA FORMA SEMPLIFICATA
 		switch(numPid){
 		case AVANZA:
-			//provvede a misurare la velocita'
-			//misuraVelocità()
-			p->e[1] = (float) ((float)p->valFin - distanza->vel);
-			/// se l'errore e' minore di una soglia, vuoil dire che e' a regime e
-			/// quindi inutile integrare ulteriormente.
-			if (abs(p->e[1]) > soglia  ){
-				/// calcola l'integrale numerico del PID
-				p->integra(gPtr->tick);
-				/// avanti oppure indietro
-				if(p->e[1] > 0.0)
-					/// avanti
-					PWM->dir_1 = PWM->dir_2 = 1;
-				else
-					/// indietro
-					PWM->dir_1 = PWM->dir_2 = 2;
-				/// impostazione del PWM ed invio del comando
-				//setXPWM(C, PWM);
-			}
-			else
-				p->attivo = false;
+//			//provvede a misurare la velocita'
+//			//misuraVelocità()
+//			p->e[1] = (float) ((float)p->valFin - distanza->vel);
+//			/// se l'errore e' minore di una soglia, vuoil dire che e' a regime e
+//			/// quindi inutile integrare ulteriormente.
+//			if (abs(p->e[1]) > soglia  ){
+//				/// calcola l'integrale numerico del PID
+//				p->integra(gPtr->tick);
+//				/// avanti oppure indietro
+//				if(p->e[1] > 0.0)
+//					/// avanti
+//					PWM->dir_1 = PWM->dir_2 = 1;
+//				else
+//					/// indietro
+//					PWM->dir_1 = PWM->dir_2 = 2;
+//				/// impostazione del PWM ed invio del comando
+//				//setXPWM(C, PWM);
+//			}
+//			else
+//				p->attivo = false;
+			PWM1->delta = 65;
+			PWM2->delta = 65;
+			PWM1->MotorGo();
+			PWM2->MotorGo();
 
 		break;
 
-		case RUOTA:
+		case RUOTA_DESTRA:
 			///provvede ad integrare la misura della velcita' angolare
 			/// prestare attenzione al segnale d'errore che poi andra' rimosso
 			/// dal PWM perche' i motori, a differenza della regolazione della velocita' dovranno
 			/// fermarsi.
-			gPtr->misuraAngoli();
-			p->e[1] = (float) (p->valFin - gPtr->yaw);
-			/// calcola l'integrale numerico del PID
-			p->integra(gPtr->tick);
-			//TODO: adesso si deve mandare il comando al PWM
+
+			val = G->yaw - valFin;
+			/// calcola il valore assoluto della differenza tra il valore da raggiungere ed i valore attuale
+			if (val < 0)
+				val = -val;
+			/// considera +-2° come angolo raggiunto
+			if (val > 2){
+				// ruota il rover
+				PWM1->delta = PWM2->delta = 50;
+				PWM1->direction = 1;
+				PWM2->direction = -1;
+				PWM1->MotorGo();
+				PWM2->MotorGo();
+				G->IsRotating = true;
+			}
+			else{
+				/// termina la rotazione
+				PWM1->MotorStop();
+				PWM2->MotorStop();
+				G->IsRotating = false;
+			}
+
+//			p->e[1] = (float) (p->valFin - gPtr->yaw);
+//			/// calcola l'integrale numerico del PID
+//			p->integra(gPtr->tick);
+
 
 		break;
 
-		case RUOTA_SU_ASSE:
-			gPtr->misuraAngoli();
-			p->e[1] = (float) (p->valFin - gPtr->yaw);
-			/// calcola l'integrale numerico del PID
-			p->integra(gPtr->tick);
-			if (p->e[1] > 0.0){
-				///ruota in senso antiorario
-				PWM->dir_1 = 1;
-				PWM->dir_2 = 2;
+		case RUOTA_SINISTRA:
+
+			val = G->yaw - valFin;
+			/// calcola il valore assoluto della differenza tra il valore da raggiungere ed i valore attuale
+			if (val < 0)
+				val = -val;
+			/// considera +-2° come angolo raggiunto
+			if (val > 2){
+				G->IsRotating = true;
+				// ruota il rover
+				PWM1->delta = PWM2->delta = 50;
+				PWM1->direction = -1;
+				PWM2->direction = 1;
+				PWM1->MotorGo();
+				PWM2->MotorGo();
 			}
 			else{
-				/// in senso orario
-				PWM->dir_1 = 2;
-				PWM->dir_2 = 1;
+				/// termina la rotazione
+				PWM1->MotorStop();
+				PWM2->MotorStop();
+				G->IsRotating = false;
 			}
-			///
-			if(p->e[1] > -1.0 && p->e[1] < 1.0){
-				/// si può pensare che il comando sia stato eseguito e completato e quindi si puo' comunicare
-				/// questo evento.
-				p->rispondi = TRUE;
-			}
-			/// impostazione del PWM ed invio del comando
-			//setXPWM(C, PWM);
 		break;
 
 		default:
 			;
 		break;
 		}
-		return 0;
 	}
+	return 0;
 }
 
 
