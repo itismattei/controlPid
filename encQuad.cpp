@@ -180,8 +180,10 @@ void encQuad::qeiInit(){
 
 
 void encQuad::readPos(){
-
+	float tmp, k = 1.0;
 	pos = QEIPositionGet(address);
+	tmp = pos * k;
+	dist_mm = (int) tmp;
 
 }
 

@@ -17,12 +17,14 @@
 #include "sens_col_ir/sens1.h"
 
 #include "Giroscopio.h"
+#include "encQuad.h"
 
 typedef struct _glb{
 	//gyro 		*gPtr;
 	TEMPER		*temperat;
 	temperatura *tempPtr;
 	colore 		*colPtr;
+	COLORE		*colorClass;
 	//distanza 	*distPtr;
 	cinematica 	*cinPtr;
 	qei 		*qeiPtr;
@@ -31,6 +33,7 @@ typedef struct _glb{
 	/* classe */
 	distMis 	*DSTptr;
 	Giroscopio  *gyro;
+	encQuad		*encoder;
 } glb;
 
 class syntaxStatus{
@@ -74,7 +77,7 @@ void rispondiComando(syn_stat *sSTAT, glb *);
 void inviaSensore(syn_stat *,  glb*);
 
 void dati_a_struttura(gyro *, distanza *, cinematica *, colore *, temperatura* ,survivor *, dati *);
-void datiRaccolti(cinematica *CIN, TEMPER *TEMP, survivor *SUR, distMis *DIS, Giroscopio *GYRO, glb *GLB );
+void datiRaccolti(encQuad *ENC, cinematica *CIN, TEMPER *TEMP, COLORE *CL, survivor *SUR, distMis *DIS, Giroscopio *GYRO, glb *GLB );
 
 pid * leggiComando(syn_stat *sSTAT, pid CTRL[], pid *p, dati *);
 void EseguiPID(syn_stat *sSTAT, ControlloPID *);

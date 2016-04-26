@@ -368,38 +368,38 @@ void inviaSensore(syn_stat *sSTAT, glb * collectedD){
 		case(1):
 			//risposta con ID del sensore
 			sSTAT->buff_reply[0] = 1;
-			sSTAT->buff_reply[1] = (collectedD->DSTptr->d_mm[1]  & 0xFF00) >> 8;
-			sSTAT->buff_reply[2] = collectedD->DSTptr->d_mm[1]  & 0x00FF;
+			sSTAT->buff_reply[1] = (collectedD->DSTptr->d_mm[0]  & 0xFF00) >> 8;
+			sSTAT->buff_reply[2] = collectedD->DSTptr->d_mm[0]  & 0x00FF;
 
 			break;
 
 		//sensore di distanza DD2
 		case(2):
 			sSTAT->buff_reply[0] = 2;
-			sSTAT->buff_reply[1] = (collectedD->DSTptr->d_mm[2]  & 0xFF00) >> 8;
-			sSTAT->buff_reply[2] = collectedD->DSTptr->d_mm[2]  & 0x00FF;
+			sSTAT->buff_reply[1] = (collectedD->DSTptr->d_mm[1]  & 0xFF00) >> 8;
+			sSTAT->buff_reply[2] = collectedD->DSTptr->d_mm[1]  & 0x00FF;
 
 			break;
 
 		/// sensore di distanza anteriore
 		case(3):
 			sSTAT->buff_reply[0] = 3;
-			sSTAT->buff_reply[1] = (collectedD->DSTptr->d_mm[3]  & 0xFF00) >> 8;
-			sSTAT->buff_reply[2] = collectedD->DSTptr->d_mm[3]  & 0x00FF;
+			sSTAT->buff_reply[1] = (collectedD->DSTptr->d_mm[2]  & 0xFF00) >> 8;
+			sSTAT->buff_reply[2] = collectedD->DSTptr->d_mm[2]  & 0x00FF;
 
 			break;
 
 		case(4):
 			sSTAT->buff_reply[0] = 4;
-			sSTAT->buff_reply[1] = (collectedD->DSTptr->d_mm[4]  & 0xFF00) >> 8;
-			sSTAT->buff_reply[2] = collectedD->DSTptr->d_mm[4]  & 0x00FF;
+			sSTAT->buff_reply[1] = (collectedD->DSTptr->d_mm[3]  & 0xFF00) >> 8;
+			sSTAT->buff_reply[2] = collectedD->DSTptr->d_mm[3]  & 0x00FF;
 
 			break;
 
 		case(5):
 			sSTAT->buff_reply[0] = 5;
-			sSTAT->buff_reply[1] = (collectedD->DSTptr->d_mm[5] & 0xFF00) >> 8;
-			sSTAT->buff_reply[2] = collectedD->DSTptr->d_mm[5]  & 0x00FF;
+			sSTAT->buff_reply[1] = (collectedD->DSTptr->d_mm[4] & 0xFF00) >> 8;
+			sSTAT->buff_reply[2] = collectedD->DSTptr->d_mm[4]  & 0x00FF;
 
 			break;
 
@@ -420,31 +420,33 @@ void inviaSensore(syn_stat *sSTAT, glb * collectedD){
 		//lettura luminosità (valore tra 0 e 255)
 		case(7):
 					sSTAT->buff_reply[0] = 8;
-					sSTAT->buff_reply[1] = (collectedD->colPtr->luminanza & 0xFF00) >> 8;
-					sSTAT->buff_reply[2] = collectedD->colPtr->luminanza & 0x00FF;
+					sSTAT->buff_reply[1] = (collectedD->colorClass->luminanza & 0xFF00) >> 8;
+					sSTAT->buff_reply[2] = collectedD->colorClass->luminanza & 0x00FF;
 				break;
 
 		//lettura temperatura (valore tra 20 e 40)
 		case(8):
 					sSTAT->buff_reply[0] = 8;
-					sSTAT->buff_reply[1] = ((int)collectedD->tempPtr->Temp & 0xFF00) >> 8;
-					sSTAT->buff_reply[2] = (int)collectedD->tempPtr->Temp & 0x00FF;
+					sSTAT->buff_reply[1] = ((int)collectedD->temperat->Tint & 0xFF00) >> 8;
+					sSTAT->buff_reply[2] = (int)collectedD->temperat->Tint & 0x00FF;
 				break;
 
 		//velocità (cm/s)
 		case(9):
 				sSTAT->buff_reply[0] = 9;
 				//cast necessario, bisogna passare un intero
-				sSTAT->buff_reply[1] = ((int)collectedD->cinPtr->vel  & 0xFF00) >> 8;
-				sSTAT->buff_reply[2] = (int)collectedD->cinPtr->vel  & 0x00FF;
+//				sSTAT->buff_reply[1] = ((int)collectedD->cinPtr->vel  & 0xFF00) >> 8;
+//				sSTAT->buff_reply[2] = (int)collectedD->cinPtr->vel  & 0x00FF;
+				sSTAT->buff_reply[1] = 1;
+				sSTAT->buff_reply[2] = 0;
 				break;
 
 		//distanza percorsa (cm)
 		case(10):
 				sSTAT->buff_reply[0] = 10;
 				//cast necessario, bisogna passare un intero
-				sSTAT->buff_reply[1] = ((int)collectedD->cinPtr->spazio[0]  & 0xFF00) >> 8;
-				sSTAT->buff_reply[2] = (int)collectedD->cinPtr->spazio[0]  & 0x00FF;
+				sSTAT->buff_reply[1] = ((int)collectedD->encoder->dist_mm  & 0xFF00) >> 8;
+				sSTAT->buff_reply[2] = (int)collectedD->encoder->dist_mm  & 0x00FF;
 				break;
 
 		default:

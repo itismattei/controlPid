@@ -63,7 +63,7 @@
 
 
 /// variabili globali
-volatile int procCom = 0, tick10, tick100;
+volatile int procCom = 0, tick10, tick100, millis10 = 0;
 volatile int procCom4 = 0;
 volatile int ADCDataReadyFlag = 0;
 /// buffer per la seriale che riceve i dati dalla raspPi
@@ -97,7 +97,7 @@ int main(void) {
 
 	/// MODULO DI CONTROLLO DELLA BATTERIA ///
 	/// imposta il livello di soglia della batteria a 1900
-	power BATT(1900);
+	power BATT(1700);
 
 	/// MODULO PWM PER MOTORI DI SPOSTAMENTO ///
 	PWM_MOTORI M1, M2;
@@ -160,7 +160,7 @@ int main(void) {
 	//passaggio degli indirizzi delle strutture alla struttura generale
 	//dati_a_struttura(&G, &DIST, &CIN, &COL, &TEMP, &SUR, &DATA);
 	/// l'oggetto COLLECTDATA (glb) e' una struttara che contiene i puntatori alle strutture e classi del progetto
-	datiRaccolti(&CIN, &sensIR, &SUR, &MISURE, &Rot, &COLLECTDATA);
+	datiRaccolti(&ENC0, &CIN, &sensIR, &CL, &SUR, &MISURE, &Rot, &COLLECTDATA);
 
 	/// setup di base
 	setupMCU();
@@ -347,6 +347,7 @@ int main(void) {
 			//UARTCharPutNonBlocking(UART1_BASE, 'c');
 			procCom = 0;
 			contatore++;
+			millis10++;
 			//lampeggio_led++;
 			if (Rot.IsPresent == OK){
 				/// aggiorna l'angolo di yaw
@@ -417,7 +418,7 @@ int main(void) {
 
 			/// test sui motori
 
-#ifdef _DEBUG_
+#ifdef __DEBUG_
 			if (gradi == 0){
 				M1.delta = M2.delta = 65;
 				M1.MotorGo();

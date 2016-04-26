@@ -212,6 +212,7 @@ float TEMPER::readTemp(){
 	//I2CReceiveN(TEMP_ADDR, TEMP_REG | 0x20, 3, buffer);
 	tempRaw = (buffer[1] << 8) + buffer[0];
 	Temp = 0.02 * tempRaw  - 273.15;
+	Tint = (int)Temp;
 	ok = 0;
 	return Temp;
 }
