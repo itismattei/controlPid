@@ -400,39 +400,22 @@ int main(void) {
 				/// segnala che la batteria sta finendo, facendo lampeggiare il rosso
 				HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_1 << 2))) ^=  GPIO_PIN_1;
 
-#ifndef _DEBUG_
-			KIT.scarico();
-#endif
-//			/// qui provo lo scarico del kit.
-//			if (dir == 1){
-//				gradi += 10;
-//				KIT.MotorGo(gradi);
-//				if (gradi >= 80)
-//					dir = -1;
-//			}
-//			else{
-//				gradi -= 10;
-//				KIT.MotorGo(gradi);
-//				if (gradi <= -30)
-//					dir = 1;
-//			}
-
-			/// test sui motori
-
-#ifdef __DEBUG_
-			if (gradi == 0){
-				M1.delta = M2.delta = 65;
-				M1.MotorGo();
-				M2.MotorGo();
-				gradi = 1;
-			}
-			else{
-				gradi = 0;
-				M1.MotorStop();
-				M2.MotorStop();
+			////
+			//// VIENE ESEGUITA QUANDO IL COMANDO E' RILASCIO KIT (comando 'P' da raspberry)
+			///  E QUANDO il COMANDO e' SULLO STATO AVVIA. RILASCIATO IL PACK il COMANDO
+			///  PONE avvia = false e NON lo RIESEGUIRA' più finché token sarà di nuovo
+			///  RILASCIO_PACK e CMD con avvia = true. QUESTO ACCADE IN convertToToken,
+			///  nel file parse.cpp
+#ifdef _DEBUG_
+			if (CMD.avvia == true && synSTATO.token == RILASCIO_PACK){
+				/// rilascio del kit
+				KIT.scarico();
+				CMD.avvia = false;
+				CMD.isRun = false;
 			}
 #endif
 
+/// stampe dei valori dei sensori di distanza.
 #ifdef _DEBUG_
 			for(int i = 0; i < 5; i++){
 

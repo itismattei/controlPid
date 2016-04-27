@@ -251,6 +251,11 @@ int comando::RUN(ControlloPID *p, syn_stat *s, PWM_MOTORI *PWM1, PWM_MOTORI *PWM
 
 		int val;
 		/// seleziona il tipo di PID. QUESTA E' LA FORMA SEMPLIFICATA
+		/// ATTENZIONE: AVANZA ED INDIETRO HANNO LO STESSO NUMERO DI PID
+		if (s->token == INDIETRO){
+			PWM1->direction = -1;
+			PWM2->direction = -1;
+		}
 		switch(numPid){
 		case AVANZA:
 //			//provvede a misurare la velocita'
@@ -273,6 +278,8 @@ int comando::RUN(ControlloPID *p, syn_stat *s, PWM_MOTORI *PWM1, PWM_MOTORI *PWM
 //			}
 //			else
 //				p->attivo = false;
+			PWM1->direction = 1;
+			PWM2->direction = 1;
 			PWM1->delta = 65;
 			PWM2->delta = 65;
 			PWM1->MotorGo();
@@ -338,8 +345,11 @@ int comando::RUN(ControlloPID *p, syn_stat *s, PWM_MOTORI *PWM1, PWM_MOTORI *PWM
 			}
 		break;
 
+		case ARRESTA:
 		default:
-			;
+			isRun = false;
+			PWM1->MotorStop();
+			PWM2->MotorStop();;
 		break;
 		}
 	}

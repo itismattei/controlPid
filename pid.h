@@ -21,12 +21,13 @@
 #define			AVANZA			0
 #define			RUOTA_DESTRA	1
 #define			RUOTA_SINISTRA	2
+#define			ARRESTA			-1
 
 class ControlloPID;
 
 class comando{
 public:
-	comando(){azione = false; isRun = false; finished = false; numPid = -1; token = -1; tick = 0;}
+	comando(){azione = false; isRun = false; finished = false; numPid = -1; token = -1; tick = 0; avvia = 0;}
 	int RUN(ControlloPID *, syn_stat *,PWM_MOTORI *, PWM_MOTORI *, Giroscopio *G);
 	void setUptrasducers(Giroscopio	*gPtr, pwm	*PWM, distMis *distanza);
 
@@ -35,6 +36,7 @@ public:
 	bool finished;			// indica se il comando e' giunto al termine
 	int numPid;				// numero del PID attivo
 	int token;				// numero del comando
+	int avvia;				// indica che il comando va eseguito
 	uint32_t tick;			// contatore dei cicli di esecuzione del comando
 	int valFin;				// imposta il valore finale a cui deve giungere il comando
 	Giroscopio 	*gPtr;

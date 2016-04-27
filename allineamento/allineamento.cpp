@@ -30,6 +30,7 @@ void allineamento::adc_allinea(distMis &DIST, pwm *PWM, pid *C)
 	float angolo;	 		//angolo tra la parete e il robot
 	float angolo_pid; 		// l'angolo da dare al pid
 
+	angolo = 0.0;
 	//leggi il sensore di distanza destro e sinistro
 
 	d[0]= DIST.d_mm[0];

@@ -150,6 +150,7 @@ void convertToToken(syn_stat *STATO, comando *cmdPtr){
 		//rilascio rescue pack
 		STATO->token = RILASCIO_PACK;
 		cmdPtr->azione = true;
+		cmdPtr->avvia = true;
 	default:
 		/// se nessun comando e'giusto produce un errore.
 		STATO->token = ERRORE;
