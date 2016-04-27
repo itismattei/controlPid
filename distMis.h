@@ -17,7 +17,7 @@ public:
 	virtual ~distMis();
 	void rawTomm1(void);
 
-	void rawTomm();
+	void rawTomm(void);
 
 	/// proprieta'
 	float 		misSens[6];		/// distanza in millimetri con virgola

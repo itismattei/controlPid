@@ -35,8 +35,6 @@
 
 void initAdc(volatile distMis *d){
 
-	d->dI[5] = 0;
-	d->d_mm[5] = 0;
 	initHW_ADC();
 	/// setta ad on al presenza e funzionalita' del sensore
 	d->run = true;
