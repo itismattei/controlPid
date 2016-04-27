@@ -33,7 +33,7 @@ distMis::~distMis() {
 
 ///
 /// estrae dal dato grezzo la misura
-void distMis::rawTomm(){
+void distMis::rawTomm1(){
 	// implementazione sintetica, con uso di powf.
 
 	//valori "esatti" solo per i primi quattro sensori

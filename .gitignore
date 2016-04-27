@@ -31,3 +31,4 @@
 .launches/tiva-pid.launch
 .set*
 /Debug
+/Release
