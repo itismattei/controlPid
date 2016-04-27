@@ -30,7 +30,7 @@ Giroscopio::Giroscopio() {
 	tempReg = 0;
 	posizione = 0;
 	yawF0 = 0.0;
-	IsRotating = 0;
+	IsRotating = offsetRequest = 0;
 	i2cPtr = NULL;
 }
 
@@ -289,9 +289,11 @@ void Giroscopio::misuraAngoli(){
 			f *= tick;
 			yawF0 += f;
 #endif
-			if (tempoDiReset >= 1000 && IsRotating == 0){
+			if ((tempoDiReset >= 1000 && IsRotating == 0) || offsetRequest){
 // TODO: SE NON STA RUOTANDO POTREBBE EFFETTUARE UN AZZERAMENTO ASSI
-
+				/// le richieste a seguito di fine rotazione non possono restare
+				/// attive più di una volta.
+				offsetRequest = 0;
 				/// sono passati 10 secondi e dovrebbe ricalcolare l'offset degli assi
 				/// dovrebbe calcolare se G->yawF è cambiato di almeno 1 grado rispetto ai 5 secondi precedenti
 				/// se non è cambiato dovrebbe azzerare la parte frazionaria

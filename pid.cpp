@@ -305,13 +305,17 @@ int comando::RUN(ControlloPID *p, syn_stat *s, PWM_MOTORI *PWM1, PWM_MOTORI *PWM
 				PWM2->direction = -1;
 				PWM1->MotorGo();
 				PWM2->MotorGo();
+				/// blocca gli aggiornamenti del giroscopio
 				G->IsRotating = true;
 			}
 			else{
 				/// termina la rotazione
 				PWM1->MotorStop();
 				PWM2->MotorStop();
+				/// attiv gli aggiornamenti del giroscopio
 				G->IsRotating = false;
+				/// chiede al giroscopio, appena puo' di effettuare un offset
+				G->offsetRequest = 1;
 			}
 
 //			p->e[1] = (float) (p->valFin - gPtr->yaw);

@@ -18,22 +18,24 @@
 
 #include "Giroscopio.h"
 #include "encQuad.h"
+#include "accel/accel.h"
 
 typedef struct _glb{
 	//gyro 		*gPtr;
-	TEMPER		*temperat;
-	temperatura *tempPtr;
-	colore 		*colPtr;
-	COLORE		*colorClass;
+	TEMPER			*temperat;
+	temperatura 	*tempPtr;
+	colore 			*colPtr;
+	COLORE			*colorClass;
 	//distanza 	*distPtr;
-	cinematica 	*cinPtr;
-	qei 		*qeiPtr;
-	survivor 	*surPtr;
+	cinematica 		*cinPtr;
+	qei 			*qeiPtr;
+	survivor 		*surPtr;
 
 	/* classe */
-	distMis 	*DSTptr;
-	Giroscopio  *gyro;
-	encQuad		*encoder;
+	distMis 		*DSTptr;
+	Giroscopio  	*gyro;
+	encQuad			*encoder;
+	accelerometro 	*acc;
 } glb;
 
 class syntaxStatus{
@@ -77,7 +79,7 @@ void rispondiComando(syn_stat *sSTAT, glb *);
 void inviaSensore(syn_stat *,  glb*);
 
 void dati_a_struttura(gyro *, distanza *, cinematica *, colore *, temperatura* ,survivor *, dati *);
-void datiRaccolti(encQuad *ENC, cinematica *CIN, TEMPER *TEMP, COLORE *CL, survivor *SUR, distMis *DIS, Giroscopio *GYRO, glb *GLB );
+void datiRaccolti(accelerometro *ACC, encQuad *ENC, cinematica *CIN, TEMPER *TEMP, COLORE *CL, survivor *SUR, distMis *DIS, Giroscopio *GYRO, glb *GLB );
 
 pid * leggiComando(syn_stat *sSTAT, pid CTRL[], pid *p, dati *);
 void EseguiPID(syn_stat *sSTAT, ControlloPID *);

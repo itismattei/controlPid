@@ -149,19 +149,13 @@ int main(void) {
 	//pidPtr = CTRL;
 	//dPtr = &DIST;
 
-
-	//TEMPptr =  &TEMP;
-//	CIN.Aptr = &A;
-//	CIN.distPTR = &DIST;
-//	CIN.vel = 0.0;
-
 	glb  COLLECTDATA;
 	comando CMD;
 	//DATA.distPtr = &DIST;
 	//passaggio degli indirizzi delle strutture alla struttura generale
 	//dati_a_struttura(&G, &DIST, &CIN, &COL, &TEMP, &SUR, &DATA);
 	/// l'oggetto COLLECTDATA (glb) e' una struttara che contiene i puntatori alle strutture e classi del progetto
-	datiRaccolti(&ENC0, &CIN, &sensIR, &CL, &SUR, &MISURE, &Rot, &COLLECTDATA);
+	datiRaccolti(&A, &ENC0, &CIN, &sensIR, &CL, &SUR, &MISURE, &Rot, &COLLECTDATA);
 
 	/// setup di base
 	setupMCU();
@@ -216,10 +210,11 @@ int main(void) {
 	ENC1.qeiInit();
 	//servo = (pwm *) &pwmServi;
 	/// inizializzazione accelerometro
-//	A.testAccel();
-//	if (A.isPresent == true)
-//		/// imposta l'accelerometro
-//		A.impostaAccel();
+	A.attach(&BUS_COMM, ACCEL_ADDR);
+	A.testAccel();
+	if (A.isPresent == true)
+		/// imposta l'accelerometro
+		A.impostaAccel();
 	/// iniziailizzazione del lettore encoder
 	//qei_init(&QEI);
 	/// abilita le interruzioni
@@ -415,6 +410,8 @@ int main(void) {
 			}
 #endif
 
+			/// MISURA IL SENSORE DI ACCELERAZIONE
+			A.misuraAccelerazioni();
 /// stampe dei valori dei sensori di distanza.
 #ifdef _DEBUG_
 			for(int i = 0; i < 5; i++){

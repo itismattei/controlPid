@@ -5,6 +5,7 @@
 
 #include "../I2C/i2cTiva.h"
 #include <stdint.h>
+#include <stdlib.h>
 
 ///////////////////////////////////////////////
 ///// ADDRESS
@@ -51,7 +52,7 @@
 
 class accelerometro {
 public:
-	accelerometro(){;}
+	accelerometro();
 
 	void impostaAccel();
 	void misuraAccelerazioni();
@@ -59,6 +60,7 @@ public:
 	void attach(I2C *, uint8_t);
 
 	float 	a[3];			/// valori di accelerazione lungo i 3 assi
+	int		aInt[3];		/// valore lungo i tre assi in formato intero in mg (milli g)
 	bool  	isPresent;		/// presenza dell'accelerometro
 	I2C		*i2cPtr;
 

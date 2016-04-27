@@ -28,7 +28,7 @@ void dati_a_struttura(gyro *G, distanza *D, cinematica *CIN, colore *COL, temper
 }
 
 
-void datiRaccolti(encQuad *ENC, cinematica *CIN, TEMPER *TEMP, COLORE * color, survivor *SUR, distMis *DIS, Giroscopio *GYRO, glb *GLB ){
+void datiRaccolti(accelerometro *ACC, encQuad *ENC, cinematica *CIN, TEMPER *TEMP, COLORE * color, survivor *SUR, distMis *DIS, Giroscopio *GYRO, glb *GLB ){
 
 	GLB->surPtr 	= SUR;
 
@@ -40,4 +40,5 @@ void datiRaccolti(encQuad *ENC, cinematica *CIN, TEMPER *TEMP, COLORE * color, s
 	GLB->DSTptr 	= DIS;
 	GLB->gyro		= GYRO;
 	GLB->encoder	= ENC;
+	GLB->acc		= ACC;
 }
