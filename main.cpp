@@ -17,6 +17,7 @@
  *  Si testano anche i sensori di distanza (5 sensori)
  *
  *  INSERIMENTO DEL CICLO PRINCIPALE con PID SEMPLIFICATO
+ *  RELEASE CON AGGIUNTA DELL'USO DELL'ACCELEROMETRO.
  */
 
 
