@@ -165,6 +165,9 @@ void convertToToken(syn_stat *STATO, comando *cmdPtr){
 	/// azzera il contatore della persistenza del comando
 	/// cio' vuol di re che c'e' un nuovo comando da servire
 	STATO->tick = 0;
+	/// resetta il contatore di timeout per permettere al comando di essere eseguito per almeno
+	/// 1.5 s
+	cmdPtr->tick = 0;
 
 }
 
