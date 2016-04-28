@@ -253,8 +253,13 @@ int comando::RUN(ControlloPID *p, syn_stat *s, PWM_MOTORI *PWM1, PWM_MOTORI *PWM
 		/// seleziona il tipo di PID. QUESTA E' LA FORMA SEMPLIFICATA
 		/// ATTENZIONE: AVANZA ED INDIETRO HANNO LO STESSO NUMERO DI PID
 		if (s->token == INDIETRO){
+			/// sicome il pid per avanti ed indietro e' lo stesso, la direzione viene impostata leggendo il token del messaggio
 			PWM1->direction = -1;
 			PWM2->direction = -1;
+		}
+		if(s->token == AVANTI){
+			PWM1->direction = 1;
+			PWM2->direction = 1;
 		}
 		switch(numPid){
 		case AVANZA:
@@ -278,8 +283,7 @@ int comando::RUN(ControlloPID *p, syn_stat *s, PWM_MOTORI *PWM1, PWM_MOTORI *PWM
 //			}
 //			else
 //				p->attivo = false;
-			PWM1->direction = 1;
-			PWM2->direction = 1;
+
 			PWM1->delta = 65;
 			PWM2->delta = 65;
 			PWM1->MotorGo();
