@@ -369,6 +369,9 @@ int main(void) {
 		/// AZIONI DA COMPIERE OGNI 100ms ///
 		if (tick10 >= 10){
 			tick10 = 0;
+			ENC0.readPos();
+			ENC0.readDir();
+			PRINTF("POS: %d\t%d\n", ENC0.pos, ENC0.dir);
 		}
 		/* misura gli encoder e calcola spostamenti e velocità */
 		//////////////////////////////////
@@ -377,7 +380,7 @@ int main(void) {
 
 			/// controlla il colore della piastrella sottostante e lo paragona la bianco memorizzato in fase di setup
 			CL.Run();
-#ifdef _DEBUG_
+#ifndef _DEBUG_
 			PRINTF("Col: %d\t W: %d\n", CL.get(), CL.getWhite());
 #endif
 			/// legge la temperatura del pirometro
@@ -392,10 +395,10 @@ int main(void) {
 			/// Ricordarsi: il dato n.6 e'lo stato della batteria
 			ROM_ADCProcessorTrigger(ADC0_BASE, 0);
 			/// legge gli encoder
-			ENC0.readPos();
-			ENC0.readDir();
-			ENC1.readPos();
-			ENC1.readDir();
+//			ENC0.readPos();
+//			ENC0.readDir();
+//			ENC1.readPos();
+//			ENC1.readDir();
 			//HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_5 << 2))) |=  GPIO_PIN_5;
 			if (BATT.battLevel > BATT.safeLevel)
 				HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_3 << 2))) ^=  GPIO_PIN_3;
@@ -436,7 +439,7 @@ int main(void) {
 			}
 #endif
 
-#ifdef _DEBUG_
+#ifndef _DEBUG_
 			for(int i = 0; i < 5; i++){
 
 				PRINTF("val%d: %d \t", i, MISURE.dI[i]);
@@ -473,7 +476,7 @@ int main(void) {
 				/// c'e' un dato campionato pronto, ad esempio la batteria, e viene copiato
 				ADCDataReadyFlag = 0;
 				BATT.battLevel = MISURE.dI[5];
-#ifdef _DEBUG_
+#ifndef _DEBUG_
 				PRINTF("Liv batteria: %d\n", BATT.battLevel);
 #endif
 			}
