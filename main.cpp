@@ -59,6 +59,7 @@
 #include "I2C/i2cTiva.h"
 #include "pwm/motpwm.h"
 #include "power.h"
+#include "pid.h"
 
 
 
@@ -129,6 +130,7 @@ int main(void) {
 	syn_stat synSTATO;
 	/// modulo zigbee per telemetria
 	//xbee XB;
+	xBee XB;
 
 	/// MODULO SENSORE DI COLORE  ///
 	COLORE CL;
@@ -155,7 +157,7 @@ int main(void) {
 //	CIN.vel = 0.0;
 
 	glb  COLLECTDATA;
-	comando CMD;
+	comando CMD1;
 	//DATA.distPtr = &DIST;
 	//passaggio degli indirizzi delle strutture alla struttura generale
 	//dati_a_struttura(&G, &DIST, &CIN, &COL, &TEMP, &SUR, &DATA);
@@ -166,6 +168,7 @@ int main(void) {
 	setupMCU();
 	/// imposta i parametri del PID
 	//setupPID(CTRL);
+
 	/// imposta le UART e setta la PRINTF sulla 1 in modo da trasmettere la telemetria
 	//setupUART(1);
 	/// imposta le UART e setta la PRINTF sulla 0
@@ -299,14 +302,16 @@ int main(void) {
 	CL.WhiteBalance();
 	//initLightSens1();
 	//whiteBal(&COL);
-
+	XB.test();
 	int dir = 1, gradi = 0;
 	/////////////////////////////////////////////////////////
 	///
 	///      TASK PRINCIPALE
 	///
 	/////////////////////////////////////////////////////////
-
+	setupUART(1);
+	XB.sendString("Ciao\n", 5);
+	PRINTF("Telemetria\n");
 	while(1){
 
 
@@ -318,7 +323,7 @@ int main(void) {
 		// controllo di messaggio sulla seriale 1 (ricevuto comando da rasp
 		if (READ_PTR1 != RX_PTR1){
 			/// analizza il comando e imposta il valore dell'oggetto CMD (comando)
-			 parse(&synSTATO, &CMD, & synStat);
+			 parse(&synSTATO, &CMD1, &synStat);
 			 /// aggiorna il buffer
 			 READ_PTR1++;
 			 READ_PTR1 &= DIM_READ_BUFF - 1;
@@ -354,7 +359,7 @@ int main(void) {
 
 			}
 
-			CMD.RUN(cPid, &synSTATO);
+			CMD1.RUN(cPid, &synSTATO);
 			/// le misure del giroscopio invece sono effettuate solo dall'apposito pid
 		}
 		/// effettua i calcoli solo se il giroscopio e' presente
