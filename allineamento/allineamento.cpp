@@ -21,7 +21,7 @@ allineamento::~allineamento(){
 
 //N.B. ancora è molto rude...
 
-void allineamento::adc_allinea(distMis &DIST, pwm *PWM, pid *C)
+void allineamento::adc_allinea(distMis &DIST, pwm *PWM /*, pid *C*/)
 {
 	//variabili
 	float delta = 0.0, d[4];
@@ -61,12 +61,12 @@ void allineamento::adc_allinea(distMis &DIST, pwm *PWM, pid *C)
 	if(angolo > angolo_minimo){
 		///setto il pid dandogli come valore finale l'inverso dell'angolo
 
-		//preso dal codice pid.c il case RUOTA
-		C->e[1] = (float) (0 - angolo_pid);
-		/// calcola l'integrale numerico del PID
-		integra(C, angolo_pid);
-		PWM->dir_1 = PWM->dir_2 = 1;
-		setXPWM(C, PWM);
+//		//preso dal codice pid.c il case RUOTA
+//		C->e[1] = (float) (0 - angolo_pid);
+//		/// calcola l'integrale numerico del PID
+//		integra(C, angolo_pid);
+//		PWM->dir_1 = PWM->dir_2 = 1;
+//		setXPWM(C, PWM);
 	}
 
  }

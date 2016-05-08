@@ -92,7 +92,7 @@ void Timer1ISR (void)
 //*****************************************************************************
 
 
-void initTimer0(int interval, gyro *G){
+void initTimer0(int interval){
     //
     // Enable lazy stacking for interrupt handlers.  This allows floating-point
     // instructions to be used within interrupt handlers, but at the expense of
@@ -125,7 +125,7 @@ void initTimer0(int interval, gyro *G){
     ROM_TimerConfigure(TIMER0_BASE, TIMER_CFG_PERIODIC);
     /// imposta il time_out
     ROM_TimerLoadSet(TIMER0_BASE, TIMER_A, tick);
-    G->tick = (float) interval / 1000;
+    //G->tick = (float) interval / 1000;
     //
     // Setup the interrupts for the timer timeouts.
     //

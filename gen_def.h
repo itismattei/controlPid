@@ -23,7 +23,7 @@
 extern "C" {
 #endif
 
-void initTimer0(int interval, gyro *G);
+void initTimer0(int interval);
 void initTimer1(int interval);
 
 #ifdef __cplusplus

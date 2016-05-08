@@ -28,11 +28,11 @@ void dati_a_struttura(gyro *G, distanza *D, cinematica *CIN, colore *COL, temper
 }
 
 
-void datiRaccolti(accelerometro *ACC, encQuad *ENC, cinematica *CIN, TEMPER *TEMP, COLORE * color, survivor *SUR, distMis *DIS, Giroscopio *GYRO, glb *GLB ){
+void datiRaccolti(accelerometro *ACC, encQuad *ENC, TEMPER *TEMP, COLORE * color, survivor *SUR, distMis *DIS, Giroscopio *GYRO, glb *GLB ){
 
 	GLB->surPtr 	= SUR;
 
-	GLB->cinPtr 	= CIN;
+	GLB->cinPtr 	= 0;
 	//GLB->colPtr 	= COL;
 	//GLB->distPtr 	= D;
 	GLB->colorClass = color;

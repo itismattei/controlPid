@@ -15,7 +15,7 @@
 
 
 
-void rispostaRotazione(pid *, syn_stat *);
+void rispostaRotazione(/*pid * ,*/ syn_stat *);
 
 /// impostazioni dei PID presenti
 void ControlloPID::setupPID(int type){
@@ -164,46 +164,46 @@ int ControlloPID::Run(Giroscopio *G, PWM_MOTORI *PWM1, PWM_MOTORI * PWM2, distMi
 /// occorre definire la funzione che mappa i valori di uscita su
 /// intervalli di funzionamento ammessi dal pwm
 /// A 11.4V si va dal 70% al 95%.
-void setXPWM(pid *C, pwm *PWM){
-
-	/// funzioncina lineare al momento
-	/// 10 -> 70; 95 -> 95
-	/// m = (95 - 70)/(95 - 10) = 0,294
-	/// q = 67,07
-	float valore;
-	valore = 0.294 * C->uscita + 67.07;
-	if (C->tipo == AVANZA){
-		PWM->delta_1 = (uint32_t)valore;
-		PWM->delta_2 = (uint32_t)valore;
-	}
-	/// invia i valori al registro del PWM
-	//pwm_power(PWM);
-
-}
+//void setXPWM(pid *C, pwm *PWM){
+//
+//	/// funzioncina lineare al momento
+//	/// 10 -> 70; 95 -> 95
+//	/// m = (95 - 70)/(95 - 10) = 0,294
+//	/// q = 67,07
+//	float valore;
+//	valore = 0.294 * C->uscita + 67.07;
+//	if (C->tipo == AVANZA){
+//		PWM->delta_1 = (uint32_t)valore;
+//		PWM->delta_2 = (uint32_t)valore;
+//	}
+//	/// invia i valori al registro del PWM
+//	//pwm_power(PWM);
+//
+//}
 
 
 ///
 /// effettua l'integrazione numerica
-void integra(pid *C, float tick){
-
-	float D, P, I;
-	/// derivativo
-	D = C->kd * (C->e[1] - C->e[0]) / tick;
-	/// proporzionale
-	P = C->kp * C->e[1];
-	/// integrale
-	I = C->I + C->ki * tick * (C->e[1] + C->e[0]);
-	I *= (float)0.50;
-	C->I = I;
-	C->uscita = D + P + I;
-	/// dispositivo con saturazione
-	if (C->uscita > 100.0)
-		C->uscita = 100.0;
-		else if (C->uscita < -100.0)
-			C->uscita = -100.0;
-	//aggiornamento dell'errore
-	C->e[0] = C->e[1];
-}
+//void integra(pid *C, float tick){
+//
+//	float D, P, I;
+//	/// derivativo
+//	D = C->kd * (C->e[1] - C->e[0]) / tick;
+//	/// proporzionale
+//	P = C->kp * C->e[1];
+//	/// integrale
+//	I = C->I + C->ki * tick * (C->e[1] + C->e[0]);
+//	I *= (float)0.50;
+//	C->I = I;
+//	C->uscita = D + P + I;
+//	/// dispositivo con saturazione
+//	if (C->uscita > 100.0)
+//		C->uscita = 100.0;
+//		else if (C->uscita < -100.0)
+//			C->uscita = -100.0;
+//	//aggiornamento dell'errore
+//	C->e[0] = C->e[1];
+//}
 
 
 ///
@@ -216,7 +216,7 @@ void comando::setUptrasducers(Giroscopio *G, pwm *p, distMis *dist){
 
 ///
 /// esegue il pid selezionato
-int comando::RUN(ControlloPID *p, syn_stat *s, PWM_MOTORI *PWM1, PWM_MOTORI *PWM2, Giroscopio *G){
+int comando::RUN(ControlloPID *p, syn_stat *s, PWM_MOTORI *PWM1, PWM_MOTORI *PWM2, encQuad * ENC1, encQuad * ENC2, Giroscopio *G){
 	/// controlla il time out del comando e se scaduto si ferma
 	if (tick > TIMEOUT_CMD){
 		/// in caso di timeout nella persistenza del comando si deve fermare

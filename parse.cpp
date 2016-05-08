@@ -484,15 +484,15 @@ void inviaSensore(syn_stat *sSTAT, glb * collectedD){
 
 ///
 /// invia la risposta, in comandi di tipo rotazione
-void rispostaRotazione(pid *pidPtr, syn_stat *synPtr){
-	uint8_t checksum = 0;
-	pidPtr->rispondi = FALSE;
-	synPtr->buff_reply[1] = '0';
-	synPtr->buff_reply[2] = TRUE;
-	int i;
-	for (i = 0 ; i < 3; i++)
-		checksum ^= synPtr->buff_reply[i];
-	checksum ^= CHECK_SUM;
-	synPtr->buff_reply[3] = checksum;
-	sendReply(synPtr, 4);
-}
+//void rispostaRotazione(pid *pidPtr, syn_stat *synPtr){
+//	uint8_t checksum = 0;
+//	pidPtr->rispondi = FALSE;
+//	synPtr->buff_reply[1] = '0';
+//	synPtr->buff_reply[2] = TRUE;
+//	int i;
+//	for (i = 0 ; i < 3; i++)
+//		checksum ^= synPtr->buff_reply[i];
+//	checksum ^= CHECK_SUM;
+//	synPtr->buff_reply[3] = checksum;
+//	sendReply(synPtr, 4);
+//}

@@ -23,7 +23,7 @@ public:
 	///
 	/// metodi
 	///
-	void adc_allinea(distMis &DIST, pwm *PWM, pid *C);
+	void adc_allinea(distMis &DIST, pwm *PWM /*,pid *C*/);
 	void gyro_allinea();
 
 private:
@@ -32,7 +32,7 @@ private:
 	float 	distMDX, distMSX, distAssi;
 	bool  	dx;
 	pwm *p;
-	pid *cPtr;
+	//pid *cPtr;
 
 private:
 	void allinea(void);

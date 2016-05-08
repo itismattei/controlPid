@@ -117,13 +117,13 @@ int main(void) {
 
 
 	//volatile double d = 1.9845637456;
-	gyro G;
+	//gyro G;
 
 	/// MODULO INERZIALE  ///
 	Giroscopio Rot;
 	//accelerazione A;
 	accelerometro A;
-	cinematica CIN;
+	//cinematica CIN;
 	/// servono differenti PID, almeno uno per la rotazione ed uno per lo spostamento
 	/// per la rotazione sarebbero interessante usarne 2, uno per la ortazione soft ed uno per la rotazione
 	/// brusca.
@@ -158,7 +158,7 @@ int main(void) {
 	//passaggio degli indirizzi delle strutture alla struttura generale
 	//dati_a_struttura(&G, &DIST, &CIN, &COL, &TEMP, &SUR, &DATA);
 	/// l'oggetto COLLECTDATA (glb) e' una struttara che contiene i puntatori alle strutture e classi del progetto
-	datiRaccolti(&A, &ENC0, &CIN, &sensIR, &CL, &SUR, &MISURE, &Rot, &COLLECTDATA);
+	datiRaccolti(&A, &ENC0, &sensIR, &CL, &SUR, &MISURE, &Rot, &COLLECTDATA);
 
 	/// setup di base
 	setupMCU();
@@ -191,7 +191,7 @@ int main(void) {
 	//initGyro(&G, Z_AXIS);
 	tick10 = tick100 = 0;
 	/// inizializza il timer 0 e genera un tick da 10 ms
-	initTimer0(INT_STEP_10_MS, &G);
+	initTimer0(INT_STEP_10_MS);
 	PRINTF("inizializzato TIMER0\n");
 	/// imposta il passo di integrazione per il calcolo dell'angolo
 	Rot.tick = (INT_STEP_10_MS / 1000.0) ;
@@ -357,7 +357,7 @@ int main(void) {
 
 			}
 
-			CMD1.RUN(cPid, &synSTATO, &M1, &M2, &Rot);
+			CMD1.RUN(cPid, &synSTATO, &M1, &M2, &ENC0, &ENC1, &Rot);
 			/// le misure del giroscopio invece sono effettuate solo dall'apposito pid
 		}
 		/// effettua i calcoli solo se il giroscopio e' presente

@@ -79,9 +79,9 @@ void rispondiComando(syn_stat *sSTAT, glb *);
 void inviaSensore(syn_stat *,  glb*);
 
 void dati_a_struttura(gyro *, distanza *, cinematica *, colore *, temperatura* ,survivor *, dati *);
-void datiRaccolti(accelerometro *ACC, encQuad *ENC, cinematica *CIN, TEMPER *TEMP, COLORE *CL, survivor *SUR, distMis *DIS, Giroscopio *GYRO, glb *GLB );
+void datiRaccolti(accelerometro *ACC, encQuad *ENC, TEMPER *TEMP, COLORE *CL, survivor *SUR, distMis *DIS, Giroscopio *GYRO, glb *GLB );
 
-pid * leggiComando(syn_stat *sSTAT, pid CTRL[], pid *p, dati *);
+//pid * leggiComando(syn_stat *sSTAT, pid CTRL[], pid *p, dati *);
 void EseguiPID(syn_stat *sSTAT, ControlloPID *);
 
 #endif /* PARSE_H_ */
