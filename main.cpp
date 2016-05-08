@@ -188,7 +188,7 @@ int main(void) {
 	/// collegato sensore di temperatura al bus I2C
 	sensIR.attachI2C(&BUS_COMM, TEMP_ADDR);
 	sensIR.taraturaTemp();
-	//initGyro(&G, Z_AXIS);
+
 	tick10 = tick100 = 0;
 	/// inizializza il timer 0 e genera un tick da 10 ms
 	initTimer0(INT_STEP_10_MS);
@@ -219,8 +219,7 @@ int main(void) {
 	if (A.isPresent == true)
 		/// imposta l'accelerometro
 		A.impostaAccel();
-	/// iniziailizzazione del lettore encoder
-	//qei_init(&QEI);
+
 	/// abilita le interruzioni
 	EI();
 	PRINTF("abilitate interruzioni\n");
@@ -236,7 +235,6 @@ int main(void) {
 		}
 		blink = 0;
 		/// azzeramento degli assi
-		//azzeraAssi(&G);
 		Rot.azzeraAssi();
 #ifdef _DEBUG_
 		PRINTF("media: ");
@@ -249,17 +247,6 @@ int main(void) {
 #endif
 	}
 
-	/// test della presenza del modulo zig-bee
-	/// il modulo zig-be si attiva con al sequnza '+++' e risponde con 'OK' (maiuscolo)
-//	if (testXbee() == 0){
-//		// ok;
-//		XB.present = 1;
-//		PRINTF("Modulo xbee presente.\n");
-//	}
-//	else{
-//		XB.present = 0;
-//		PRINTF("Modulo xbee non presente.\n");
-//	}
 //
 //	pwm_power(&PWM);
 	contatore = 0;
