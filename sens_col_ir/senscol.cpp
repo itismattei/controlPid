@@ -204,7 +204,7 @@ float TEMPER::readTemp(){
 	unsigned char buffer[4];
 	if (i2cPtr == NULL){
 		PRINTF("registrare il canale I2c per il pirometro\n");
-		return;
+		return -300.0;
 	}
 	//char valore;
 	/// per leggere la temperatura deve chiamare il sensore su I2C
@@ -212,6 +212,7 @@ float TEMPER::readTemp(){
 	//I2CReceiveN(TEMP_ADDR, TEMP_REG | 0x20, 3, buffer);
 	tempRaw = (buffer[1] << 8) + buffer[0];
 	Temp = 0.02 * tempRaw  - 273.15;
+	Tint = (int)Temp;
 	ok = 0;
 	return Temp;
 }

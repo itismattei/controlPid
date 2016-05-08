@@ -412,8 +412,8 @@ void I2C::InitI2C(uint32_t base){
 }
 
 /// riceve N bytes
-void I2C::I2CGetN(uint8_t reg, uint8_t numElem, uint8_t buff[]){;
-	uint32_t i;
+uint32_t I2C::I2CGetN(uint8_t reg, uint8_t numElem, uint8_t buff[]){;
+	uint32_t i, conteggio = 0;
 	/// Impsta l'indirizzo dello slave e la modalità di scrittura
 	HWREG(BASE_ADDR + I2C_O_MSA) = (SLAVE_ADD << 1) | false;
 	//I2CMasterSlaveAddrSet(I2C0_BASE, slave_addr, false);
@@ -426,11 +426,13 @@ void I2C::I2CGetN(uint8_t reg, uint8_t numElem, uint8_t buff[]){;
 	HWREG(BASE_ADDR + I2C_O_MCS) = I2C_MASTER_CMD_BURST_SEND_START;
 	//I2CMasterControl(I2C0_BASE, I2C_MASTER_CMD_BURST_SEND_START);
 
-	int contatore = 0;
-	//wait for MCU to finish transaction
-	while(I2CMasterBusy(BASE_ADDR) && ++contatore < 1000000);
-	if (contatore >= 1000000)
-		return;
+		//wait for MCU to finish transaction
+	while(I2CMasterBusy(BASE_ADDR) && conteggio < 1000000)
+  	/// sblocca l'attesa se il dispositivo non e' presente
+    	conteggio++;
+    if (conteggio >= 1000000)
+    	/// e' scattato il timeout
+    	return (0xFFFF);
 	//specify that we are going to read from slave device
 	HWREG(BASE_ADDR + I2C_O_MSA) = (SLAVE_ADD << 1) | true;
 	//I2CMasterSlaveAddrSet(I2C0_BASE, slave_addr, true);
@@ -464,6 +466,7 @@ void I2C::I2CGetN(uint8_t reg, uint8_t numElem, uint8_t buff[]){;
 	//wait for MCU to finish transaction
 	while(I2CMasterBusy(BASE_ADDR));
 	buff[numElem - 1] = I2CMasterDataGet(BASE_ADDR);
+	return 0;
 }
 
 

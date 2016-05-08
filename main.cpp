@@ -15,7 +15,9 @@
  *  alcune prove
  *  In questa release si testa sia il giroscopio che l'accelerometro.
  *  Si testano anche i sensori di distanza (5 sensori)
- *  Versione di PROVA DEI VARI SENSORI ED ATTUATORI
+ *
+ *  INSERIMENTO DEL CICLO PRINCIPALE con PID SEMPLIFICATO
+ *  RELEASE CON AGGIUNTA DELL'USO DELL'ACCELEROMETRO.
  */
 
 
@@ -64,7 +66,7 @@
 
 
 /// variabili globali
-volatile int procCom = 0, tick10, tick100;
+volatile int procCom = 0, tick10, tick100, millis10 = 0;
 volatile int procCom4 = 0;
 volatile int ADCDataReadyFlag = 0;
 /// buffer per la seriale che riceve i dati dalla raspPi
@@ -98,7 +100,7 @@ int main(void) {
 
 	/// MODULO DI CONTROLLO DELLA BATTERIA ///
 	/// imposta il livello di soglia della batteria a 1900
-	power BATT(1900);
+	power BATT(1700);
 
 	/// MODULO PWM PER MOTORI DI SPOSTAMENTO ///
 	PWM_MOTORI M1, M2;
@@ -150,19 +152,13 @@ int main(void) {
 	//pidPtr = CTRL;
 	//dPtr = &DIST;
 
-
-	//TEMPptr =  &TEMP;
-//	CIN.Aptr = &A;
-//	CIN.distPTR = &DIST;
-//	CIN.vel = 0.0;
-
 	glb  COLLECTDATA;
 	comando CMD1;
 	//DATA.distPtr = &DIST;
 	//passaggio degli indirizzi delle strutture alla struttura generale
 	//dati_a_struttura(&G, &DIST, &CIN, &COL, &TEMP, &SUR, &DATA);
 	/// l'oggetto COLLECTDATA (glb) e' una struttara che contiene i puntatori alle strutture e classi del progetto
-	datiRaccolti(&CIN, &sensIR, &SUR, &MISURE, &Rot, &COLLECTDATA);
+	datiRaccolti(&A, &ENC0, &CIN, &sensIR, &CL, &SUR, &MISURE, &Rot, &COLLECTDATA);
 
 	/// setup di base
 	setupMCU();
@@ -218,10 +214,11 @@ int main(void) {
 	ENC1.qeiInit();
 	//servo = (pwm *) &pwmServi;
 	/// inizializzazione accelerometro
-//	A.testAccel();
-//	if (A.isPresent == true)
-//		/// imposta l'accelerometro
-//		A.impostaAccel();
+	A.attach(&BUS_COMM, ACCEL_ADDR);
+	A.testAccel();
+	if (A.isPresent == true)
+		/// imposta l'accelerometro
+		A.impostaAccel();
 	/// iniziailizzazione del lettore encoder
 	//qei_init(&QEI);
 	/// abilita le interruzioni
@@ -329,7 +326,7 @@ int main(void) {
 			 READ_PTR1 &= DIM_READ_BUFF - 1;
 		}
 		if (synSTATO.valid == VALIDO && synSTATO.token != ERRORE){
-			/// il comandoche e' stato analizzato ha prodotto un risultat adeguato
+			/// il comandoche e' stato analizzato ha prodotto un risultato adeguato
 			rispondiComando(&synSTATO, &COLLECTDATA);
 			/// avendo terminato la risposta, la validità dell'automa
 			/// va rimossa.
@@ -352,6 +349,7 @@ int main(void) {
 			//UARTCharPutNonBlocking(UART1_BASE, 'c');
 			procCom = 0;
 			contatore++;
+			millis10++;
 			//lampeggio_led++;
 			if (Rot.IsPresent == OK){
 				/// aggiorna l'angolo di yaw
@@ -359,7 +357,7 @@ int main(void) {
 
 			}
 
-			CMD1.RUN(cPid, &synSTATO);
+			CMD1.RUN(cPid, &synSTATO, &M1, &M2, &Rot);
 			/// le misure del giroscopio invece sono effettuate solo dall'apposito pid
 		}
 		/// effettua i calcoli solo se il giroscopio e' presente
@@ -406,40 +404,25 @@ int main(void) {
 				/// segnala che la batteria sta finendo, facendo lampeggiare il rosso
 				HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_1 << 2))) ^=  GPIO_PIN_1;
 
-#ifndef _DEBUG_
-			KIT.scarico();
-#endif
-//			/// qui provo lo scarico del kit.
-//			if (dir == 1){
-//				gradi += 10;
-//				KIT.MotorGo(gradi);
-//				if (gradi >= 80)
-//					dir = -1;
-//			}
-//			else{
-//				gradi -= 10;
-//				KIT.MotorGo(gradi);
-//				if (gradi <= -30)
-//					dir = 1;
-//			}
-
-			/// test sui motori
-
+			////
+			//// VIENE ESEGUITA QUANDO IL COMANDO E' RILASCIO KIT (comando 'P' da raspberry)
+			///  E QUANDO il COMANDO e' SULLO STATO AVVIA. RILASCIATO IL PACK il COMANDO
+			///  PONE avvia = false e NON lo RIESEGUIRA' più finché token sarà di nuovo
+			///  RILASCIO_PACK e CMD con avvia = true. QUESTO ACCADE IN convertToToken,
+			///  nel file parse.cpp
 #ifdef _DEBUG_
-			if (gradi == 0){
-				M1.delta = M2.delta = 65;
-				M1.MotorGo();
-				M2.MotorGo();
-				gradi = 1;
-			}
-			else{
-				gradi = 0;
-				M1.MotorStop();
-				M2.MotorStop();
+			if (CMD1.avvia == true && synSTATO.token == RILASCIO_PACK){
+				/// rilascio del kit
+				KIT.scarico();
+				CMD1.avvia = false;
+				CMD1.isRun = false;
 			}
 #endif
 
-#ifndef _DEBUG_
+			/// MISURA IL SENSORE DI ACCELERAZIONE
+			A.misuraAccelerazioni();
+/// stampe dei valori dei sensori di distanza.
+#ifdef _DEBUG_
 			for(int i = 0; i < 5; i++){
 
 				PRINTF("val%d: %d \t", i, MISURE.dI[i]);

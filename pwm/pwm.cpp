@@ -152,7 +152,9 @@ void PWM_MOTORI::Init(){
 /// spegne il motore associato al PWM
 void PWM_MOTORI::MotorStop(){
 	delta = 0;
-	pwmPower();
+	direction = 1;
+	MotorGo();
+	//pwmPower();
 }
 
 

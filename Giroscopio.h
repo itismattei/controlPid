@@ -66,6 +66,7 @@ public:
 	int temp;
 	/// viene attiato dal pid durante la rotazione in modo da non resettare il giroscopio.
 	char IsRotating;
+	char offsetRequest;
 private:
 	uint16_t posizione;
 	I2C *i2cPtr;

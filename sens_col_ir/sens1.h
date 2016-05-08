@@ -28,7 +28,7 @@ public:
 	TEMPER(){ok = 0; isSurvivor = NO_SURVIVOR;}
 	~TEMPER(){;}
 	float readTemp();
-	float getTemp(){ return Temp; }
+	float getTemp(){ return Tint; }
 	void taraturaTemp();
 	void attachI2C(I2C *, uint8_t sa);
 
@@ -36,6 +36,7 @@ public:
 	int 		tempRaw;		/// lettura dal sensore
 	float 		T_tar;			/// temperatura dell'ambiente letta dal pirometro
 	int 		Tcase;			///	temperatura del corpo del pirometro
+	int 		Tint;			/// lettura del sensore in °C come intero.
 	int			ok;				/// pirometro tarato
 	uint16_t 	isSurvivor;		/// ha individuato un corpo caldo
 	I2C* 		i2cPtr;			/// puntatore al canale di trasmissione I2C
@@ -64,7 +65,7 @@ public:
 
 	inline void Init(){ initLightSens1(); initTimer4(10);}
 	/// legge il valore di luminanza
-	inline int read(){ return readCol(); }
+	inline int read(){ return readCol() ; }
 	/// legge il valore di luminanza
 	inline int get(void){ return luminanza; }
 	/// restituisce il valore del bianco

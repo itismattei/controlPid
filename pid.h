@@ -11,6 +11,7 @@
 
 #include "gyro_f.h"
 #include "pwm/pwm.h"
+#include "pwm/motpwm.h"
 #include "adc/adc.h"
 #include <stdint.h>
 #include "Giroscopio.h"
@@ -18,15 +19,16 @@
 #include "init.h"
 
 #define			AVANZA			0
-#define			RUOTA			1
-#define			RUOTA_SU_ASSE	2
+#define			RUOTA_DESTRA	1
+#define			RUOTA_SINISTRA	2
+#define			ARRESTA			-1
 
 class ControlloPID;
 
 class comando{
 public:
-	comando(){azione = false; isRun = false; finished = false; numPid = -1;}
-	int RUN(ControlloPID *, syn_stat *);
+	comando(){azione = false; isRun = false; finished = false; numPid = -1; token = -1; tick = 0; avvia = 0;}
+	int RUN(ControlloPID *, syn_stat *,PWM_MOTORI *, PWM_MOTORI *, Giroscopio *G);
 	void setUptrasducers(Giroscopio	*gPtr, pwm	*PWM, distMis *distanza);
 
 	bool azione;			//indica se e' un comando di azione
@@ -34,6 +36,9 @@ public:
 	bool finished;			// indica se il comando e' giunto al termine
 	int numPid;				// numero del PID attivo
 	int token;				// numero del comando
+	int avvia;				// indica che il comando va eseguito
+	uint32_t tick;			// contatore dei cicli di esecuzione del comando
+	int valFin;				// imposta il valore finale a cui deve giungere il comando
 	Giroscopio 	*gPtr;
 	pwm			*PWM;
 	distMis		*distanza;
@@ -46,7 +51,7 @@ public:
 	void setupPID(int type);
 	void setKpid(float, float, float);
 	void integra(float tick);
-	int Run(Giroscopio *G, pwm *PWM, distMis *distanza);
+	int Run(Giroscopio *G, PWM_MOTORI *PWM1, PWM_MOTORI *PWM2, distMis *distanza);
 
 	float 		kp;
 	float 		kd;
