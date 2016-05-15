@@ -16,7 +16,6 @@
 
 #include "pwm/pwm.h"
 #include "uartp/uartstdio.h"
-//#include "uartp/cmdline.h"
 #include "uartp/uart.h"
 
 #include "qei.h"

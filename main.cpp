@@ -36,7 +36,6 @@
 #include "driverlib/uart.h"
 #include "driverlib/rom.h"
 #include "uartp/uartstdio.h"
-//#include "uartp/cmdline.h"
 #include "I2C/tiva_i2c.h"
 #include "gyro_init.h"
 #include "accel/accel.h"
