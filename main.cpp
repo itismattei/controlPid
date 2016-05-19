@@ -210,6 +210,7 @@ int main(void) {
 	PRINTF("inizializzato automa comandi\n");
 	/// inizializzati i moduli encoder
 	ENC0.qeiInit();
+	ENC0.intIDXEnable();
 	ENC1.qeiInit();
 	//servo = (pwm *) &pwmServi;
 	/// inizializzazione accelerometro

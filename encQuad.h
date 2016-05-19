@@ -17,13 +17,14 @@
 class encQuad {
 public:
 	encQuad();
-	virtual ~encQuad();
+	~encQuad();
 	void qeiInit();
 	void readPos();
 	void readVel();
 	void readDir();
 	void setAddr(uint32_t add){address = add;}
 	void update();
+	void intIDXEnable();
 
 	/// prorpieta'
 	int 		vel;

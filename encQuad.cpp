@@ -11,8 +11,10 @@
 #include "inc/hw_memmap.h"
 #include "inc/hw_types.h"
 #include "inc/hw_gpio.h"
+#include "inc/hw_ints.h"
 
 #include "driverlib/sysctl.h"
+#include "driverlib/interrupt.h"
 #include "driverlib/gpio.h"
 #include "driverlib/pin_map.h"
 #include "driverlib/uart.h"
@@ -23,7 +25,7 @@
 #include "uartp/uartstdio.h"
 #include "uartp/uart.h"
 
-
+extern "C" void IntEnc0(void);
 
 void UnlockPD7_01()
 {
@@ -40,9 +42,10 @@ encQuad::encQuad() {
 	// TODO Auto-generated constructor stub
 	address 	= 0;
 	/// DA CONTROLLARE SE 80000 VA BENE
-	fscala 		= 80000;
+	fscala 		= 800000;
 	zero_pos 	= 0;
 	vel_period = ROM_SysCtlClockGet()/10;
+	vel = 0;
 
 }
 
@@ -70,17 +73,21 @@ void encQuad::qeiInit(){
 		case QEI0_BASE:
 			// Enable Port D module so we can work with it
 			SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD);
+			SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
 			// Make pin direction of bits 6 and 7 INPUTS (this may be unnecessary?)
 			UnlockPD7_01();
 			GPIODirModeSet(GPIO_PORTD_BASE, GPIO_PIN_7 | GPIO_PIN_6, GPIO_DIR_MODE_IN);
+			GPIODirModeSet(GPIO_PORTF_BASE, GPIO_PIN_4, GPIO_DIR_MODE_IN);
 			// Enable programming access to QEI Module 0
 			SysCtlPeripheralEnable(SYSCTL_PERIPH_QEI0);
 			QEIDisable(address);
 			// Tell the mux which particular QEI function to connect to specified pin
 			GPIOPinConfigure(GPIO_PD6_PHA0);
 			GPIOPinConfigure(GPIO_PD7_PHB0);    // now redundant
+			GPIOPinConfigure(GPIO_PF4_IDX0);
 			// Tell the GPIO module which pins will be QEI type pins
 			GPIOPinTypeQEI(GPIO_PORTD_BASE, GPIO_PIN_7 | GPIO_PIN_6);
+			GPIOPinTypeQEI(GPIO_PORTF_BASE, GPIO_PIN_4);
 		break;
 
 		case QEI1_BASE:
@@ -144,7 +151,7 @@ void encQuad::qeiInit(){
 		//! \return None.
 
 		//configurazione qei
-		QEIConfigure(address,(QEI_CONFIG_CAPTURE_A | QEI_CONFIG_NO_RESET | QEI_CONFIG_QUADRATURE | QEI_CONFIG_NO_SWAP), fscala);
+		QEIConfigure(address,(QEI_CONFIG_CAPTURE_A | QEI_CONFIG_RESET_IDX | QEI_CONFIG_QUADRATURE | QEI_CONFIG_NO_SWAP), fscala);
 		//QEIConfigure(QEI1_BASE,(QEI_CONFIG_CAPTURE_A | QEI_CONFIG_NO_RESET | QEI_CONFIG_QUADRATURE | QEI_CONFIG_NO_SWAP), fscala);
 
 		QEIPositionSet(address, zero_pos);
@@ -166,11 +173,13 @@ void encQuad::qeiInit(){
 	//	QEIIntRegister(QEI1_BASE,*QEI1IntHandler);
 	//
 	//	///TODO: se si vuole usare l'interrupt del qei vanno decommentate le due righe che seguono
-	//	//IntEnable(INT_QEI0);
+		IntEnable(INT_QEI0);
 	//	//IntEnable(INT_QEI1);
 	//
 	//	//QEIIntEnable(QEI0_BASE, QEI_INTDIR | QEI_INTTIMER); //interruzione abilitata al cambio di direzione e al timer della velocità finito
 	//	QEIIntEnable(QEI0_BASE, QEI_INTDIR);
+	//	QEIIntEnable(QEI0_BASE, QEI_INTINDEX);
+
 	//	QEIIntEnable(QEI1_BASE, QEI_INTDIR);
 		QEIEnable(address);
 		//QEIEnable(QEI0_BASE);
@@ -235,3 +244,17 @@ void encQuad::update(){
 //		PRINTF("\n");
 //#endif
 //}
+
+void encQuad::intIDXEnable(){
+	QEIIntEnable(address, QEI_INTINDEX);
+}
+
+volatile int i = 0;
+volatile int distanza[10];
+///
+///
+void IntEnc0(void){
+	QEIIntClear(QEI0_BASE, QEI_INTINDEX | QEI_INTDIR);
+	distanza[i++] = QEIPositionGet(QEI0_BASE);
+	///occorrerebbe contare il numero di IDX
+}
