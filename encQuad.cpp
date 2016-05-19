@@ -26,6 +26,7 @@
 #include "uartp/uart.h"
 
 extern "C" void IntEnc0(void);
+extern "C" void IntGPIOf(void);
 
 void UnlockPD7_01()
 {
@@ -77,17 +78,36 @@ void encQuad::qeiInit(){
 			// Make pin direction of bits 6 and 7 INPUTS (this may be unnecessary?)
 			UnlockPD7_01();
 			GPIODirModeSet(GPIO_PORTD_BASE, GPIO_PIN_7 | GPIO_PIN_6, GPIO_DIR_MODE_IN);
-			GPIODirModeSet(GPIO_PORTF_BASE, GPIO_PIN_4, GPIO_DIR_MODE_IN);
+			//GPIODirModeSet(GPIO_PORTF_BASE, GPIO_PIN_4, GPIO_DIR_MODE_IN);
 			// Enable programming access to QEI Module 0
 			SysCtlPeripheralEnable(SYSCTL_PERIPH_QEI0);
 			QEIDisable(address);
 			// Tell the mux which particular QEI function to connect to specified pin
 			GPIOPinConfigure(GPIO_PD6_PHA0);
 			GPIOPinConfigure(GPIO_PD7_PHB0);    // now redundant
-			GPIOPinConfigure(GPIO_PF4_IDX0);
+			//GPIOPinConfigure(GPIO_PF4_IDX0);
 			// Tell the GPIO module which pins will be QEI type pins
 			GPIOPinTypeQEI(GPIO_PORTD_BASE, GPIO_PIN_7 | GPIO_PIN_6);
-			GPIOPinTypeQEI(GPIO_PORTF_BASE, GPIO_PIN_4);
+			//GPIOPinTypeQEI(GPIO_PORTF_BASE, GPIO_PIN_4);
+			/// imposta PF4 a ricevere interruzioni (segnale IDX)
+		    ROM_GPIOPinTypeGPIOInput(GPIO_PORTF_BASE, GPIO_PIN_4);
+		    //GPIOIntTypeSet(GPIO_PORTD_BASE, GPIO_PIN_1, GPIO_BOTH_EDGES);
+		    ROM_GPIOIntTypeSet(GPIO_PORTF_BASE, GPIO_PIN_4, GPIO_RISING_EDGE);
+		    // abilita l'interruzione a livello di periferica
+
+		    //GPIOIntEnable(GPIO_PORTD_BASE, GPIO_INT_PIN_1);
+		    //verificare se la funzione è necessaria
+		    //GPIOIntRegister(GPIO_PORTD_BASE, *IntGPIOd);
+		    //
+			// Set the interrupt priorities so they are all equal.
+			//
+			ROM_IntPrioritySet(INT_GPIOF, 0x00);
+			/// disabilita la generazione di interruzioni da parte del pin PD1
+			GPIOIntEnable(GPIO_PORTF_BASE, GPIO_INT_PIN_4);
+		    //
+		    // Enable the interrupts at CPU controller level.
+		    //
+		    ROM_IntEnable(INT_GPIOF);
 		break;
 
 		case QEI1_BASE:
@@ -250,7 +270,7 @@ void encQuad::intIDXEnable(){
 }
 
 volatile int i = 0;
-volatile int distanza[10];
+volatile int distanza[64];
 ///
 ///
 void IntEnc0(void){
@@ -258,3 +278,10 @@ void IntEnc0(void){
 	distanza[i++] = QEIPositionGet(QEI0_BASE);
 	///occorrerebbe contare il numero di IDX
 }
+
+void IntGPIOf(void){
+	GPIOIntClear(GPIO_PORTF_BASE, GPIO_INT_PIN_4);
+	distanza[i++] = QEIPositionGet(QEI0_BASE);
+	i &= 63;
+}
+

@@ -134,11 +134,11 @@ int main(void) {
 	xBee XB;
 
 	/// MODULO SENSORE DI COLORE  ///
-	COLORE CL;
+	//COLORE CL;
 
 
 	/// MODULO SENSORE DI TEMPERATURA (PIROMETRO) ///
-	TEMPER sensIR;
+	//TEMPER sensIR;
 	/// informazioni sul sopravvissuto
 	survivor SUR;
 	//inizializzazione struttura per qei
@@ -157,7 +157,7 @@ int main(void) {
 	//passaggio degli indirizzi delle strutture alla struttura generale
 	//dati_a_struttura(&G, &DIST, &CIN, &COL, &TEMP, &SUR, &DATA);
 	/// l'oggetto COLLECTDATA (glb) e' una struttara che contiene i puntatori alle strutture e classi del progetto
-	datiRaccolti(&A, &ENC0, &sensIR, &CL, &SUR, &MISURE, &Rot, &COLLECTDATA);
+	//datiRaccolti(&A, &ENC0, &sensIR, &CL, &SUR, &MISURE, &Rot, &COLLECTDATA);
 
 	/// setup di base
 	setupMCU();
@@ -185,8 +185,8 @@ int main(void) {
 	Rot.attachI2C(&BUS_COMM, GYRO_ADDR);
 	Rot.initGyro(ODR_190 | Z_AXIS);
 	/// collegato sensore di temperatura al bus I2C
-	sensIR.attachI2C(&BUS_COMM, TEMP_ADDR);
-	sensIR.taraturaTemp();
+	//sensIR.attachI2C(&BUS_COMM, TEMP_ADDR);
+	//sensIR.taraturaTemp();
 
 	tick10 = tick100 = 0;
 	/// inizializza il timer 0 e genera un tick da 10 ms
@@ -210,7 +210,6 @@ int main(void) {
 	PRINTF("inizializzato automa comandi\n");
 	/// inizializzati i moduli encoder
 	ENC0.qeiInit();
-	ENC0.intIDXEnable();
 	ENC1.qeiInit();
 	//servo = (pwm *) &pwmServi;
 	/// inizializzazione accelerometro
@@ -282,8 +281,8 @@ int main(void) {
 	KIT.MotorGo(80);
 	MOT_SENS.MotorGo(0);
 
-	CL.Init();
-	CL.WhiteBalance();
+	//CL.Init();
+	//CL.WhiteBalance();
 	//initLightSens1();
 	//whiteBal(&COL);
 	XB.test();
@@ -364,16 +363,16 @@ int main(void) {
 		if (tick100 >= 100){
 
 			/// controlla il colore della piastrella sottostante e lo paragona la bianco memorizzato in fase di setup
-			CL.Run();
+			//CL.Run();
 #ifndef _DEBUG_
 			PRINTF("Col: %d\t W: %d\n", CL.get(), CL.getWhite());
 #endif
 			/// legge la temperatura del pirometro
-			if(sensIR.readTemp() > sensIR.T_tar + 10.0)
-				/// ha torvato un ferito
-				sensIR.isSurvivor = IS_SURVIVOR;
-			else
-				sensIR.isSurvivor = NO_SURVIVOR;
+//			if(sensIR.readTemp() > sensIR.T_tar + 10.0)
+//				/// ha torvato un ferito
+//				sensIR.isSurvivor = IS_SURVIVOR;
+//			else
+//				sensIR.isSurvivor = NO_SURVIVOR;
 			/// TODO controllare se riesce a funzionare mentre legge le accelerazioni su I2C
 			/// avvia il campionamento degli ADC. I dati vengono posti nell'oggetto MISURE dalla routine di servizio
 			/// dell'interruzione AD.
