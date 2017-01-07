@@ -256,7 +256,7 @@ void setupUART(int num){
 	/// inizializza UART0
 	ConfigureUART(115200, UART0);
 	/// seleziona la uart a cui andra' 'uscita di PRINTF
-	/// uart0 e' quella su usb, uart1 e' quella sui pin PB0 e PB1
+	/// uart0 e' quella su usb, uart1 e' quella sui pin PB0 (RX) e PB1 (TX)
 	//g_ui32Base = g_ui32UARTBase[UART0];
 	g_ui32Base = g_ui32UARTBase[num];
 }

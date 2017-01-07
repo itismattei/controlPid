@@ -18,6 +18,9 @@
  *
  *  INSERIMENTO DEL CICLO PRINCIPALE con PID SEMPLIFICATO
  *  RELEASE CON AGGIUNTA DELL'USO DELL'ACCELEROMETRO.
+ *
+ *  NOTE: Provata la comunicazione con raspberry: invio di 3 comandi , F, B, S.
+ *        risultato ok.
  */
 
 
@@ -166,6 +169,8 @@ int main(void) {
 
 	/// imposta le UART e setta la PRINTF sulla 1 in modo da trasmettere la telemetria
 	//setupUART(1);
+	/// imposta la UART1 a ricevere da raspberry (PB0 = RX; PB1 = TX)
+	//setupUART(1);
 	/// imposta le UART e setta la PRINTF sulla 0
 	setupUART(0);
 	PRINTF("impostata UART0 per debug\n");
@@ -285,16 +290,16 @@ int main(void) {
 	CL.WhiteBalance();
 	//initLightSens1();
 	//whiteBal(&COL);
-	XB.test();
+	//XB.test();
 	int dir = 1, gradi = 0;
 	/////////////////////////////////////////////////////////
 	///
 	///      TASK PRINCIPALE
 	///
 	/////////////////////////////////////////////////////////
-	setupUART(1);
-	XB.sendString("Ciao\n", 5);
-	PRINTF("Telemetria\n");
+	//setupUART(1);
+	//XB.sendString("Ciao\n", 5);
+	//PRINTF("Telemetria\n");
 	while(1){
 
 
@@ -317,6 +322,7 @@ int main(void) {
 			/// avendo terminato la risposta, la validità dell'automa
 			/// va rimossa.
 			synSTATO.valid = NON_VALIDO;
+			PRINTF("comando ricevuto: %c\n", synSTATO.cmd[0]);
 		}
 		/// invia la risposta per i comandi di rotazione, quando sono stati eseguiti
 //		if(pidPtr->rispondi == TRUE){
