@@ -78,54 +78,54 @@ void distMis::rawTomm(){
 	/// conversione del dato grezzo in cm
 	for (int i = 0; i < 6; i++){
 		/// per i sensori 2 e 5 vanno bene
-		if (i ==2 || i == 5){
-			/// distnza superiori a 40cm non vengono calcolate
-			if (dI[i] < 400)
-				dI[i] = 400;
-			if (dI[i] < 970){
-				/// si usa la prima retta interpolante
-				f = m[0] * dI[i] + q[0];
-			}
-			else if (dI[i] < 2050){
-				/// intervallo 5 - 7 cm
-				f = m[1] * dI[i] + q[1];
-				}
-				else if (dI[i] < 3745){
-					/// intervallo 5 - 3.5 cm
-					f = m[2] * dI[i] + q[2];
-					}
-	//				else if (dI[i] < 3711){
-	//					f = m[3] * dI[i] + q[3];
-	//				}
+//		if (i ==2 || i == 5){
+//			/// distnza superiori a 40cm non vengono calcolate
+//			if (dI[i] < 400)
+//				dI[i] = 400;
+//			if (dI[i] < 970){
+//				/// si usa la prima retta interpolante
+//				f = m[0] * dI[i] + q[0];
+//			}
+//			else if (dI[i] < 2050){
+//				/// intervallo 5 - 7 cm
+//				f = m[1] * dI[i] + q[1];
+//				}
+//				else if (dI[i] < 3745){
+//					/// intervallo 5 - 3.5 cm
+//					f = m[2] * dI[i] + q[2];
+//					}
+//	//				else if (dI[i] < 3711){
+//	//					f = m[3] * dI[i] + q[3];
+//	//				}
+//
+//			if (dI[i] >= 3745){
+//				/// valori minori di 3.5cm non hanno senso
+//				dI[i] = 3745;
+//				f =  m[2] * 3711.0 + q[2];
+//			}
+//
+//		}
+//
+//		if (i == 1)
+//			f = a[0]*dI[i]*dI[i] + a[1] * dI[i] + a[2];
+//		if (i == 4)
+//			f = b[0]*dI[i]*dI[i] + b[1] * dI[i] + b[2];
+//		if (i == 3){
+//			/// il sensore viene interpolato con 3 spezzoni di parabola
+//			if (dI[i] < 940){
+//				f = c[0]*dI[i]*dI[i] + c[1] * dI[i] + c[2];
+//			}
+//			else {if (dI[i] < 1170)
+//					f = e[0]*dI[i]*dI[i] + e[1] * dI[i] + e[2];
+//				   else
+//					f = g[0]*dI[i]*dI[i] + g[1] * dI[i] + g[2];
+//			}
+//		}
+//
+// 		/// la distanza (in cm) e' 1 / f
+//		d = 1 / f * 10;			/// distanza in mm
 
-			if (dI[i] >= 3745){
-				/// valori minori di 3.5cm non hanno senso
-				dI[i] = 3745;
-				f =  m[2] * 3711.0 + q[2];
-			}
-
-		}
-
-		if (i == 1)
-			f = a[0]*dI[i]*dI[i] + a[1] * dI[i] + a[2];
-		if (i == 4)
-			f = b[0]*dI[i]*dI[i] + b[1] * dI[i] + b[2];
-		if (i == 3){
-			/// il sensore viene interpolato con 3 spezzoni di parabola
-			if (dI[i] < 940){
-				f = c[0]*dI[i]*dI[i] + c[1] * dI[i] + c[2];
-			}
-			else {if (dI[i] < 1170)
-					f = e[0]*dI[i]*dI[i] + e[1] * dI[i] + e[2];
-				   else
-					f = g[0]*dI[i]*dI[i] + g[1] * dI[i] + g[2];
-			}
-		}
-
- 		/// la distanza (in cm) e' 1 / f
-		d = 1 / f * 10;			/// distanza in mm
-
-		d_mm[i] = (int) d;
+		d_mm[i] = dI[i];
 	}
 }
 

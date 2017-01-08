@@ -339,13 +339,12 @@ void rispondiComando(syn_stat *sSTAT, glb *colletedD){
 			sSTAT->buff_reply[3] = sSTAT->check;
 			sSTAT->buff_reply[4] = '*';
 		}
-		else
-			for (int  i = 0; i < 5; i++)
-				sSTAT->buff_reply[i] = 0;
-
 		/// invia i 4 byte su seriale. L'ultimo e' invato dalla funzione sendReply
 		sendReply(sSTAT, 4);
 	}
+	/// ripulisce il buffer di risposta
+	for (int  i = 0; i < 5; i++)
+		sSTAT->buff_reply[i] = 0;
 }
 
 ///

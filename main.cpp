@@ -457,6 +457,7 @@ int main(void) {
 			}
 			//// reset del contatore
 			tick100 = 0;
+
 		}
 
 
