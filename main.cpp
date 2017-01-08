@@ -21,6 +21,9 @@
  *
  *  NOTE: Provata la comunicazione con raspberry: invio di 3 comandi , F, B, S.
  *        risultato ok.
+ *        Provata la comunicazione con raspberry dei sensori di distanza 1 e 3.
+ *        risultato dipendente dallo sleep della raspberry. Comunicazione ok,
+ *        al piu' con un ritardo di un ciclo.
  */
 
 
