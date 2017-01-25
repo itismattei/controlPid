@@ -2,28 +2,16 @@
  * main.c
  */
 
-/* Progetti di test per il bus I2C
-	Created on: 20/apr/2015
+/*  Vari test sui dispositivi del rover
+	Created on: 20/gen/2017
  *
- *
- *
- *  Versione che sviluppa i controlli PID e e che si occupa di definire
- *  l'automa dei tasks.
- *  VERSIONE COMPLETA DI TEST: prove sui componenti in modalita' completa
- *  VERSIONE IN C++
- *  Ripresa dalla release precedente
- *  alcune prove
- *  In questa release si testa sia il giroscopio che l'accelerometro.
- *  Si testano anche i sensori di distanza (5 sensori)
- *
- *  INSERIMENTO DEL CICLO PRINCIPALE con PID SEMPLIFICATO
- *  RELEASE CON AGGIUNTA DELL'USO DELL'ACCELEROMETRO.
- *
+ *	Si realizzano alcuni testi di movimento, allineamento e lettura sensori
  *  NOTE: Provata la comunicazione con raspberry: invio di 3 comandi , F, B, S.
  *        risultato ok.
  *        Provata la comunicazione con raspberry dei sensori di distanza 1 e 3.
  *        risultato dipendente dallo sleep della raspberry. Comunicazione ok,
  *        al piu' con un ritardo di un ciclo.
+ *
  */
 
 
@@ -386,6 +374,8 @@ int main(void) {
 			/// avvia il campionamento degli ADC. I dati vengono posti nell'oggetto MISURE dalla routine di servizio
 			/// dell'interruzione AD.
 			/// Ricordarsi: il dato n.6 e'lo stato della batteria
+			/*		   ***			*/
+			/** AVVIA IL CAMPIONAMENTO **/
 			ROM_ADCProcessorTrigger(ADC0_BASE, 0);
 			/// legge gli encoder
 //			ENC0.readPos();
@@ -463,7 +453,8 @@ int main(void) {
 
 		}
 
-
+		/** 	AZIONI SPECIALI		**/
+		// Allineamento cingoli
 
 			/*if(G.IsPresent == OK)
 				if( contatore == 1){
