@@ -383,11 +383,18 @@ int main(void) {
 //			ENC1.readPos();
 //			ENC1.readDir();
 			//HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_5 << 2))) |=  GPIO_PIN_5;
-			if (BATT.battLevel > BATT.safeLevel)
-				HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_3 << 2))) ^=  GPIO_PIN_3;
-			else
+			if (BATT.battLevel > BATT.safeLevel){
+				HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_3 << 2))) ^=  GREEN_LED;
+				/// si assicura che il led rosso sia spento
+				HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_1 << 2))) &=  ~GPIO_PIN_1;
+			}
+
+			else{
 				/// segnala che la batteria sta finendo, facendo lampeggiare il rosso
 				HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_1 << 2))) ^=  GPIO_PIN_1;
+				/// spegne il led verde
+				HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_3 << 2))) &=  ~GREEN_LED;
+			}
 
 			////
 			//// VIENE ESEGUITA QUANDO IL COMANDO E' RILASCIO KIT (comando 'P' da raspberry)

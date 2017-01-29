@@ -33,6 +33,7 @@ public:
 	int direction;
 	uint32_t numPin;
 	uint32_t numMot;
+	float k;
 };
 
 

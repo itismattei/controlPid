@@ -45,6 +45,11 @@
 #define		INT_STEP_10_MS		10
 
 
+// ##### DEFINIZIONE DEI COLORI DEI LED PRESENTI SULLA SCHEDA
+#define BLUE_LED  		GPIO_PIN_2
+#define GREEN_LED  		GPIO_PIN_3
+#define RED_LED  		GPIO_PIN_1
+
 
 
 ///

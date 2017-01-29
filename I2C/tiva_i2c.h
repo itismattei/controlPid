@@ -12,6 +12,7 @@
 #define TIVA_I2C_H_
 
 #include <stdint.h>
+#include "../init.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -26,13 +27,6 @@ void I2CSend_String(uint32_t slave_addr, char array[]);
 #ifdef __cplusplus
 }
 #endif
-
-
-#define BLUE_LED  		GPIO_PIN_2
-#define GREEN_LED  		GPIO_PIN_3
-#define RED_LED  		GPIO_PIN_1
-
-
 
 
 #endif /* TIVA_I2C_H_ */

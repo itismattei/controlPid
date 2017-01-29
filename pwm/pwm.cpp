@@ -170,7 +170,7 @@ void PWM_MOTORI::pwmPower(){
 /// muove il motore
 void PWM_MOTORI::MotorGo(){
 	/// FATTORI DI CORREZIONE DEI MOTORI. SI NOTA CHE IL N.1 VA UN PO' MENO DEL NUMERO 2
-	float f, k;
+	float f;
 	int valPwm;
 	switch (numMot){
 	case 1:
