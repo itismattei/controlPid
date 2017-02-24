@@ -45,9 +45,9 @@ void normalizzaColori(colore *colPtr){
 ///
 /// taratura del sensore
 
-int readCol(void){
+int COLORE::readCol(void){
 	volatile uint32_t i = 0, tmp;
-	/// accende il dispositivo
+	/// accende il dispositivo, cioè il led bianco che illumina il piano
 	HWREG(GPIO_PORTA_BASE + (GPIO_O_DATA + (GPIO_PIN_2 << 2))) = GPIO_PIN_2;
 	//breve attesa
 	for (i = 0; i < 1000; i++);
@@ -56,6 +56,7 @@ int readCol(void){
 	/// abilita le interruzioni sul pin PD1, che verrano contate
 	GPIOIntEnable(GPIO_PORTA_BASE, GPIO_INT_PIN_3);
 	/// attende la fine del campionamento.
+	/// la variabile globale viene modificata in void Timer4ISR(void)
 	while(procCom4 == 0);
 	/// ricarica per prossimo campionamento
 	procCom4 = 0;
@@ -258,7 +259,7 @@ void TEMPER::attachI2C(I2C * p, uint8_t sa){
 
 
 COLORE::COLORE(){
-	 luminanza = 0; bianco = 0; piastra.isDark = ISNT_DARK;
+	 luminanza = 0; bianco = 0; numPiastra = 0;
 }
 
 void COLORE::Run(){
@@ -266,8 +267,8 @@ void COLORE::Run(){
 	/// imposta la proprieta' luminanza
 	set(lum);
 	if(lum < getWhite() / 4){
-		piastra.isDark = IS_DARK;
+		piastra[numPiastra].isDark = IS_DARK;
 	}
 	else
-		piastra.isDark = ISNT_DARK;
+		piastra[numPiastra].isDark = ISNT_DARK;
 }
