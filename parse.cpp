@@ -303,7 +303,7 @@ void convertToToken(syn_stat *STATO, comando *cmdPtr){
 /// fornisce dati dai sensori a seguito di richiesta
 
 
-void rispondiComando(syn_stat *sSTAT, glb *colletedD){
+void rispondiComando(syn_stat *sSTAT, ALLSTRUCT *colletedD){
 	/// controlla se la sintazzi e' valida
 	sSTAT->check = 0;
 	/// controllo ridondante gia' effettuato
@@ -361,7 +361,7 @@ void sendReply(syn_stat *sSTAT, uint8_t numChar){
 
 ///
 /// risponde alla richiesta di un sensore
-void inviaSensore(syn_stat *sSTAT, glb * collectedD){
+void inviaSensore(syn_stat *sSTAT, ALLSTRUCT * collectedD){
 
 	//TODO: ho aggiunto il puntatore alla struttura del colore, va aggiunto anche quello della temperatura?
 	uint8_t  datoValido = 1;

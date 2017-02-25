@@ -145,13 +145,17 @@ int main(void) {
 	//pidPtr = CTRL;
 	//dPtr = &DIST;
 
-	glb  COLLECTDATA;
+	//glb  COLLECTDATA;
 	comando CMD1;
 	//DATA.distPtr = &DIST;
 	//passaggio degli indirizzi delle strutture alla struttura generale
 	//dati_a_struttura(&G, &DIST, &CIN, &COL, &TEMP, &SUR, &DATA);
 	/// l'oggetto COLLECTDATA (glb) e' una struttara che contiene i puntatori alle strutture e classi del progetto
-	datiRaccolti(&A, &ENC0, &sensIR, &CL, &SUR, &MISURE, &Rot, &COLLECTDATA);
+	/// l'utilita' e' che puo' essere usato come unico puntatore per distribuire le strutture nei vari punti
+	/// del programma.
+	ALLSTRUCT allDATA;
+//	datiRaccolti(&A, &ENC0, &sensIR, &CL, &SUR, &MISURE, &Rot, &COLLECTDATA);
+	allDATA.setup(&A, &ENC0, &sensIR, &CL, &SUR, &MISURE, &Rot);
 
 	/// setup di base
 	setupMCU();
@@ -309,7 +313,7 @@ int main(void) {
 		}
 		if (synSTATO.valid == VALIDO && synSTATO.token != ERRORE){
 			/// il comandoche e' stato analizzato ha prodotto un risultato adeguato
-			rispondiComando(&synSTATO, &COLLECTDATA);
+			rispondiComando(&synSTATO, &allDATA);
 			/// avendo terminato la risposta, la validità dell'automa
 			/// va rimossa.
 			synSTATO.valid = NON_VALIDO;

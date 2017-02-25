@@ -20,8 +20,47 @@
 #include "encQuad.h"
 #include "accel/accel.h"
 
-typedef struct _glb{
-	//gyro 		*gPtr;
+//typedef struct _glb{
+//	//gyro 		*gPtr;
+//	TEMPER			*temperat;
+//	temperatura 	*tempPtr;
+//	colore 			*colPtr;
+//	COLORE			*colorClass;
+//	//distanza 	*distPtr;
+//	cinematica 		*cinPtr;
+//	qei 			*qeiPtr;
+//	survivor 		*surPtr;
+//
+//	/* classe */
+//	distMis 		*DSTptr;
+//	Giroscopio  	*gyro;
+//	encQuad			*encoder;
+//	accelerometro 	*acc;
+//} glb;
+
+/////
+/// questa classe ha lo scopo di raccogliere le varie strutture dati create nello sviluppo del software
+/// in un'unica organizzazione e rendere quindi più accessibile l'uso dei dati in qualunque parte del main.
+////
+class ALLSTRUCT{
+public:
+	ALLSTRUCT(){}
+
+	void setup(accelerometro *ACC, encQuad *ENC, TEMPER *TEMP, COLORE *color, survivor *SUR, distMis *DIS, Giroscopio *GYRO){
+		surPtr 	= SUR;
+
+		cinPtr 		= 0;
+		//GLB->colPtr 	= COL;
+		//GLB->distPtr 	= D;
+		colorClass 	= color;
+		temperat 	= TEMP;
+		DSTptr 		= DIS;
+		gyro		= GYRO;
+		encoder		= ENC;
+		acc			= ACC;
+	}
+
+	///membri
 	TEMPER			*temperat;
 	temperatura 	*tempPtr;
 	colore 			*colPtr;
@@ -36,7 +75,7 @@ typedef struct _glb{
 	Giroscopio  	*gyro;
 	encQuad			*encoder;
 	accelerometro 	*acc;
-} glb;
+};
 
 class syntaxStatus{
 public:
@@ -74,12 +113,12 @@ void sendReply(syn_stat *, uint8_t numChar);
 }
 #endif
 
-void rispondiComando(syn_stat *sSTAT, glb *);
+void rispondiComando(syn_stat *sSTAT, ALLSTRUCT *);
 /// invia la lettura di un sensore
-void inviaSensore(syn_stat *,  glb*);
+void inviaSensore(syn_stat *,  ALLSTRUCT*);
 
 void dati_a_struttura(gyro *, distanza *, cinematica *, colore *, temperatura* ,survivor *, dati *);
-void datiRaccolti(accelerometro *ACC, encQuad *ENC, TEMPER *TEMP, COLORE *CL, survivor *SUR, distMis *DIS, Giroscopio *GYRO, glb *GLB );
+//void datiRaccolti(accelerometro *ACC, encQuad *ENC, TEMPER *TEMP, COLORE *CL, survivor *SUR, distMis *DIS, Giroscopio *GYRO, glb *GLB );
 
 //pid * leggiComando(syn_stat *sSTAT, pid CTRL[], pid *p, dati *);
 void EseguiPID(syn_stat *sSTAT, ControlloPID *);
