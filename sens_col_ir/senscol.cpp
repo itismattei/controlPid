@@ -259,16 +259,16 @@ void TEMPER::attachI2C(I2C * p, uint8_t sa){
 
 
 COLORE::COLORE(){
-	 luminanza = 0; bianco = 0; numPiastra = 0;
+	 luminanza = 0; bianco = 0;
 }
 
-void COLORE::Run(){
+void COLORE::Run(TILE * tP){
 	uint32_t lum = read();
 	/// imposta la proprieta' luminanza
 	set(lum);
 	if(lum < getWhite() / 4){
-		piastra[numPiastra].isDark = IS_DARK;
+		tP->isDark = IS_DARK;
 	}
 	else
-		piastra[numPiastra].isDark = ISNT_DARK;
+		tP->isDark = ISNT_DARK;
 }

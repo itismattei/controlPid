@@ -46,25 +46,28 @@ class ALLSTRUCT{
 public:
 	ALLSTRUCT(){}
 
-	void setup(accelerometro *ACC, encQuad *ENC, TEMPER *TEMP, COLORE *color, survivor *SUR, distMis *DIS, Giroscopio *GYRO){
+	void setup(accelerometro *ACC, encQuad *ENC, TEMPER *TEMP, COLORE *color, TILE * t, survivor *SUR, distMis *DIS, Giroscopio *GYRO){
 		surPtr 	= SUR;
 
 		cinPtr 		= 0;
 		//GLB->colPtr 	= COL;
 		//GLB->distPtr 	= D;
 		colorClass 	= color;
+		tilePtr 	= t;
 		temperat 	= TEMP;
 		DSTptr 		= DIS;
 		gyro		= GYRO;
 		encoder		= ENC;
 		acc			= ACC;
+
 	}
 
 	///membri
 	TEMPER			*temperat;
 	temperatura 	*tempPtr;
-	colore 			*colPtr;
+	//colore 			*colPtr;
 	COLORE			*colorClass;
+	TILE			*tilePtr;
 	//distanza 	*distPtr;
 	cinematica 		*cinPtr;
 	qei 			*qeiPtr;

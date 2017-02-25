@@ -53,8 +53,10 @@ int readCol(void);
 /// indica le mattonelle scure da evitare, memorizzandone le coordinate
 class TILE{
 public:
-	TILE(){p[0] = p[1] = 0; isDark = IS_DARK;}
-
+	TILE(){p[0] = p[1] = 0; isDark = ISNT_DARK;}
+	void set(int x, int y){
+		p[0] = x; p[1] = y;
+	}
 	uint32_t isDark;
 	/// coordinate delle piastrelle, intese come posizione in una matrice di
 	/// 30cm x 30cm
@@ -78,7 +80,7 @@ public:
 	inline void WhiteBalance(){ bianco = read(); }
 
 	int readCol();
-	void Run();
+	void Run(TILE * tP);
 
 	/// proprieta'
 	int 	rosso;
@@ -86,8 +88,6 @@ public:
 	int 	blu;
 	int 	luminanza;
 	int 	bianco;
-	TILE	piastra[50];
-	int 	numPiastra;
 };
 
 

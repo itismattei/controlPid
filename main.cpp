@@ -12,6 +12,8 @@
  *        risultato dipendente dallo sleep della raspberry. Comunicazione ok,
  *        al piu' con un ritardo di un ciclo.
  *
+ *  RIMOSSA LA STRUCT GLB e SOSTITUITA CON LA CLASSE ALLSTRUCT CHE PERMETTE DI AVERE TUTTE LE STRUCT
+ *  DISPNIBILE NEL PROGRAMMA
  */
 
 
@@ -129,6 +131,8 @@ int main(void) {
 
 	/// MODULO SENSORE DI COLORE  ///
 	COLORE CL;
+	/// PIASTRELLA
+	TILE PST[50];
 
 
 	/// MODULO SENSORE DI TEMPERATURA (PIROMETRO) ///
@@ -145,17 +149,17 @@ int main(void) {
 	//pidPtr = CTRL;
 	//dPtr = &DIST;
 
-	//glb  COLLECTDATA;
+
 	comando CMD1;
 	//DATA.distPtr = &DIST;
 	//passaggio degli indirizzi delle strutture alla struttura generale
 	//dati_a_struttura(&G, &DIST, &CIN, &COL, &TEMP, &SUR, &DATA);
-	/// l'oggetto COLLECTDATA (glb) e' una struttara che contiene i puntatori alle strutture e classi del progetto
+
 	/// l'utilita' e' che puo' essere usato come unico puntatore per distribuire le strutture nei vari punti
 	/// del programma.
 	ALLSTRUCT allDATA;
-//	datiRaccolti(&A, &ENC0, &sensIR, &CL, &SUR, &MISURE, &Rot, &COLLECTDATA);
-	allDATA.setup(&A, &ENC0, &sensIR, &CL, &SUR, &MISURE, &Rot);
+
+	allDATA.setup(&A, &ENC0, &sensIR, &CL, &PST[0], &SUR, &MISURE, &Rot);
 
 	/// setup di base
 	setupMCU();
@@ -364,7 +368,8 @@ int main(void) {
 		if (tick100 >= 100){
 
 			/// controlla il colore della piastrella sottostante e lo paragona la bianco memorizzato in fase di setup
-			CL.Run();
+			/// bisogna anche impostare il numero della piastrella e le sue coordinate.
+			CL.Run(&PST[0]);
 #ifndef _DEBUG_
 			PRINTF("Col: %d\t W: %d\n", CL.get(), CL.getWhite());
 #endif
