@@ -43,6 +43,7 @@
 #define		FALSE				'0'
 
 #define		INT_STEP_10_MS		10
+#define		_100_US				100
 
 
 // ##### DEFINIZIONE DEI COLORI DEI LED PRESENTI SULLA SCHEDA

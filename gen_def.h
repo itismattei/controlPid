@@ -25,6 +25,7 @@ extern "C" {
 
 void initTimer0(int interval);
 void initTimer1(int interval);
+void initTimer2(int prescaler);
 
 #ifdef __cplusplus
 }

@@ -29,7 +29,11 @@ void resetAutoma(syn_stat * STATO){
 	STATO->valid = NON_VALIDO;
 }
 
-
+/*
+ * 	L'analisi del messaggio avviene in due fasi: il parsing e la risposta al comando
+ * 	Il parsing genera un token che e' successivamente usato nella risposta al comando.
+ *
+ */
 ///
 /// analizza il comando che e' arrivato
 ///
@@ -137,7 +141,7 @@ void convertToToken(syn_stat *STATO, comando *cmdPtr){
 		/// potrebbe essere un "DESTRA" con valFIn = -180
 	break;
 	case 'G':
-		//// non ancora implementato
+		//// lettura gradi di rotazione dal giroscopio
 		STATO->token = MISURA_GRADI;
 		cmdPtr->azione = false;
 	break;
@@ -172,157 +176,33 @@ void convertToToken(syn_stat *STATO, comando *cmdPtr){
 }
 
 
-///
-/// legge il comando e restituisce, quando il comando e' valido il puntatore al pid di interesse
-/// in caso contrario il puntatore e' NULL oppure il valore che gia' aveva.
-//pid * leggiComando(syn_stat *sSTAT, pid CTRL[], pid *p, dati *data){
-//
-//	uint8_t checksum = 0;
-//	//pid *p = NULL;
-//	/// controlla se ci sono caratteri da processare
-//	if (RX_PTR1 != READ_PTR1){
-//		/// e se si', li invia al parser, che restituisce in synSTATO il token del comando
-//		//parse(sSTAT);
-//		READ_PTR1++;
-//		READ_PTR1 &= DIM_READ_BUFF - 1;
-//	}
-//	/// controlla il time out del comando e se scaduto si ferma
-//	if (sSTAT->tick > TIMEOUT_CMD){
-//		/// in caso di timeout nella persistenza del comando si deve fermare
-//		/// quale era o erano i pid attivo/i?
-//		sSTAT->token = STOP;
-//		sSTAT->valid = NON_VALIDO;
-//		p = NULL;
-//		/// deve anche mettere i pid in stato disattivo (.attivo = false)
-//	}
-//	/// agggiorna il contatore di persistenza.
-//	sSTAT->tick++;
-//
-//	/// dal token si deve estrarre il valore finale da inserire nel PID al prossimo ciclo  e restituire l'indirizzo del
-//	/// del PID su cui si andra' ad integrare.
-//	if (sSTAT->valid == VALIDO){
-//
-//		switch(sSTAT->token){
-//		case AVANTI:
-//			/// imposta la velocita'
-//			CTRL[0].valFin = 50;		/// velocita' in cm/s
-//			CTRL[0].attivo = TRUE;
-//			p = &CTRL[0];
-//			sSTAT->buff_reply[0] = 'F';
-//		break;
-//
-//		case INDIETRO:
-//			/// imposta la velocita'
-//			CTRL[0].valFin = -50;		/// velocita' in cm/s
-//			CTRL[0].attivo = TRUE;
-//			p = &CTRL[0];
-//			sSTAT->buff_reply[0] = 'B';
-//		break;
-//		//TODO ricordare di impostare la scelta tra ruota e ruota su asse
-//		case DESTRA:
-//			/// usa il PID ruota e non routa su asse
-//			/// non e' detto che la scelta sia ottimale. Come faccio a scegliere tra le due????
-//			/// forse è meglio ruotare sull'asse, gli informatici stavano considerando questo
-//			/// imposta l'angolo
-//			CTRL[1].valFin = 90;		/// angolo in gradi
-//			CTRL[1].attivo = TRUE;
-//			p = &CTRL[1];
-//			sSTAT->buff_reply[0] = 'R';
-//			/// necessita di risposta alla fine
-//			sSTAT->suspend_reply = TRUE;
-//		break;
-//
-//		case SINISTRA:
-//			/// usa il PID ruota e non routa su asse
-//			/// non e' detto che la scelta sia ottimale. Come faccio a scegleire tra le due????
-//			/// imposta l'angolo
-//			CTRL[1].valFin = -90;		/// angolo in gradi
-//			CTRL[1].attivo = TRUE;
-//			p = &CTRL[1];
-//			sSTAT->buff_reply[0] = 'L';
-//			/// necessita di risposta alla fine
-//			sSTAT->suspend_reply = TRUE;
-//		break;
-//
-//		case GIRA_INDIETRO:
-//			/// usa il PID routa su asse
-//			/// da che parte e' meglio ruotare? Orario-antiorario? Come faccio a scegleire tra le due????
-//			/// imposta l'angolo
-//			CTRL[2].valFin = -180;		/// angolo in gradi
-//			CTRL[2].attivo = TRUE;
-//			p = &CTRL[2];
-//			sSTAT->buff_reply[0] = 'I';
-//			/// necessita di risposta alla fine
-//			sSTAT->suspend_reply = TRUE;
-//		break;
-//
-//		case LETTURA_SENSORE:
-//			PRINTF("Sta chiedendo dei dati\n");
-//			//rispondiComando(sSTAT, data);
-//		break;
-//
-//		case STOP:
-//			sSTAT->buff_reply[0] = 'S';
-//		default:
-//			/// disattiva tutti i pid al valore attualmente calcolato
-//			CTRL[0].attivo = FALSE;
-//			CTRL[1].attivo = FALSE;
-//			CTRL[2].attivo = FALSE;
-//			/// se il puntatore restituito e' NULL allora vuol dire che si e' verificato un errore
-//			/// ed i pid devono essere tutti fermati
-//			p = NULL;
-//
-//		break;
-//		}
-//
-//		if(sSTAT->buff_reply[0] != 'R' || sSTAT->buff_reply[0] != 'L' || sSTAT->buff_reply[0] != 'I'){
-//			/// risponde solo ai comandi di avanzamento o stop, ma non a quelli di rotazione
-//			if (sSTAT->buff_reply[0] > 16 ){
-//				/// significa che e' un comando d'azione a cui non e' ancora stato risposto
-//				/// e quindi conclude con comando valido
-//				/// se fosse stato una richiesta di dati non sarebbe passato
-//				/// qui
-//				sSTAT->buff_reply[1] = '0';
-//				sSTAT->buff_reply[2] = TRUE;
-//				int i;
-//				for (i = 0 ; i < 3; i++)
-//					checksum ^= sSTAT->buff_reply[i];
-//				checksum ^= CHECK_SUM;
-//				sSTAT->buff_reply[3] = checksum;
-//
-//			}
-//			sendReply(sSTAT, 4);
-//		}
-//	}
-//
-//	return p;
-//}
-
 
 ///
 /// fornisce dati dai sensori a seguito di richiesta
 
 
-void rispondiComando(syn_stat *sSTAT, ALLSTRUCT *colletedD){
+void rispondiComando(syn_stat *sSTAT, ALLSTRUCT *collectedD){
 	/// controlla se la sintazzi e' valida
 	sSTAT->check = 0;
 	/// controllo ridondante gia' effettuato
 	if (sSTAT->valid == VALIDO){
 		/// analizza il token e per il momento risposnde alle richieste di dati
-		/// i tokens sono: MISURA_GRADI LETTURA_SENSORE (con nuero di sensore in sSTAT.cmd[1])
+		/// i tokens sono: LETTURA_SENSORE (con nuero di sensore in sSTAT.cmd[1])
 		switch(sSTAT->token){
 
-//		case MISURA_GRADI:
-//			sSTAT->buff_reply[0] = 'G';
-//			sSTAT->buff_reply[1] = (data->gPtr->yaw  & 0xFF00) >> 8;
-//			sSTAT->buff_reply[2] = data->gPtr->yaw  & 0x00FF;
-//
-//		break;
+		/// le psecifiche prevedono che la misura dei gradi sia richiesta con il comando 'G'
+		/// oppure con il comando 'D' seguito dall'intero 6 (lettura del sesto dato o sensore)
+		case MISURA_GRADI:
+			sSTAT->buff_reply[0] = 'G';
+			sSTAT->buff_reply[1] = (collectedD->gyro->yaw  & 0xFF00) >> 8;
+			sSTAT->buff_reply[2] = collectedD->gyro->yaw  & 0x00FF;
+
+		break;
 
 		/// fornisce la risposta alla lettura di un sensore
 		case LETTURA_SENSORE:
 			/// prepara solamente il buffer di risposta
-			inviaSensore(sSTAT, colletedD);
+			inviaSensore(sSTAT, collectedD);
 		break;
 		}
 
@@ -425,7 +305,7 @@ void inviaSensore(syn_stat *sSTAT, ALLSTRUCT * collectedD){
 
 		//lettura luminosità (valore tra 0 e 255)
 		case(7):
-					sSTAT->buff_reply[0] = 8;
+					sSTAT->buff_reply[0] = 7;
 					sSTAT->buff_reply[1] = (collectedD->colorClass->luminanza & 0xFF00) >> 8;
 					sSTAT->buff_reply[2] = collectedD->colorClass->luminanza & 0x00FF;
 				break;
@@ -481,17 +361,3 @@ void inviaSensore(syn_stat *sSTAT, ALLSTRUCT * collectedD){
 
 }
 
-///
-/// invia la risposta, in comandi di tipo rotazione
-//void rispostaRotazione(pid *pidPtr, syn_stat *synPtr){
-//	uint8_t checksum = 0;
-//	pidPtr->rispondi = FALSE;
-//	synPtr->buff_reply[1] = '0';
-//	synPtr->buff_reply[2] = TRUE;
-//	int i;
-//	for (i = 0 ; i < 3; i++)
-//		checksum ^= synPtr->buff_reply[i];
-//	checksum ^= CHECK_SUM;
-//	synPtr->buff_reply[3] = checksum;
-//	sendReply(synPtr, 4);
-//}

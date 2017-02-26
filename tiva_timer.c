@@ -11,6 +11,7 @@
 #include "inc/hw_gpio.h"
 #include "inc/hw_ints.h"
 #include "inc/hw_memmap.h"
+#include "inc/hw_timer.h"
 #include "driverlib/gpio.h"
 #include "driverlib/rom.h"
 #include "driverlib/timer.h"
@@ -177,4 +178,32 @@ void initTimer1(int interval){
 
 }
 
+///
+/// Usa il timer 2 per portare la base dei tempo a 100us usando il prescaler.
+/// in questo modo si vuole avere un intervallo regolare per l'integrazione del PID
+/// leggendo il valore del contatore di timerA a 32 bit
+/// Il valore del prescale e' posto a 7999 in modo che il divisore sia 7999+1 = 8000
+/// e quindi arrivi al contatore un impulso ogni 100us. Tenendo conto che il PID
+/// e' calcolato ogni 10ms si ha un fattore di correzione del tempo di integrazione
+/// pari ad 1/100. Se l'errore del timer del PID dovesse essere inferiore si potrebbe
+/// abbassare questo timer a 10 us.
+/// A 100us il tempo di reset del registro del contatore a 32 bit si resetta ogni 5 giorni circa
+
+void initTimer2(uint32_t BASE_TEMPO){
+	/// divide il clock per 8000 e quindi calcola il prescaler a 7999
+	uint32_t PRESCALER = (ROM_SysCtlClockGet()  / 1000000) * BASE_TEMPO - 1;
+	/// abilita il modulo timer2
+	SysCtlPeripheralEnable(SYSCTL_PERIPH_WTIMER2);
+	/// configura il funzionamento periodico
+	TimerConfigure(WTIMER2_BASE, TIMER_CFG_PERIODIC | TIMER_CFG_SPLIT_PAIR);
+	//TimerLoadSet(TIMER2_BASE, TIMER_A, -1);
+	//HWREG(TIMER2_BASE + TIMER_O_PP) = TIMER_PP_SIZE_32;
+	//HWREG(WTIMER2_BASE + TIMER_O_TAPR) = PRESCALER;
+	/// imposta il prescaler a 7999
+	//HWREG(TIMER2_BASE + TIMER_O_TAPR) = PRESCALER;
+	TimerPrescaleSet(WTIMER2_BASE, TIMER_A, PRESCALER);
+	/// avvia il timer
+	TimerEnable(WTIMER2_BASE, TIMER_A);
+
+}
 

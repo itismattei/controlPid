@@ -196,6 +196,9 @@ int main(void) {
 	/// inizializza il timer 0 e genera un tick da 10 ms
 	initTimer0(INT_STEP_10_MS);
 	PRINTF("inizializzato TIMER0\n");
+	/// inizializza il timer 2 a contare con prescaler ogni 100us
+	initTimer2(_100_US);
+	PRINTF("inizializzato TIMER2\n");
 	/// imposta il passo di integrazione per il calcolo dell'angolo
 	Rot.tick = (INT_STEP_10_MS / 1000.0) ;
 	/// inizializza il timer 1
@@ -348,6 +351,7 @@ int main(void) {
 
 			}
 
+
 			CMD1.RUN(cPid, &synSTATO, &M1, &M2, &ENC0, &ENC1, &Rot);
 			/// le misure del giroscopio invece sono effettuate solo dall'apposito pid
 		}
@@ -367,6 +371,8 @@ int main(void) {
 		/// AZIONI DA COMPIERE OGNI 1s ///
 		if (tick100 >= 100){
 
+			uint32_t micros = TimerValueGet(WTIMER2_BASE, TIMER_A);
+			PRINTF("micros: %u\n", micros);
 			/// controlla il colore della piastrella sottostante e lo paragona la bianco memorizzato in fase di setup
 			/// bisogna anche impostare il numero della piastrella e le sue coordinate.
 			CL.Run(&PST[0]);

@@ -35,7 +35,7 @@ Giroscopio::Giroscopio() {
 }
 
 Giroscopio::~Giroscopio() {
-	// TODO Auto-generated destructor stubù
+	// TODO Auto-generated destructor stub
 	i2cPtr = NULL;
 }
 
