@@ -26,16 +26,19 @@
 
 class ControlloPID;
 
+///
+/// la classe comando serve a trasformare i  dati del PID nei valori di PWM dei motori
 class comando{
 public:
-	comando(){azione = false; isRun = false; finished = false; numPid = -1; token = -1; tick = 0; avvia = 0;}
+	comando();
+
 	int RUN(ControlloPID *, syn_stat *,PWM_MOTORI *, PWM_MOTORI *, encQuad * ENC1, encQuad * ENC2, Giroscopio *G);
 	void setUptrasducers(Giroscopio	*gPtr, pwm	*PWM, distMis *distanza);
 
 	bool azione;			//indica se e' un comando di azione
 	bool isRun;				// indica se il comando sta andando
 	bool finished;			// indica se il comando e' giunto al termine
-	int numPid;				// numero del PID attivo
+
 	int token;				// numero del comando
 	int avvia;				// indica che il comando va eseguito
 	uint32_t tick;			// contatore dei cicli di esecuzione del comando
@@ -43,7 +46,16 @@ public:
 	Giroscopio 	*gPtr;
 	pwm			*PWM;
 	distMis		*distanza;
+
+	//private:
+	int numPid;				// numero del PID attivo. VIENE ASSEGNATO DENTRO convertToToken
+	int sogliaAlfa;			// soglia di angolo raggiunto
+	int sogliaVel;			// soglia di velocita' raggiunte
 };
+
+///
+/// la clsse seguente contiene i parametri dello specifico PID. Potrebbe essere utile avere parametri diversi per la rotazione
+/// e per il movimento lineare.
 
 class ControlloPID{
 public:

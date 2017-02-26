@@ -50,7 +50,7 @@ void ControlloPID::integra(float tick){
 	P = kp * e[1];
 	/// integrale
 	I = I1 + ki * tick * (e[1] + e[0]);
-	I *= (float)0.50;
+	I *= 0.50;
 	I1 = I;
 	uscita = D + P + I;
 	/// dispositivo con saturazione
@@ -123,7 +123,8 @@ int ControlloPID::Run(Giroscopio *G, PWM_MOTORI *PWM1, PWM_MOTORI * PWM2, distMi
 		/// dal PWM perche' i motori, a differenza della regolazione della velocita' dovranno
 		/// fermarsi.
 		G->IsRotating = 1;
-		G->misuraAngoli();
+		/// non serve e viene commentata,poiche' e' gia' stata calcolata nel ciclo principale
+		//G->misuraAngoli();
 		e[1] = (float) (valFin - G->yaw);
 		/// calcola l'integrale numerico del PID
 		integra(G->tick);
@@ -132,7 +133,8 @@ int ControlloPID::Run(Giroscopio *G, PWM_MOTORI *PWM1, PWM_MOTORI * PWM2, distMi
 	break;
 
 	case RUOTA_SINISTRA:
-		G->misuraAngoli();
+		/// non serve e viene commentata,poiche' e' gia' stata calcolata nel ciclo principale
+		//G->misuraAngoli();
 		e[1] = (float) (valFin - G->yaw);
 		/// calcola l'integrale numerico del PID
 		integra(G->tick);
@@ -205,6 +207,15 @@ int ControlloPID::Run(Giroscopio *G, PWM_MOTORI *PWM1, PWM_MOTORI * PWM2, distMi
 //	C->e[0] = C->e[1];
 //}
 
+///
+/// COSTRUTTORE CLASSE COMANDO
+comando::comando(){
+	azione = false; isRun = false; finished = false; numPid = -1; token = -1; tick = 0; avvia = 0;
+	/// soglia in gradi del raggiungimento
+	sogliaAlfa = 2;
+	/// soglia in cm/s del raggiungimento della velocita'
+	sogliaVel = 1;
+}
 
 ///
 /// impsotazione dei puntatori ai trasduttori
@@ -302,7 +313,7 @@ int comando::RUN(ControlloPID *p, syn_stat *s, PWM_MOTORI *PWM1, PWM_MOTORI *PWM
 			if (val < 0)
 				val = -val;
 			/// considera +-2° come angolo raggiunto
-			if (val > 2){
+			if (val > sogliaAlfa){
 				// ruota il rover
 				PWM1->delta = PWM2->delta = 50;
 				PWM1->direction = 1;

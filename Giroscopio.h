@@ -69,6 +69,7 @@ public:
 	char offsetRequest;
 private:
 	uint16_t posizione;
+	uint32_t jitter_timer, prevValue;
 	I2C *i2cPtr;
 
 };

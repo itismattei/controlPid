@@ -302,3 +302,5 @@ void minQuad(int16_t *x, int16_t *y, int numS, float *b, float *a){
 	*a = q;
 
 }
+
+

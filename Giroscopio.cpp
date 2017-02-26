@@ -32,6 +32,8 @@ Giroscopio::Giroscopio() {
 	yawF0 = 0.0;
 	IsRotating = offsetRequest = 0;
 	i2cPtr = NULL;
+	jitter_timer = prevValue = 0;
+
 }
 
 Giroscopio::~Giroscopio() {
@@ -279,7 +281,7 @@ void Giroscopio::misuraAngoli(){
 			/// usa la retta di regressione
 			tmp -=  q;
 #endif
-			/// integrazione rettangolare: valore letto * fondo scala * intervallo di tempo di integrazione
+			/// integrazione rettangolare: valore letto * fondo scala * intervallo di tempo di integrazione (var.: tick)
 			/// posto a 10ms
 			f = z * DPS * kz;
 			f *= tick;
@@ -314,6 +316,25 @@ void Giroscopio::misuraAngoli(){
 			/// riporta il valore ad intero
 			yaw = (int16_t) yawF;
 		}
+
+		///
+		/// qui effettua la correzione sulla jitter dell'intervallo di integrazione
+		///
+		float corr = 0.0;
+		int32_t diff;
+		jitter_timer = TimerValueGet(WTIMER2_BASE, TIMER_A);
+		if (prevValue != 0){
+			/// effettua l'aggiornamento
+			diff = prevValue - jitter_timer;
+			if (diff < 0)
+				diff = -diff;
+			/// se sono passati esattamente 10ms allora diff = 100, altrimenti la differenza sara' il jitter;
+			/// supponendo che diff - 100 = 1, allora corr = 1e-4 => 100 us
+			corr = (float)(diff - 100) / 10000.0;
+			tick += corr;
+		}
+
+		prevValue = jitter_timer;
 
 		if((asseOn & ALL_AXIS) == ALL_AXIS){
 			if(i2cPtr == NULL)
