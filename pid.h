@@ -34,6 +34,7 @@ public:
 
 	int RUN(ControlloPID *, syn_stat *,PWM_MOTORI *, PWM_MOTORI *, encQuad * ENC1, encQuad * ENC2, Giroscopio *G);
 	void setUptrasducers(Giroscopio	*gPtr, pwm	*PWM, distMis *distanza);
+	void setFpwm(PWM_MOTORI *, PWM_MOTORI *, ControlloPID *, int);
 
 	bool azione;			//indica se e' un comando di azione
 	bool isRun;				// indica se il comando sta andando
@@ -63,7 +64,7 @@ public:
 
 	void setupPID(int type);
 	void setKpid(float, float, float);
-	void integra(float tick);
+	void calcola(float tick);
 	int Run(Giroscopio *G, PWM_MOTORI *PWM1, PWM_MOTORI *PWM2, distMis *distanza);
 
 	float 		kp;
