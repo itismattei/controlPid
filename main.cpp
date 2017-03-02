@@ -100,9 +100,6 @@ int main(void) {
 	/// imposta il livello di soglia della batteria a 1900
 	power BATT(1700);
 
-	/// MODULO PWM PER MOTORI DI SPOSTAMENTO ///
-	PWM_MOTORI M1, M2;
-
 	/// MODULO PWM PER MOTORI SERVO ///
 	PWM_SERVI KIT, MOT_SENS;
 	sensPtr = &MOT_SENS;
@@ -170,6 +167,8 @@ int main(void) {
 	setupMCU();
 	/// imposta i parametri del PID
 	//setupPID(CTRL);
+	/// MODULO PWM PER MOTORI DI SPOSTAMENTO ///
+	//
 
 	/// imposta le UART e setta la PRINTF sulla 1 in modo da trasmettere la telemetria
 	//setupUART(1);
@@ -281,16 +280,19 @@ int main(void) {
 	/// task principale
 	int tempCont = 0;
 
-	M1.Init();
-	M1.delta = 0;
-	M1.MotorGo();
+	/// i motori vanno inizializzati da queste parti, altrimenti l'impostazione delle periferiche precoce, prima che l'unita'
+	/// sia avviata provoca un fault e si entra nella interruzione di servizio per periferica non pronta.
+	PWM_MOTORI M1, M2;
+	//M1.Init();
+	//M1.delta = 0;
+	//M1.MotorGo();
 
-	M2.Init();
-	M2.delta = 0;
-	M2.MotorGo();
+	//M2.Init();
+	//M2.delta = 0;
+	//M2.MotorGo();
 	KIT.Init();
 	MOT_SENS.Init();
-	KIT.MotorGo(80);
+	KIT.MotorGo(0);
 	MOT_SENS.MotorGo(0);
 
 	CL.Init();
@@ -478,6 +480,12 @@ int main(void) {
 			//// reset del contatore
 			tick100 = 0;
 
+			//// 45 puo' essere il pwm minimo per far andare i motori con batteria a 11.3V
+//			M1.delta = 45;
+//			M1.MotorGo();
+//			M2.delta = 45;
+//			M2.MotorGo();
+//			while(1);
 		}
 
 		/** 	AZIONI SPECIALI		**/

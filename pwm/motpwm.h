@@ -17,7 +17,7 @@ public:
 	static int numPwm;
 
 public:
-	PWM_MOTORI(){numPwm ++; direction = 1; numMot = numPwm;}
+	PWM_MOTORI(){numPwm ++; direction = 1; numMot = numPwm; Init(); }
 	~PWM_MOTORI(){if (numPwm > 0) numPwm --;}
 
 	void Init();
