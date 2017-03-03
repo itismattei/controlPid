@@ -309,6 +309,12 @@ int main(void) {
 	//setupUART(1);
 	//XB.sendString("Ciao\n", 5);
 	//PRINTF("Telemetria\n");
+	bool taratura = false;
+	int valori[4];
+	int lettura = 0;
+	int delta1 = 45;
+	int delta2 = 50;
+
 	while(1){
 
 
@@ -338,6 +344,11 @@ int main(void) {
 //			rispostaRotazione(pidPtr, &synSTATO);
 //			pidPtr->rispondi = FALSE;
 //		}
+
+		M1.delta = delta1;
+		M1.MotorGo();
+		M2.delta = delta2;
+		M2.MotorGo();
 //
 		/*********************/
 		/* AZIONI CADENZATE  */
@@ -371,12 +382,27 @@ int main(void) {
 			tick10 = 0;
 			ENC0.readPos();
 			ENC0.readDir();
+			ENC1.readPos();
+
+			if (taratura){
+				taratura = false;
+				valori[0] = ENC0.pos;
+				valori[1] = ENC1.pos;
+				float differenza = ((float)(valori[1]-valori[0]) / valori[0])*100;
+				PRINTF("DIFFERENZA: %d\n", (int)differenza);
+				delta2 = delta1 + (int)(differenza + valori[1]/200);
+				M2.delta = delta2;
+				M2.MotorGo();
+			}
+
 			PRINTF("POS: %d\t%d\n", ENC0.pos, ENC0.dir);
+			PRINTF("POS2: %d\n", ENC1.pos);
 		}
 		/* misura gli encoder e calcola spostamenti e velocità */
 		//////////////////////////////////
 		/// AZIONI DA COMPIERE OGNI 1s ///
 		if (tick100 >= 100){
+			taratura = true;
 
 			uint32_t micros = TimerValueGet(WTIMER2_BASE, TIMER_A);
 			PRINTF("micros: %u\n", micros);
@@ -481,11 +507,11 @@ int main(void) {
 			tick100 = 0;
 
 			//// 45 puo' essere il pwm minimo per far andare i motori con batteria a 11.3V
-//			M1.delta = 45;
-//			M1.MotorGo();
-//			M2.delta = 45;
-//			M2.MotorGo();
-//			while(1);
+/*			M1.delta = 45;
+			M1.MotorGo();
+			M2.delta = 45;
+			M2.MotorGo();
+			while(1);*/
 		}
 
 		/** 	AZIONI SPECIALI		**/
