@@ -74,7 +74,7 @@ void ControlloPID::calcola(float tick){
 /// dell'errore dopo l'azione del PID
 /// il PID deve distinguere tra rotazione e movimento lineare e
 /// per questo riceve un vettore di struct di tipo PID
-int ControlloPID::Run(Giroscopio *G, PWM_MOTORI *PWM1, PWM_MOTORI * PWM2, distMis *DISTANZA){
+int ControlloPID::Run(Giroscopio *G, PWM_MOTORI *PWM1, PWM_MOTORI * PWM2, distMis *DISTANZA, encQuad * ENC1, encQuad * ENC2){
 
 	float soglia = 0.05;
 	/// controllare se arriva un puntatore nullo per il pid, generato da una condizione di time out
