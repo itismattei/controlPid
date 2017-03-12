@@ -35,6 +35,7 @@ public:
 	uint32_t 	address;
 	/// distanza percorsa in mm
 	int			dist_mm;
+	float 		kPos;
 
 };
 

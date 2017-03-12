@@ -23,7 +23,7 @@ void ControlloPID::setupPID(int type){
 	/// inizializza i coeficienti del pid
 	switch(type){
 	case 1:
-	setKpid(30.0, 0.5, 25.0);
+		setKpid(30.0, 0.5, 25.0);
 	break;
 
 	default:
@@ -36,10 +36,10 @@ void ControlloPID::setupPID(int type){
 
 ///
 /// imposta i coefficienti del PID su valori standard
-void ControlloPID::setKpid(float kp, float kd, float ki){
-	kp = kp;
-	kd = kd;
-	ki = ki;
+void ControlloPID::setKpid(float p, float d, float i){
+	kp[0] = p;
+	kd[0] = d;
+	ki[0] = i;
 	/// imposta anche i valori inziali della derivata ed integrale
 	I1 = 0.0;
 	d = 0.0;
@@ -51,11 +51,11 @@ void ControlloPID::calcola(float tick){
 
 	float D, P, I;
 	/// derivativo
-	D = kd * (e[1] - e[0]) / tick;
+	D = kd[0] * (e[1] - e[0]) / tick;
 	/// proporzionale
-	P = kp * e[1];
+	P = kp[0] * e[1];
 	/// integrale (trapezoidale)
-	I = I1 + ki * tick * (e[1] + e[0]);
+	I = I1 + ki[0] * tick * (e[1] + e[0]);
 	I *= 0.50;
 	I1 = I;
 	uscita = D + P + I;
@@ -314,8 +314,8 @@ int comando::RUN(ControlloPID *p, syn_stat *s, PWM_MOTORI *PWM1, PWM_MOTORI *PWM
 void comando::setFpwm(PWM_MOTORI *pwm1, PWM_MOTORI *pwm2, ControlloPID *p, int  numPid){
 	switch(numPid){
 	case 1:
-		/// qui la curca e' lineare, ma si puo' scegliere anche una differente curva
-		pwm1->delta = pwm2->delta = p->uscita * 0.35 + 65.0;
+		/// qui la curva e' lineare, ma si puo' scegliere anche una differente curva
+		pwm1->delta = pwm2->delta = p->uscita * 0.45 + 55.0;
 
 	break;
 

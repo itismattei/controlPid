@@ -65,11 +65,11 @@ public:
 	void setupPID(int type);
 	void setKpid(float, float, float);
 	void calcola(float tick);
-	int Run(Giroscopio *G, PWM_MOTORI *PWM1, PWM_MOTORI *PWM2, distMis *distanza);
+	int Run(Giroscopio *G, PWM_MOTORI *PWM1, PWM_MOTORI *PWM2, distMis *distanza, encQuad * ENC1, encQuad * ENC2);
 
-	float 		kp;
-	float 		kd;
-	float 		ki;
+	float 		kp[4];
+	float 		kd[4];
+	float 		ki[4];
 	float 		e[2];		/// errori all'istante attuale e precedente
 	float 		I1;			///valore integrale
 	float 		d;			/// valore della derivata

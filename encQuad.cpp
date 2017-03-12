@@ -42,8 +42,8 @@ encQuad::encQuad() {
 	/// DA CONTROLLARE SE 80000 VA BENE
 	fscala 		= 80000;
 	zero_pos 	= 0;
-	vel_period = ROM_SysCtlClockGet()/10;
-
+	vel_period = ROM_SysCtlClockGet() / 100;
+	kPos = 1.0;
 }
 
 encQuad::~encQuad() {
@@ -154,7 +154,7 @@ void encQuad::qeiInit(){
 		QEIVelocityDisable(address);
 		//QEIVelocityDisable(QEI1_BASE);
 
-		QEIVelocityConfigure(address, QEI_VELDIV_2, vel_period);  //periferica, divisore, periodo
+		QEIVelocityConfigure(address, QEI_VELDIV_1, vel_period);  //periferica, divisore, periodo
 		//QEIVelocityConfigure(QEI1_BASE, QEI_VELDIV_2, vel_period);  //periferica, divisore, periodo
 
 		QEIVelocityEnable(address);
@@ -179,16 +179,17 @@ void encQuad::qeiInit(){
 
 
 void encQuad::readPos(){
-	float tmp, k = 1.0;
+	float tmp;
 	pos = QEIPositionGet(address);
-	tmp = pos * k;
+	tmp = pos * kPos;
 	dist_mm = (int) tmp;
 
 }
 
 void encQuad::readVel(){
-
-	;
+	/// legge la velocità misurata.
+	/// in questo caso l'intervallo di lettura sono 0.01s e quindi verrano letti val/0,01 impulsi al secondo
+	vel = QEIVelocityGet(address) * 100;
 
 }
 
@@ -203,35 +204,8 @@ void encQuad::readDir(){
 void encQuad::update(){
 
 	pos =  QEIPositionGet(address);
-	vel =  QEIVelocityGet(address);
+	vel =  QEIVelocityGet(address) * 100;
 	dir =  QEIDirectionGet(address);
 
 }
 
-
-//void qei_test(qei *p){
-//	volatile int i;
-////		for(i=0; i<1000000; i++)
-////		{
-////
-////		}
-//
-//		p->pos_1 =  QEIPositionGet(QEI0_BASE);
-//		p->vel_1 =  QEIVelocityGet(QEI0_BASE);
-//		p->dir_1 = QEIDirectionGet(QEI0_BASE);
-//
-//		p->pos_2 =  QEIPositionGet(QEI1_BASE);
-//		p->vel_2 =  QEIVelocityGet(QEI1_BASE);
-//		p->dir_2 = QEIDirectionGet(QEI1_BASE);
-//
-//#ifdef _DEBUG_
-//		PRINTF("\nPosizione 1: %d \t", p->pos_1);
-//		PRINTF("Posizione 2: %d \n", p->pos_2);
-//		PRINTF("direzione 1: %d \n", p->dir_1);
-//		PRINTF("Velocita 1: %d \t", p->vel_1);
-//		PRINTF("Velocita 2: %d \n", p->vel_2);
-//		PRINTF("direzione 1: %d \t", p->dir_1);
-//		PRINTF("direzione 2: %d \n", p->dir_2);
-//		PRINTF("\n");
-//#endif
-//}
