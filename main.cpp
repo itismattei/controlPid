@@ -313,9 +313,48 @@ int main(void) {
 	//PRINTF("Telemetria\n");
 	bool taratura = false;
 	int valori[4];
-	int lettura = 0;
 	int delta1 = 45;
 	int delta2 = 50;
+	int k = 0;
+
+	// 40 impulsi sono circa 1cm
+	//test per verificare differenza nei cingoli
+	while (tick100 <= 100){
+		M1.delta = 45;
+		M2.delta = 50;
+		M1.MotorGo();
+		M2.MotorGo();
+	}
+	M1.MotorStop();
+	M2.MotorStop();
+	tick100 = 0;
+	ENC0.readPos();
+	ENC1.readPos();
+	k = ENC0.pos - ENC1.pos;
+	PRINTF("K: %d\n", k);
+	if (k < 0){
+		k = 0;
+	}
+	while (tick100 <= 200){
+
+	}
+	/*tick100 = 0;
+	while (tick100 <= 200){
+		M1.setDir(-1);
+		M2.setDir(-1);
+		M1.delta = 45;
+		M2.delta = 50;
+		M1.MotorGo();
+		M2.MotorGo();
+	}
+
+	M1.MotorStop();
+	M2.MotorStop();
+	tick100 = 0;
+	//ENC0.readPos();
+	//ENC1.readPos();*/
+	//PRINTF("POS0: %d\n", ENC0.pos);
+	//PRINTF("POS1: %d\n", ENC1.pos);
 
 	while(1){
 
@@ -392,13 +431,15 @@ int main(void) {
 				valori[1] = ENC1.pos;
 				float differenza = ((float)(valori[1]-valori[0]) / valori[0])*100;
 				PRINTF("DIFFERENZA: %d\n", (int)differenza);
-				delta2 = delta1 + (int)(differenza + valori[1]/200);
+				delta2 = delta1 + (int)(differenza + delta2-delta1 + k);
 				M2.delta = delta2;
 				M2.MotorGo();
+				M1.MotorGo();
+				PRINTF("VEL: %d\n", M2.delta);
 			}
 
-			PRINTF("POS: %d\t%d\n", ENC0.pos, ENC0.dir);
-			PRINTF("POS2: %d\n", ENC1.pos);
+			//PRINTF("POS: %d\t%d\n", ENC0.pos, ENC0.dir);
+			//PRINTF("POS2: %d\n", ENC1.pos);
 		}
 		/* misura gli encoder e calcola spostamenti e velocità */
 		//////////////////////////////////
