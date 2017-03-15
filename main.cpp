@@ -364,6 +364,8 @@ int main(void) {
 			}
 
 			/// e' eseguito il movimento sulla classe comando
+			/// viene richiesto il pid di riferimento, lo stato del comando (in modo da continuare se il comando e' valido),
+			/// i  pwm per i motori, il valore degli encoder e del giroscopio.
 			CMD1.RUN(cPid, &synSTATO, &M1, &M2, &ENC0, &ENC1, &Rot);
 			/// le misure del giroscopio invece sono effettuate solo dall'apposito pid
 		}

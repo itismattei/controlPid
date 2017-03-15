@@ -20,8 +20,10 @@ void rispostaRotazione(/*pid * ,*/ syn_stat *);
 /// impostazioni dei PID presenti
 void digPID::setupPID(int type){
 	///
+	e[0] = e[1] = 0.0;
 	/// inizializza i coeficienti del pid
 	switch(type){
+	/// il PID n.1 che e' relativo all'avanzamento, ha come parametro regolato la velocita' del rover
 	case 1:
 		setKpid(30.0, 0.5, 25.0);
 	break;
@@ -148,6 +150,8 @@ comando::comando(){
 	sogliaAlfa = 2;
 	/// soglia in cm/s del raggiungimento della velocita'
 	sogliaVel = 1;
+	/// valore finale
+	valFin = 0.0;
 }
 
 ///

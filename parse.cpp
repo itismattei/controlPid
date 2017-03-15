@@ -112,11 +112,15 @@ void convertToToken(syn_stat *STATO, comando *cmdPtr){
 		STATO->token = AVANTI;
 		cmdPtr->azione = true;
 		cmdPtr->numPid = 0;
+		/// imposta il valore finale del PID: 5cm / s
+		cmdPtr->valFin = 5.0;
 	break;
 	case 'B':
 		STATO->token = INDIETRO;
 		cmdPtr->azione = true;
 		cmdPtr->numPid = 0;
+		/// imposta il valore finale del PID: 5cm / s
+		cmdPtr->valFin = 5.0;
 	break;
 	case 'S':
 		STATO->token = STOP;
@@ -127,12 +131,14 @@ void convertToToken(syn_stat *STATO, comando *cmdPtr){
 		STATO->token = DESTRA;
 		cmdPtr->azione = true;
 		cmdPtr->numPid = 1;
+		/// imposta il valore finale del PID
 		cmdPtr->valFin -= 90;
 	break;
 	case 'L':
 		STATO->token = SINISTRA;
 		cmdPtr->azione = true;
 		cmdPtr->numPid = 2;
+		/// imposta il valore finale del PID
 		cmdPtr->valFin += 90;
 	break;
 	case 'I':
