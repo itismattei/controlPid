@@ -13,6 +13,7 @@
 #include "pwm/pwm.h"
 #include "pwm/motpwm.h"
 #include "adc/adc.h"
+#include "Jitter/Jitter.h"
 #include <stdint.h>
 #include "Giroscopio.h"
 #include "distMis.h"
@@ -32,7 +33,7 @@ class comando{
 public:
 	comando();
 
-	int RUN(digPID *, syn_stat *,PWM_MOTORI *, PWM_MOTORI *, encQuad * ENC1, encQuad * ENC2, Giroscopio *G);
+	int RUN(digPID *, syn_stat *,PWM_MOTORI *, PWM_MOTORI *, encQuad * ENC1, encQuad * ENC2, Giroscopio *G, Jitter *J);
 	void setUptrasducers(Giroscopio	*gPtr, pwm	*PWM, distMis *distanza);
 	void setFpwm(PWM_MOTORI *, PWM_MOTORI *, digPID *, int);
 
@@ -69,7 +70,7 @@ public:
 
 	void setupPID(int type);
 	void setKpid(float, float, float);
-	void calcola(float tick);
+	void calcola(float tick, Jitter *);
 	int Run(Giroscopio *G, PWM_MOTORI *PWM1, PWM_MOTORI *PWM2, distMis *distanza, encQuad * ENC1, encQuad * ENC2);
 
 	float 		kp[4];

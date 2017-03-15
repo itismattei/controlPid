@@ -14,6 +14,7 @@
 #include "gyro_init.h"
 #include "uartp/uartstdio.h"
 #include "I2C/tiva_i2c.h"
+#include "Jitter/Jitter.h"
 #include "inc/hw_gpio.h"
 #include "driverlib/gpio.h"
 #include "gen_def.h"
@@ -32,7 +33,6 @@ Giroscopio::Giroscopio() {
 	yawF0 = 0.0;
 	IsRotating = offsetRequest = 0;
 	i2cPtr = NULL;
-	jitter_timer = prevValue = 0;
 
 }
 
@@ -251,7 +251,7 @@ void Giroscopio::setupAssi(char stato){
 ///
 /// integra la misura del'angolo a partire dalla velocità angolare
 ///
-void Giroscopio::misuraAngoli(){
+void Giroscopio::misuraAngoli(Jitter *J){
 
 	static uint32_t tempoDiReset = 0;
 	uint32_t valore;
@@ -322,10 +322,10 @@ void Giroscopio::misuraAngoli(){
 		///
 		float corr = 0.0;
 		int32_t diff;
-		jitter_timer = TimerValueGet(WTIMER2_BASE, TIMER_A);
-		if (prevValue != 0){
+		J->setActualGyro();
+		if (J->prevValueGyro != 0){
 			/// effettua l'aggiornamento
-			diff = prevValue - jitter_timer;
+			diff = J->prevValueGyro - J->jitter_timerGyro;
 			if (diff < 0)
 				diff = -diff;
 			/// se sono passati esattamente 10ms allora diff = 100, altrimenti la differenza sara' il jitter;
@@ -333,8 +333,7 @@ void Giroscopio::misuraAngoli(){
 			corr = (float)(diff - 100) / 10000.0;
 			tick += corr;
 		}
-
-		prevValue = jitter_timer;
+		J->prevValueGyro = J->jitter_timerGyro;
 
 		if((asseOn & ALL_AXIS) == ALL_AXIS){
 			if(i2cPtr == NULL)

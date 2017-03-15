@@ -49,9 +49,26 @@ void digPID::setKpid(float p, float d, float i){
 
 ///
 /// effettua l'integrazione numerica
-void digPID::calcola(float tick){
+void digPID::calcola(float tick, Jitter *J){
 
-	float D, P, I;
+	float D, P, I, corr = 0.0;
+	///
+	/// qui effettua la correzione sulla jitter dell'intervallo di integrazione
+	///
+	int32_t diff;
+	J->setActualPID();
+	if (J->prevValuePID != 0){
+		/// effettua l'aggiornamento
+		diff = J->prevValuePID - J->jitter_timerPID;
+		if (diff < 0)
+			diff = -diff;
+		/// se sono passati esattamente 10ms allora diff = 100, altrimenti la differenza sara' il jitter;
+		/// supponendo che diff - 100 = 1, allora corr = 1e-4 => 100 us
+		corr = (float)(diff - 100) / 10000.0;
+		tick += corr;
+	}
+	J->prevValueGyro = J->jitter_timerGyro;
+
 	/// derivativo
 	D = kd[0] * (e[1] - e[0]) / tick;
 	/// proporzionale
@@ -164,7 +181,8 @@ void comando::setUptrasducers(Giroscopio *G, pwm *p, distMis *dist){
 
 ///
 /// esegue il pid selezionato
-int comando::RUN(digPID *p, syn_stat *s, PWM_MOTORI *PWM1, PWM_MOTORI *PWM2, encQuad * ENC1, encQuad * ENC2, Giroscopio *G){
+int comando::RUN(digPID *p, syn_stat *s, PWM_MOTORI *PWM1, PWM_MOTORI *PWM2, encQuad * ENC1, encQuad * ENC2,
+		Giroscopio *G, Jitter *J){
 	/// controlla il time out del comando e se scaduto si ferma
 	if (tick > TIMEOUT_CMD){
 		/// in caso di timeout nella persistenza del comando si deve fermare
@@ -217,21 +235,21 @@ int comando::RUN(digPID *p, syn_stat *s, PWM_MOTORI *PWM1, PWM_MOTORI *PWM2, enc
 			p->e[1] = (p->valFin - veloc);
 //			/// se l'errore e' minore di una soglia, vuoil dire che e' a regime e
 //			/// quindi inutile integrare ulteriormente.
-//			if (abs(p->e[1]) > soglia  ){
+			if (abs(p->e[1]) > soglia  ){
 //				/// calcola l'integrale numerico del PID
-//				p->integra(gPtr->tick);
+				p->calcola(INT_STEP_10_MS / 1000.0, J);
 //				/// avanti oppure indietro
-//				if(p->e[1] > 0.0)
-//					/// avanti
-//					PWM->dir_1 = PWM->dir_2 = 1;
-//				else
-//					/// indietro
-//					PWM->dir_1 = PWM->dir_2 = 2;
+				if(p->e[1] > 0.0)
+					/// avanti
+					PWM->dir_1 = PWM->dir_2 = 1;
+				else
+					/// indietro
+					PWM->dir_1 = PWM->dir_2 = 2;
 //				/// impostazione del PWM ed invio del comando
 //				//setXPWM(C, PWM);
-//			}
-//			else
-//				p->attivo = false;
+			}
+			else
+				p->attivo = false;
 
 			setFpwm(PWM1, PWM2, p, numPid);
 			PWM1->MotorGo();

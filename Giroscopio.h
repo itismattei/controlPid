@@ -10,6 +10,7 @@
 
 #include <stdint.h>
 #include "I2C/i2cTiva.h"
+#include "Jitter/Jitter.h"
 
 #define		maxDimBuff		256
 #define		numSampleBias	128
@@ -21,7 +22,7 @@ public:
 
 	void initGyro(char);
 	void setupAssi(char stato);
-	void misuraAngoli();
+	void misuraAngoli(Jitter *J);
 	void azzeraAssi(void);
 	void printAsseZ(int);
 	int getTemp();
@@ -69,7 +70,6 @@ public:
 	char offsetRequest;
 private:
 	uint16_t posizione;
-	uint32_t jitter_timer, prevValue;
 	I2C *i2cPtr;
 
 };

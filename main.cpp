@@ -44,6 +44,7 @@
 #include "gyro_f.h"
 #include "uartp/uart.h"
 #include "init.h"
+#include "Jitter/Jitter.h"
 
 #include "pid.h"
 #include "xbee/xbee.h"
@@ -115,7 +116,7 @@ int main(void) {
 
 	//volatile double d = 1.9845637456;
 	//gyro G;
-
+	Jitter JIT;
 	/// MODULO INERZIALE  ///
 	Giroscopio Rot;
 	//accelerazione A;
@@ -359,14 +360,14 @@ int main(void) {
 			//lampeggio_led++;
 			if (Rot.IsPresent == OK){
 				/// aggiorna l'angolo di yaw
-				Rot.misuraAngoli();
+				Rot.misuraAngoli(&JIT);
 
 			}
 
 			/// e' eseguito il movimento sulla classe comando
 			/// viene richiesto il pid di riferimento, lo stato del comando (in modo da continuare se il comando e' valido),
 			/// i  pwm per i motori, il valore degli encoder e del giroscopio.
-			CMD1.RUN(cPid, &synSTATO, &M1, &M2, &ENC0, &ENC1, &Rot);
+			CMD1.RUN(cPid, &synSTATO, &M1, &M2, &ENC0, &ENC1, &Rot, &JIT);
 			/// le misure del giroscopio invece sono effettuate solo dall'apposito pid
 		}
 		/// effettua i calcoli solo se il giroscopio e' presente
