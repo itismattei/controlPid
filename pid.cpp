@@ -18,7 +18,7 @@
 void rispostaRotazione(/*pid * ,*/ syn_stat *);
 
 /// impostazioni dei PID presenti
-void ControlloPID::setupPID(int type){
+void digPID::setupPID(int type){
 	///
 	/// inizializza i coeficienti del pid
 	switch(type){
@@ -36,7 +36,7 @@ void ControlloPID::setupPID(int type){
 
 ///
 /// imposta i coefficienti del PID su valori standard
-void ControlloPID::setKpid(float p, float d, float i){
+void digPID::setKpid(float p, float d, float i){
 	kp[0] = p;
 	kd[0] = d;
 	ki[0] = i;
@@ -47,7 +47,7 @@ void ControlloPID::setKpid(float p, float d, float i){
 
 ///
 /// effettua l'integrazione numerica
-void ControlloPID::calcola(float tick){
+void digPID::calcola(float tick){
 
 	float D, P, I;
 	/// derivativo
@@ -74,7 +74,7 @@ void ControlloPID::calcola(float tick){
 /// dell'errore dopo l'azione del PID
 /// il PID deve distinguere tra rotazione e movimento lineare e
 /// per questo riceve un vettore di struct di tipo PID
-int ControlloPID::Run(Giroscopio *G, PWM_MOTORI *PWM1, PWM_MOTORI * PWM2, distMis *DISTANZA, encQuad * ENC1, encQuad * ENC2){
+int digPID::Run(Giroscopio *G, PWM_MOTORI *PWM1, PWM_MOTORI * PWM2, distMis *DISTANZA, encQuad * ENC1, encQuad * ENC2){
 
 	float soglia = 0.05;
 	/// controllare se arriva un puntatore nullo per il pid, generato da una condizione di time out
@@ -160,7 +160,7 @@ void comando::setUptrasducers(Giroscopio *G, pwm *p, distMis *dist){
 
 ///
 /// esegue il pid selezionato
-int comando::RUN(ControlloPID *p, syn_stat *s, PWM_MOTORI *PWM1, PWM_MOTORI *PWM2, encQuad * ENC1, encQuad * ENC2, Giroscopio *G){
+int comando::RUN(digPID *p, syn_stat *s, PWM_MOTORI *PWM1, PWM_MOTORI *PWM2, encQuad * ENC1, encQuad * ENC2, Giroscopio *G){
 	/// controlla il time out del comando e se scaduto si ferma
 	if (tick > TIMEOUT_CMD){
 		/// in caso di timeout nella persistenza del comando si deve fermare
@@ -209,7 +209,8 @@ int comando::RUN(ControlloPID *p, syn_stat *s, PWM_MOTORI *PWM1, PWM_MOTORI *PWM
 		case AVANZA:
 //			//provvede a misurare la velocita'
 //			//misuraVelocità()
-//			p->e[1] = (float) ((float)p->valFin - distanza->vel);
+			float veloc = (ENC1->readVel() - ENC2->readVel()) /  2;
+			p->e[1] = (p->valFin - veloc);
 //			/// se l'errore e' minore di una soglia, vuoil dire che e' a regime e
 //			/// quindi inutile integrare ulteriormente.
 //			if (abs(p->e[1]) > soglia  ){
@@ -311,7 +312,7 @@ int comando::RUN(ControlloPID *p, syn_stat *s, PWM_MOTORI *PWM1, PWM_MOTORI *PWM
 ///
 /// cpnverte l'uscita del pid nel giusto valore del pwm
 ///
-void comando::setFpwm(PWM_MOTORI *pwm1, PWM_MOTORI *pwm2, ControlloPID *p, int  numPid){
+void comando::setFpwm(PWM_MOTORI *pwm1, PWM_MOTORI *pwm2, digPID *p, int  numPid){
 	switch(numPid){
 	case 1:
 		/// qui la curva e' lineare, ma si puo' scegliere anche una differente curva

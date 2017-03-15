@@ -42,7 +42,8 @@ encQuad::encQuad() {
 	/// DA CONTROLLARE SE 80000 VA BENE
 	fscala 		= 80000;
 	zero_pos 	= 0;
-	vel_period = ROM_SysCtlClockGet() / 100;
+	/// velocita' calcolata sul un intervallo di 1ms
+	vel_period = ROM_SysCtlClockGet() / 80000;
 	kPos = 1.0;
 }
 
@@ -186,10 +187,12 @@ void encQuad::readPos(){
 
 }
 
-void encQuad::readVel(){
+float encQuad::readVel(){
 	/// legge la velocità misurata.
-	/// in questo caso l'intervallo di lettura sono 0.01s e quindi verrano letti val/0,01 impulsi al secondo
-	vel = QEIVelocityGet(address) * 100;
+	/// in questo caso l'intervallo di lettura sono 0.001s e quindi verrano letti val/0,01 impulsi al secondo
+	/// RICORDARSI DI DIVIVERE PER IL RAPPROTO distanza/numImpulsi
+	vel = QEIVelocityGet(address) * 1000;
+	return vel;
 
 }
 

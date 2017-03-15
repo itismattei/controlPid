@@ -24,7 +24,7 @@
 #define			RUOTA_SINISTRA	2
 #define			ARRESTA			-1
 
-class ControlloPID;
+class digPID;
 
 ///
 /// la classe comando serve a trasformare i  dati del PID nei valori di PWM dei motori
@@ -32,9 +32,9 @@ class comando{
 public:
 	comando();
 
-	int RUN(ControlloPID *, syn_stat *,PWM_MOTORI *, PWM_MOTORI *, encQuad * ENC1, encQuad * ENC2, Giroscopio *G);
+	int RUN(digPID *, syn_stat *,PWM_MOTORI *, PWM_MOTORI *, encQuad * ENC1, encQuad * ENC2, Giroscopio *G);
 	void setUptrasducers(Giroscopio	*gPtr, pwm	*PWM, distMis *distanza);
-	void setFpwm(PWM_MOTORI *, PWM_MOTORI *, ControlloPID *, int);
+	void setFpwm(PWM_MOTORI *, PWM_MOTORI *, digPID *, int);
 
 	bool azione;			//indica se e' un comando di azione
 	bool isRun;				// indica se il comando sta andando
@@ -58,9 +58,9 @@ public:
 /// la clsse seguente contiene i parametri dello specifico PID. Potrebbe essere utile avere parametri diversi per la rotazione
 /// e per il movimento lineare.
 
-class ControlloPID{
+class digPID{
 public:
-	ControlloPID(){;}
+	digPID(){;}
 
 	void setupPID(int type);
 	void setKpid(float, float, float);
@@ -75,7 +75,7 @@ public:
 	float 		d;			/// valore della derivata
 	float 		uscita;		/// valore dell'uscita
 	uint32_t 	tipo;		/// tipo di movimento: avenzamento, rotazione, rotazione su asse centrale
-	int			valFin;		/// valore finale da raggiungere
+	float		valFin;		/// valore finale da raggiungere
 	bool 		attivo;		/// indica se il pid agisce o e' disattivato.
 	uint8_t		rispondi;	/// flag che indica che occorre fornire risposta, per i comandi di tipo rotazione
 };

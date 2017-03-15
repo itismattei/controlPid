@@ -124,6 +124,6 @@ void dati_a_struttura(gyro *, distanza *, cinematica *, colore *, temperatura* ,
 //void datiRaccolti(accelerometro *ACC, encQuad *ENC, TEMPER *TEMP, COLORE *CL, survivor *SUR, distMis *DIS, Giroscopio *GYRO, glb *GLB );
 
 //pid * leggiComando(syn_stat *sSTAT, pid CTRL[], pid *p, dati *);
-void EseguiPID(syn_stat *sSTAT, ControlloPID *);
+void EseguiPID(syn_stat *sSTAT, digPID *);
 
 #endif /* PARSE_H_ */

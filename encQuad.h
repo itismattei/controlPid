@@ -20,13 +20,13 @@ public:
 	virtual ~encQuad();
 	void qeiInit();
 	void readPos();
-	void readVel();
+	float readVel();
 	void readDir();
 	void setAddr(uint32_t add){address = add;}
 	void update();
 
 	/// prorpieta'
-	int 		vel;
+	float 		vel;
 	int 		dir;
 	int 		pos;
 	int 		vel_period;

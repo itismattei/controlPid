@@ -124,7 +124,7 @@ int main(void) {
 	/// servono differenti PID, almeno uno per la rotazione ed uno per lo spostamento
 	/// per la rotazione sarebbero interessante usarne 2, uno per la rotazione soft ed uno per la rotazione
 	/// brusca.
-	ControlloPID cPid[3];
+	digPID cPid[3];
 	cPid[0].setupPID(1);
 	cPid[1].setupPID(2);
 	cPid[2].setupPID(3);
