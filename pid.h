@@ -43,15 +43,17 @@ public:
 	int token;				// numero del comando
 	int avvia;				// indica che il comando va eseguito
 	uint32_t tick;			// contatore dei cicli di esecuzione del comando
-	int valFin;				// imposta il valore finale a cui deve giungere il comando
+
 	Giroscopio 	*gPtr;
 	pwm			*PWM;
 	distMis		*distanza;
 
 	//private:
-	int numPid;				// numero del PID attivo. VIENE ASSEGNATO DENTRO convertToToken
-	int sogliaAlfa;			// soglia di angolo raggiunto
-	int sogliaVel;			// soglia di velocita' raggiunte
+	int 	numPid;				// numero del PID attivo. VIENE ASSEGNATO DENTRO convertToToken
+	int 	sogliaAlfa;			// soglia di angolo raggiunto
+	int 	sogliaVel;			// soglia di velocita' raggiunte
+	float 	valFin;			// imposta il valore finale a cui deve giungere il comando. Puo' essere una velocita', una rotazione, una distanza,...
+
 };
 
 ///
@@ -61,6 +63,9 @@ public:
 class ControlloPID{
 public:
 	ControlloPID(){;}
+	///
+	/// impostazione valore finale
+	void setPoint(float valore) { valFin = valore; }
 
 	void setupPID(int type);
 	void setKpid(float, float, float);
