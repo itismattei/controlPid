@@ -2,7 +2,7 @@
  * Jitter.cpp
  *
  *  Created on: 15/mar/2017
- *      Author: massimo
+ *      Author: itismattei
  */
 
 #include "Jitter.h"

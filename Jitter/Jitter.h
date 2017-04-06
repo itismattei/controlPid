@@ -2,7 +2,7 @@
  * Jitter.h
  *
  *  Created on: 15/mar/2017
- *      Author: massimo
+ *      Author: itismattei
  */
 
 #ifndef JITTER_H_
