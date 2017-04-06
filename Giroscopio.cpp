@@ -191,6 +191,8 @@ void Giroscopio::initGyro(char assi){
 			/// per il drone, stato = ALL (0x7)
 			/// per il rover stato = Z (0x4);
 			setupAssi(assi);
+			PRINTF("Giroscopio PRESENTE\n");
+
 		}
 		else{
 			IsPresent = NOT_PRESENT;

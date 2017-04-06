@@ -179,7 +179,7 @@ int main(void) {
 	//setupUART(1);
 	/// imposta le UART e setta la PRINTF sulla 0
 	setupUART(0);
-	PRINTF("impostata UART0 per debug\n");
+	PRINTF("\n######\nImpostata UART0 per debug\n");
 	/// messaggio d'inizio
 	PRINT_WELCOME();
 
