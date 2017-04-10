@@ -315,11 +315,11 @@ int main(void) {
 	int valori[4];
 	int delta1 = 45;
 	int delta2 = 50;
-	int k = 0;
+	float k = 0;
 
 	// 40 impulsi sono circa 1cm
 	//test per verificare differenza nei cingoli
-	while (tick100 <= 100){
+	while (tick10 <= 50){
 		M1.delta = 45;
 		M2.delta = 50;
 		M1.MotorGo();
@@ -327,34 +327,33 @@ int main(void) {
 	}
 	M1.MotorStop();
 	M2.MotorStop();
-	tick100 = 0;
+	tick10 = 0;
 	ENC0.readPos();
 	ENC1.readPos();
-	k = ENC0.pos - ENC1.pos;
-	PRINTF("K: %d\n", k);
+	k = ((float)(ENC1.pos-ENC0.pos) / ENC0.pos)*100;
+	PRINTF("K: %d\n", (int)k);
 	if (k < 0){
 		k = 0;
 	}
 	while (tick100 <= 200){
 
 	}
-	/*tick100 = 0;
+
+	//Non funziona il metodo per invertire la direzione
+	/*
+	tick100 = 0;
 	while (tick100 <= 200){
-		M1.setDir(-1);
-		M2.setDir(-1);
 		M1.delta = 45;
 		M2.delta = 50;
+		M1.setDir(-1);
+		M2.setDir(-1);
 		M1.MotorGo();
 		M2.MotorGo();
 	}
 
 	M1.MotorStop();
 	M2.MotorStop();
-	tick100 = 0;
-	//ENC0.readPos();
-	//ENC1.readPos();*/
-	//PRINTF("POS0: %d\n", ENC0.pos);
-	//PRINTF("POS1: %d\n", ENC1.pos);
+	tick100 = 0;*/
 
 	while(1){
 
@@ -431,7 +430,7 @@ int main(void) {
 				valori[1] = ENC1.pos;
 				float differenza = ((float)(valori[1]-valori[0]) / valori[0])*100;
 				PRINTF("DIFFERENZA: %d\n", (int)differenza);
-				delta2 = delta1 + (int)(differenza + delta2-delta1 + k);
+				delta2 = delta1 + (int)(differenza + delta2-delta1 + k/2);
 				M2.delta = delta2;
 				M2.MotorGo();
 				M1.MotorGo();
