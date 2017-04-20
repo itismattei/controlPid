@@ -240,9 +240,11 @@ void sendReply(syn_stat *sSTAT, uint8_t numChar){
 	/// invia tutti i caratterei nella stringa
 	for (i= 0; i < numChar; i++)
 		UARTCharPut(UART1_BASE, sSTAT->buff_reply[i]);
+	//UARTCharPut(UART1_BASE, 'A' + i);
 
 	/// infine invia il terminatore di stringa '*'
 	UARTCharPut(UART1_BASE, '*');
+	//UARTCharPut(UART1_BASE, 'A');
 }
 
 ///

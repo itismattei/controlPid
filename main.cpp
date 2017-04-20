@@ -313,6 +313,16 @@ int main(void) {
 	//XB.sendString("Ciao\n", 5);
 	//PRINTF("Telemetria\n");
 
+//	while(1){
+//		int contatore = 0;
+//		for (i= 60; i < 64; i++)
+//			UARTCharPut(UART1_BASE, i);
+//
+//		/// infine invia il terminatore di stringa '*'
+//		UARTCharPut(UART1_BASE, '*');
+//
+//		while (++contatore < 50000000);
+//	}
 	while(1){
 
 
