@@ -27,6 +27,7 @@ void resetAutoma(syn_stat * STATO){
 	STATO->cmd[0] = STATO->cmd[1] = 0;
 	STATO->l_cmd = 0;
 	STATO->valid = NON_VALIDO;
+	STATO->token = ERRORE;
 }
 
 /*
@@ -48,6 +49,7 @@ void parse(syn_stat *STATO, comando *cmdPtr, syntaxStatus *synPtr){
 	switch(STATO->ST){
 	case 0:
 		STATO->check = 0;
+		STATO->token = ERRORE;
 		if (STATO->cmd[0] >64 && STATO->cmd[0] < 91 ){
 			/// una lettera MAIUSCOLA e quindi un comando di azione da raspberry
 			STATO->l_cmd = 4;
@@ -83,20 +85,20 @@ void parse(syn_stat *STATO, comando *cmdPtr, syntaxStatus *synPtr){
 		if(STATO->check == STATO->cmd[2]){
 			/// ok, il messaggio e' valido
 			convertToToken(STATO, cmdPtr);
-			/// il comando e' ora valido
-			STATO->valid = VALIDO;
 			STATO->ST = 3;
 		}
-		else
+		else{
 			STATO->ST = 0;
+			STATO->valid = NON_VALIDO;
+		}
 
 	break;
 
 	case 3:
-		// resetta l'automa e rimette lo stato a NON_VALIDO
 		/// l'invio del comando e' fatto di 4 bytes e quindi passa di qui quando e' arrivato il IV byte cioe' quello
 		/// del terminatore
-		resetAutoma(STATO);
+		/// il comando e' ora valido
+		STATO->valid = VALIDO;
 	break;
 
 	}
@@ -114,6 +116,10 @@ void convertToToken(syn_stat *STATO, comando *cmdPtr){
 		cmdPtr->numPid = 0;
 		/// imposta il valore finale del PID: 5cm / s
 		cmdPtr->valFin = 5.0;
+		/// preparazione della risposta secondo il protocollo
+		STATO->buff_reply[0] = 'F';
+		STATO->buff_reply[1] = 'T';
+		STATO->buff_reply[2] = 'F' ^ 'T' ^ CHECK_SUM;
 	break;
 	case 'B':
 		STATO->token = INDIETRO;
@@ -121,11 +127,17 @@ void convertToToken(syn_stat *STATO, comando *cmdPtr){
 		cmdPtr->numPid = 0;
 		/// imposta il valore finale del PID: 5cm / s
 		cmdPtr->valFin = 5.0;
+		STATO->buff_reply[0] = 'B';
+		STATO->buff_reply[1] = 'T';
+		STATO->buff_reply[2] = 'B' ^ 'T' ^ CHECK_SUM;
 	break;
 	case 'S':
 		STATO->token = STOP;
 		cmdPtr->azione = true;
 		cmdPtr->numPid = -1;
+		STATO->buff_reply[0] = 'S';
+		STATO->buff_reply[1] = 'T';
+		STATO->buff_reply[2] = 'S' ^ 'T' ^ CHECK_SUM;
 	break;
 	case 'R':
 		STATO->token = DESTRA;
@@ -133,6 +145,9 @@ void convertToToken(syn_stat *STATO, comando *cmdPtr){
 		cmdPtr->numPid = 1;
 		/// imposta il valore finale del PID
 		cmdPtr->valFin -= 90;
+		STATO->buff_reply[0] = 'R';
+		STATO->buff_reply[1] = 'T';
+		STATO->buff_reply[2] = 'R' ^ 'T' ^ CHECK_SUM;
 	break;
 	case 'L':
 		STATO->token = SINISTRA;
@@ -140,11 +155,17 @@ void convertToToken(syn_stat *STATO, comando *cmdPtr){
 		cmdPtr->numPid = 2;
 		/// imposta il valore finale del PID
 		cmdPtr->valFin += 90;
+		STATO->buff_reply[0] = 'L';
+		STATO->buff_reply[1] = 'T';
+		STATO->buff_reply[2] = 'L' ^ 'T' ^ CHECK_SUM;
 	break;
 	case 'I':
 		STATO->token = GIRA_INDIETRO;
 		cmdPtr->azione = true;
 		/// potrebbe essere un "DESTRA" con valFIn = -180
+		STATO->buff_reply[0] = 'I';
+		STATO->buff_reply[1] = 'T';
+		STATO->buff_reply[2] = 'I' ^ 'T' ^ CHECK_SUM;
 	break;
 	case 'G':
 		//// lettura gradi di rotazione dal giroscopio
@@ -216,17 +237,19 @@ void rispondiComando(syn_stat *sSTAT, ALLSTRUCT *collectedD){
 		if (sSTAT->dato_valido == 1){
 			sSTAT->check  = 0;
 		/// calcolo checksum
-			for(int i = 0; i < 3; i++)
+			for(int i = 0; i < 2; i++)
 				/// calcola il checksum
 				sSTAT->check ^= sSTAT->buff_reply[i];
 
 			/// aggiunge la chiave 0xA9
 			sSTAT->check ^= CHECK_SUM;
-			sSTAT->buff_reply[3] = sSTAT->check;
-			sSTAT->buff_reply[4] = '*';
+			sSTAT->buff_reply[2] = sSTAT->check;
+			sSTAT->buff_reply[3] = '*';
 		}
 		/// invia i 4 byte su seriale. L'ultimo e' invato dalla funzione sendReply
-		sendReply(sSTAT, 4);
+		/// per la risposta ai comandi, il protocollo prevede:
+		/// 'X' 'T/F' check_sum '*', quindi 3 byte
+		sendReply(sSTAT, 3);
 	}
 	/// ripulisce il buffer di risposta
 	for (int  i = 0; i < 5; i++)
@@ -262,38 +285,38 @@ void inviaSensore(syn_stat *sSTAT, ALLSTRUCT * collectedD){
 		case(1):
 			//risposta con ID del sensore
 			sSTAT->buff_reply[0] = 1;
-			sSTAT->buff_reply[1] = (collectedD->DSTptr->d_mm[0]  & 0xFF00) >> 8;
-			sSTAT->buff_reply[2] = collectedD->DSTptr->d_mm[0]  & 0x00FF;
+			//sSTAT->buff_reply[1] = (collectedD->DSTptr->d_mm[0]  & 0xFF00) >> 8;
+			sSTAT->buff_reply[1] = collectedD->DSTptr->d_mm[0]  & 0x00FF;
 
 			break;
 
 		//sensore di distanza DD2
 		case(2):
 			sSTAT->buff_reply[0] = 2;
-			sSTAT->buff_reply[1] = (collectedD->DSTptr->d_mm[1]  & 0xFF00) >> 8;
-			sSTAT->buff_reply[2] = collectedD->DSTptr->d_mm[1]  & 0x00FF;
+			//sSTAT->buff_reply[1] = (collectedD->DSTptr->d_mm[1]  & 0xFF00) >> 8;
+			sSTAT->buff_reply[1] = collectedD->DSTptr->d_mm[1]  & 0x00FF;
 
 			break;
 
 		/// sensore di distanza anteriore
 		case(3):
 			sSTAT->buff_reply[0] = 3;
-			sSTAT->buff_reply[1] = (collectedD->DSTptr->d_mm[2]  & 0xFF00) >> 8;
-			sSTAT->buff_reply[2] = collectedD->DSTptr->d_mm[2]  & 0x00FF;
+			//sSTAT->buff_reply[1] = (collectedD->DSTptr->d_mm[2]  & 0xFF00) >> 8;
+			sSTAT->buff_reply[1] = collectedD->DSTptr->d_mm[2]  & 0x00FF;
 
 			break;
 
 		case(4):
 			sSTAT->buff_reply[0] = 4;
-			sSTAT->buff_reply[1] = (collectedD->DSTptr->d_mm[3]  & 0xFF00) >> 8;
-			sSTAT->buff_reply[2] = collectedD->DSTptr->d_mm[3]  & 0x00FF;
+			//STAT->buff_reply[1] = (collectedD->DSTptr->d_mm[3]  & 0xFF00) >> 8;
+			sSTAT->buff_reply[1] = collectedD->DSTptr->d_mm[3]  & 0x00FF;
 
 			break;
 
 		case(5):
 			sSTAT->buff_reply[0] = 5;
-			sSTAT->buff_reply[1] = (collectedD->DSTptr->d_mm[4] & 0xFF00) >> 8;
-			sSTAT->buff_reply[2] = collectedD->DSTptr->d_mm[4]  & 0x00FF;
+			//sSTAT->buff_reply[1] = (collectedD->DSTptr->d_mm[4] & 0xFF00) >> 8;
+			sSTAT->buff_reply[1] = collectedD->DSTptr->d_mm[4]  & 0x00FF;
 
 			break;
 

@@ -334,6 +334,7 @@ int main(void) {
 		// controllo di messaggio sulla seriale 1 (ricevuto comando da rasp
 		if (READ_PTR1 != RX_PTR1){
 			/// analizza il comando e imposta il valore dell'oggetto CMD (comando)
+			/// ATTENZIONE: synStat NON E' ANCORA USATO
 			 parse(&synSTATO, &CMD1, &synStat);
 			 /// aggiorna il buffer
 			 READ_PTR1++;
@@ -343,8 +344,8 @@ int main(void) {
 			/// il comandoche e' stato analizzato ha prodotto un risultato adeguato
 			rispondiComando(&synSTATO, &allDATA);
 			/// avendo terminato la risposta, la validità dell'automa
-			/// va rimossa.
-			synSTATO.valid = NON_VALIDO;
+			/// va rimossa e viene quindi resettato
+			resetAutoma(&synSTATO);
 			PRINTF("comando ricevuto: %c\n", synSTATO.cmd[0]);
 		}
 		/// invia la risposta per i comandi di rotazione, quando sono stati eseguiti
@@ -463,7 +464,8 @@ int main(void) {
 			PRINTF("\n");
 //
 #endif
-//				/// converte la misure grezza in mm
+			/// converte la misure grezza, letta dalla routine di interruzione in mm
+			/// la lttura del dato sei sensori e' esattamente questo dato.
 			MISURE.rawTomm();
 #ifndef _DEBUG_
 //				/// ricopia nella struttare DIST:
