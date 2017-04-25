@@ -119,7 +119,8 @@ void convertToToken(syn_stat *STATO, comando *cmdPtr){
 		/// preparazione della risposta secondo il protocollo
 		STATO->buff_reply[0] = 'F';
 		STATO->buff_reply[1] = 'T';
-		STATO->buff_reply[2] = 'F' ^ 'T' ^ CHECK_SUM;
+		STATO->buff_reply[2] = '0';
+		STATO->buff_reply[3] = 'F' ^ 'T' ^ '0' ^ CHECK_SUM;
 	break;
 	case 'B':
 		STATO->token = INDIETRO;
@@ -129,7 +130,8 @@ void convertToToken(syn_stat *STATO, comando *cmdPtr){
 		cmdPtr->valFin = 5.0;
 		STATO->buff_reply[0] = 'B';
 		STATO->buff_reply[1] = 'T';
-		STATO->buff_reply[2] = 'B' ^ 'T' ^ CHECK_SUM;
+		STATO->buff_reply[2] = '0';
+		STATO->buff_reply[3] = 'B' ^ 'T' ^ '0' ^ CHECK_SUM;
 	break;
 	case 'S':
 		STATO->token = STOP;
@@ -137,7 +139,8 @@ void convertToToken(syn_stat *STATO, comando *cmdPtr){
 		cmdPtr->numPid = -1;
 		STATO->buff_reply[0] = 'S';
 		STATO->buff_reply[1] = 'T';
-		STATO->buff_reply[2] = 'S' ^ 'T' ^ CHECK_SUM;
+		STATO->buff_reply[2] = '0';
+		STATO->buff_reply[3] = 'S' ^ 'T' ^ '0' ^ CHECK_SUM;;
 	break;
 	case 'R':
 		STATO->token = DESTRA;
@@ -147,7 +150,8 @@ void convertToToken(syn_stat *STATO, comando *cmdPtr){
 		cmdPtr->valFin -= 90;
 		STATO->buff_reply[0] = 'R';
 		STATO->buff_reply[1] = 'T';
-		STATO->buff_reply[2] = 'R' ^ 'T' ^ CHECK_SUM;
+		STATO->buff_reply[2] = '0';
+		STATO->buff_reply[3] = 'R' ^ 'T' ^ '0' ^ CHECK_SUM;
 	break;
 	case 'L':
 		STATO->token = SINISTRA;
@@ -157,7 +161,8 @@ void convertToToken(syn_stat *STATO, comando *cmdPtr){
 		cmdPtr->valFin += 90;
 		STATO->buff_reply[0] = 'L';
 		STATO->buff_reply[1] = 'T';
-		STATO->buff_reply[2] = 'L' ^ 'T' ^ CHECK_SUM;
+		STATO->buff_reply[2] = '0';
+		STATO->buff_reply[3] = 'L' ^ 'T' ^ '0' ^ CHECK_SUM;
 	break;
 	case 'I':
 		STATO->token = GIRA_INDIETRO;
@@ -165,7 +170,8 @@ void convertToToken(syn_stat *STATO, comando *cmdPtr){
 		/// potrebbe essere un "DESTRA" con valFIn = -180
 		STATO->buff_reply[0] = 'I';
 		STATO->buff_reply[1] = 'T';
-		STATO->buff_reply[2] = 'I' ^ 'T' ^ CHECK_SUM;
+		STATO->buff_reply[2] = '0';
+		STATO->buff_reply[3] = 'I' ^ 'T' ^ '0' ^ CHECK_SUM;
 	break;
 	case 'G':
 		//// lettura gradi di rotazione dal giroscopio
@@ -237,19 +243,19 @@ void rispondiComando(syn_stat *sSTAT, ALLSTRUCT *collectedD){
 		if (sSTAT->dato_valido == 1){
 			sSTAT->check  = 0;
 		/// calcolo checksum
-			for(int i = 0; i < 2; i++)
+			for(int i = 0; i < 3; i++)
 				/// calcola il checksum
 				sSTAT->check ^= sSTAT->buff_reply[i];
 
 			/// aggiunge la chiave 0xA9
 			sSTAT->check ^= CHECK_SUM;
-			sSTAT->buff_reply[2] = sSTAT->check;
-			sSTAT->buff_reply[3] = '*';
+			sSTAT->buff_reply[3] = sSTAT->check;
+			sSTAT->buff_reply[4] = '*';
 		}
 		/// invia i 4 byte su seriale. L'ultimo e' invato dalla funzione sendReply
 		/// per la risposta ai comandi, il protocollo prevede:
-		/// 'X' 'T/F' check_sum '*', quindi 3 byte
-		sendReply(sSTAT, 3);
+		/// 'X' 'T/F' '0' oppure valore lettura , check_sum '*', quindi 4 byte
+		sendReply(sSTAT, 4);
 	}
 	/// ripulisce il buffer di risposta
 	for (int  i = 0; i < 5; i++)
@@ -285,38 +291,38 @@ void inviaSensore(syn_stat *sSTAT, ALLSTRUCT * collectedD){
 		case(1):
 			//risposta con ID del sensore
 			sSTAT->buff_reply[0] = 1;
-			//sSTAT->buff_reply[1] = (collectedD->DSTptr->d_mm[0]  & 0xFF00) >> 8;
-			sSTAT->buff_reply[1] = collectedD->DSTptr->d_mm[0]  & 0x00FF;
+			sSTAT->buff_reply[1] = (collectedD->DSTptr->d_mm[0]  & 0xFF00) >> 8;
+			sSTAT->buff_reply[2] = collectedD->DSTptr->d_mm[0]  & 0x00FF;
 
 			break;
 
 		//sensore di distanza DD2
 		case(2):
 			sSTAT->buff_reply[0] = 2;
-			//sSTAT->buff_reply[1] = (collectedD->DSTptr->d_mm[1]  & 0xFF00) >> 8;
-			sSTAT->buff_reply[1] = collectedD->DSTptr->d_mm[1]  & 0x00FF;
+			sSTAT->buff_reply[1] = (collectedD->DSTptr->d_mm[1]  & 0xFF00) >> 8;
+			sSTAT->buff_reply[2] = collectedD->DSTptr->d_mm[1]  & 0x00FF;
 
 			break;
 
 		/// sensore di distanza anteriore
 		case(3):
 			sSTAT->buff_reply[0] = 3;
-			//sSTAT->buff_reply[1] = (collectedD->DSTptr->d_mm[2]  & 0xFF00) >> 8;
-			sSTAT->buff_reply[1] = collectedD->DSTptr->d_mm[2]  & 0x00FF;
+			sSTAT->buff_reply[1] = (collectedD->DSTptr->d_mm[2]  & 0xFF00) >> 8;
+			sSTAT->buff_reply[2] = collectedD->DSTptr->d_mm[2]  & 0x00FF;
 
 			break;
 
 		case(4):
 			sSTAT->buff_reply[0] = 4;
-			//STAT->buff_reply[1] = (collectedD->DSTptr->d_mm[3]  & 0xFF00) >> 8;
-			sSTAT->buff_reply[1] = collectedD->DSTptr->d_mm[3]  & 0x00FF;
+			sSTAT->buff_reply[1] = (collectedD->DSTptr->d_mm[3]  & 0xFF00) >> 8;
+			sSTAT->buff_reply[2] = collectedD->DSTptr->d_mm[3]  & 0x00FF;
 
 			break;
 
 		case(5):
 			sSTAT->buff_reply[0] = 5;
-			//sSTAT->buff_reply[1] = (collectedD->DSTptr->d_mm[4] & 0xFF00) >> 8;
-			sSTAT->buff_reply[1] = collectedD->DSTptr->d_mm[4]  & 0x00FF;
+			sSTAT->buff_reply[1] = (collectedD->DSTptr->d_mm[4] & 0xFF00) >> 8;
+			sSTAT->buff_reply[2] = collectedD->DSTptr->d_mm[4]  & 0x00FF;
 
 			break;
 
