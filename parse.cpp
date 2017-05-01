@@ -56,6 +56,7 @@ void parse(syn_stat *STATO, comando *cmdPtr, syntaxStatus *synPtr){
 			STATO->ST = 1;
 			STATO->check = STATO->cmd[0];
 		}
+		//PRINTF("0-%d\n", uart1buffer[READ_PTR1]);
 		/*else if(STATO->cmd[0] <= 16){
 			/// comando di richiesta dati lungo due caratteri
 			STATO->l_cmd = 2;
@@ -78,6 +79,7 @@ void parse(syn_stat *STATO, comando *cmdPtr, syntaxStatus *synPtr){
 			STATO->valid = VALIDO;
 		}
 */
+		//PRINTF("1-%d\n", uart1buffer[READ_PTR1]);
 	break;
 
 	case 2:
@@ -91,7 +93,7 @@ void parse(syn_stat *STATO, comando *cmdPtr, syntaxStatus *synPtr){
 			STATO->ST = 0;
 			STATO->valid = NON_VALIDO;
 		}
-
+		//PRINTF("2-%d\n", uart1buffer[READ_PTR1]);
 	break;
 
 	case 3:
@@ -99,6 +101,8 @@ void parse(syn_stat *STATO, comando *cmdPtr, syntaxStatus *synPtr){
 		/// del terminatore
 		/// il comando e' ora valido
 		STATO->valid = VALIDO;
+		//PRINTF("3-%d\n", uart1buffer[READ_PTR1]);
+		//PRINTF("cmd OK!\n\n");
 	break;
 
 	}

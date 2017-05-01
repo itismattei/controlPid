@@ -84,7 +84,7 @@ temperatura *TEMPptr;
 
 int main(void) {
 	
-	volatile uint32_t valore = 0, i, blink = 0, contatore, lampeggio_led;
+	volatile uint32_t valore = 0, i, blink = 0, contatore, lampeggio_led, misuraJitter = 0, mJ = 0;
 	volatile int32_t arrot;
 	volatile int16_t val1 = 0, x, y, z;
 	syntaxStatus synStat;
@@ -185,7 +185,8 @@ int main(void) {
 
 	/// MODULO COMUNICAZIONE BUS I2C ///
 	//I2C TEST(I2C0_BASE);
-	I2C BUS_COMM(I2C1_BASE);
+	//I2C BUS_COMM(I2C1_BASE);
+	I2C BUS_COMM[3] = {I2C1_BASE, I2C1_BASE, I2C1_BASE};
 	/// messaggio d'inizio
 	PRINTF("inizializzato I2C\n");
 
@@ -193,10 +194,10 @@ int main(void) {
 	/// INIZIALIZZAZIONI MODULI E COLLEGAMENTI AI CANALI DI COMUNICAZIONE
 
 	/// inizializza il giroscopio con banda a 190Hz invece cha a 95Hz
-	Rot.attachI2C(&BUS_COMM, GYRO_ADDR);
+	Rot.attachI2C(&BUS_COMM[0], GYRO_ADDR);
 	Rot.initGyro(ODR_190 | Z_AXIS);
 	/// collegato sensore di temperatura al bus I2C
-	sensIR.attachI2C(&BUS_COMM, TEMP_ADDR);
+	sensIR.attachI2C(&BUS_COMM[1], TEMP_ADDR);
 	sensIR.taraturaTemp();
 
 	tick10 = tick100 = 0;
@@ -227,7 +228,7 @@ int main(void) {
 	ENC1.qeiInit();
 	//servo = (pwm *) &pwmServi;
 	/// inizializzazione accelerometro
-	A.attach(&BUS_COMM, ACCEL_ADDR);
+	A.attach(&BUS_COMM[2], ACCEL_ADDR);
 	A.testAccel();
 	if (A.isPresent == true)
 		/// imposta l'accelerometro
@@ -346,7 +347,7 @@ int main(void) {
 			/// avendo terminato la risposta, la validità dell'automa
 			/// va rimossa e viene quindi resettato
 			resetAutoma(&synSTATO);
-			PRINTF("comando ricevuto: %c\n", synSTATO.cmd[0]);
+			//PRINTF("comando ricevuto: %c\n", synSTATO.cmd[0]);
 		}
 		/// invia la risposta per i comandi di rotazione, quando sono stati eseguiti
 //		if(pidPtr->rispondi == TRUE){
@@ -380,6 +381,7 @@ int main(void) {
 			/// i  pwm per i motori, il valore degli encoder e del giroscopio.
 			CMD1.RUN(cPid, &synSTATO, &M1, &M2, &ENC0, &ENC1, &Rot, &JIT);
 			/// le misure del giroscopio invece sono effettuate solo dall'apposito pid
+
 		}
 		/// effettua i calcoli solo se il giroscopio e' presente
 		/// TODO: il PID viene calcolato ongi 10ms oppure ogni 20ms? Come è meglio?
@@ -388,10 +390,9 @@ int main(void) {
 		/// AZIONI DA COMPIERE OGNI 100ms ///
 		if (tick10 >= 10){
 			tick10 = 0;
-			ENC0.readPos();
+//			ENC0.readPos();
+//			PRINTF("POS: %d\t%d\n", ENC0.pos, ENC0.dir);
 
-
-			PRINTF("POS: %d\t%d\n", ENC0.pos, ENC0.dir);
 		}
 		/* misura gli encoder e calcola spostamenti e velocità */
 		//////////////////////////////////
@@ -399,7 +400,19 @@ int main(void) {
 		if (tick100 >= 100){
 
 			uint32_t micros = TimerValueGet(WTIMER2_BASE, TIMER_A);
-			PRINTF("micros: %u\n", micros);
+			mJ = misuraJitter - micros;
+			mJ /= 100;
+			PRINTF("micros: %u delta (0.1 ms) %u\t", micros, mJ);
+			misuraJitter = micros;
+
+			PRINTF("ang_rot %d \t", Rot.yaw);
+			printFloat(Rot.tick, 4);
+			//PRINTF("\t");
+			//printFloat(Rot.corr, 7);
+			A.misuraAccelerazioni();
+			PRINTF("\tAz: %d\n", A.aInt[2]);
+			//PRINTF("\n");
+
 			/// controlla il colore della piastrella sottostante e lo paragona la bianco memorizzato in fase di setup
 			/// bisogna anche impostare il numero della piastrella e le sue coordinate.
 			CL.Run(&PST[0]);

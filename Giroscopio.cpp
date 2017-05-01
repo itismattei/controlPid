@@ -30,9 +30,11 @@ Giroscopio::Giroscopio() {
 	// TODO Auto-generated constructor stub
 	tempReg = 0;
 	posizione = 0;
-	yawF0 = 0.0;
+	yawF0 = corr = 0.0;
 	IsRotating = offsetRequest = 0;
 	i2cPtr = NULL;
+	rev[0] = 'G';
+	rev[1] = 'y';
 
 }
 
@@ -286,7 +288,7 @@ void Giroscopio::misuraAngoli(Jitter *J){
 			/// integrazione rettangolare: valore letto * fondo scala * intervallo di tempo di integrazione (var.: tick)
 			/// posto a 10ms
 			f = z * DPS * kz;
-			f *= tick;
+			f *= (tick + corr);
 			yawF += f;
 #ifdef	_DEBUG_
 			f = tmp * DPS * kz;
@@ -328,12 +330,12 @@ void Giroscopio::misuraAngoli(Jitter *J){
 		if (J->prevValueGyro != 0){
 			/// effettua l'aggiornamento
 			diff = J->prevValueGyro - J->jitter_timerGyro;
+			//PRINTF("DeltaJitter %d\n", diff);
 			if (diff < 0)
 				diff = -diff;
 			/// se sono passati esattamente 10ms allora diff = 100, altrimenti la differenza sara' il jitter;
 			/// supponendo che diff - 100 = 1, allora corr = 1e-4 => 100 us
 			corr = (float)(diff - 100) / 10000.0;
-			tick += corr;
 		}
 		J->prevValueGyro = J->jitter_timerGyro;
 

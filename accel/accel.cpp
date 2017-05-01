@@ -71,7 +71,7 @@ void accelerometro::testAccel(){
 			/// legge il registro di controllo 1 che dovrebbe contenere 0x07
 			valore = i2cPtr->I2CGet(CTRL_REG1_A);
 			if ((valore & 0xFF) == 7){
-				PRINTF("Accelereometro OK! %d\n", valore);
+				PRINTF("Accelereometro OK!");
 				isPresent =  true;
 				//blinkRedLed();
 			}
@@ -79,6 +79,7 @@ void accelerometro::testAccel(){
 				isPresent = false;
 				PRINTF("Accelereometro ROTTO! %d\n", valore);
 			}
+
 		}
 	}
 }
@@ -90,12 +91,13 @@ void accelerometro::impostaAccel(){
 	volatile uint32_t valore;
 	/// imposta il campionamento a 50 sample / s ed abilita i 3 assi
 	//I2CSend(ACCEL_ADDR, 2, CTRL_REG1_A, ODR1 + ODR0 + ZaxEN + YaxEN + XaxEN);
-	i2cPtr->I2CPut(2, 2, CTRL_REG1_A, ODR1 + ODR0 + ZaxEN + YaxEN + XaxEN);
+	i2cPtr->I2CPut(2, CTRL_REG1_A, ODR1 + ODR0 + ZaxEN + YaxEN + XaxEN);
 	/// attesa dell'accensione del dispositivo
-	valore = 1000;
+	valore = 2000;
 	while(--valore);
 	//valore = I2CReceive(ACCEL_ADDR, CTRL_REG1_A);
-	valore = i2cPtr->I2CGet(CTRL_REG1_A);
+	//valore = i2cPtr->I2CGet(CTRL_REG1_A);
+
 }
 
 ///
@@ -106,25 +108,27 @@ void accelerometro::misuraAccelerazioni(){
 	volatile int x, y, z;
 	uint8_t buffer[8];
 	/// legge i valori degli assi
+	if (isPresent){
 	//if((I2CReceive(ACCEL_ADDR, STATUS_REG_A) & 0xF) != 0){
-	if((i2cPtr->I2CGet(STATUS_REG_A) & 0xF) != 0){
-		//I2CReceiveN(ACCEL_ADDR, OUT_X_L_A | MUL_READ , 6, buffer);
-		i2cPtr->I2CGetN(OUT_X_L_A | MUL_READ , 6, buffer);
-		//I2CReceiveN(ACCEL_ADDR, OUT_X_L_A | MUL_READ , 6, buffer);
-		x = (int16_t)((buffer[1]<< 8) + buffer[0]);
-		y = (int16_t)((buffer[3]<< 8) + buffer[2]);
-		z = (int16_t)((buffer[5]<< 8) + buffer[4]);
-		a[0] = (float) x * 2 / 32768;
-		a[1] = (float) y * 2 / 32768;
-		a[2] = (float) z * 2 / 32768;
+		if((i2cPtr->I2CGet(STATUS_REG_A) & 0xF) != 0){
+			//I2CReceiveN(ACCEL_ADDR, OUT_X_L_A | MUL_READ , 6, buffer);
+			i2cPtr->I2CGetN(OUT_X_L_A | MUL_READ , 6, buffer);
+			//I2CReceiveN(ACCEL_ADDR, OUT_X_L_A | MUL_READ , 6, buffer);
+			x = (int16_t)((buffer[1]<< 8) + buffer[0]);
+			y = (int16_t)((buffer[3]<< 8) + buffer[2]);
+			z = (int16_t)((buffer[5]<< 8) + buffer[4]);
+			a[0] = (float) x * 2 / 32768;
+			a[1] = (float) y * 2 / 32768;
+			a[2] = (float) z * 2 / 32768;
 
-		/// converte il valore reale misurato in un valore in mg intero
-		for (int i = 0; i < 3; i++)
-			aInt[i] = (int)(a[i] * 1000);
-		//PRINTF("acc z:\t");
-		//printFloat(a[2], 4);
-		//PRINTF("\n");
-		///PRINTF("acc x %d\t acc y %d\t acc z %d\n", x, y, z);
+			/// converte il valore reale misurato in un valore in mg intero
+			for (int i = 0; i < 3; i++)
+				aInt[i] = (int)(a[i] * 1000);
+			//PRINTF("acc z:\t");
+			//printFloat(a[2], 4);
+			//PRINTF("\n");
+			///PRINTF("acc x %d\t acc y %d\t acc z %d\n", x, y, z);
+		}
 	}
 }
 

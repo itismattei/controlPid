@@ -68,7 +68,11 @@ public:
 	/// viene attiato dal pid durante la rotazione in modo da non resettare il giroscopio.
 	char IsRotating;
 	char offsetRequest;
+	char rev[10];
+	/// fattore di correzione del jitter nell'intgrazione dell'angolo
+	float corr;
 private:
+
 	uint16_t posizione;
 	I2C *i2cPtr;
 
