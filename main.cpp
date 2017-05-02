@@ -100,8 +100,9 @@ int main(void) {
 	distMisPtr = &MISURE;
 
 	/// MODULO DI CONTROLLO DELLA BATTERIA ///
-	/// imposta il livello di soglia della batteria a 1900
-	power BATT(1700);
+	/// imposta il livello di soglia della batteria a 2600 che corrisponde a:
+	/// 2930/7.52*6.9
+	power BATT(2600);
 
 	/// MODULO PWM PER MOTORI SERVO ///
 	PWM_SERVI KIT, MOT_SENS;
@@ -507,7 +508,7 @@ int main(void) {
 				/// c'e' un dato campionato pronto, ad esempio la batteria, e viene copiato
 				ADCDataReadyFlag = 0;
 				BATT.battLevel = MISURE.dI[5];
-#ifndef _DEBUG_
+#ifdef _DEBUG_
 				PRINTF("Liv batteria: %d\n", BATT.battLevel);
 #endif
 			}

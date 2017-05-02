@@ -77,7 +77,7 @@ void accelerometro::testAccel(){
 			}
 			else{
 				isPresent = false;
-				PRINTF("Accelereometro ROTTO! %d\n", valore);
+				PRINTF("Accelerometro ROTTO! %d\n", valore);
 			}
 
 		}
