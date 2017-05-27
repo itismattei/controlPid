@@ -65,7 +65,7 @@ volatile int contLightPwm = 0;
 void IntGPIOd(void){
 
 	GPIOIntClear(GPIO_PORTD_BASE, GPIO_INT_PIN_1);
-
+	while(1);
 	contLightPwm++;
 //    //
 //    // Set PB3 high to indicate entry to this interrupt handler.
@@ -84,7 +84,7 @@ void IntGPIOd(void){
 void IntGpioA(void){
 
 	GPIOIntClear(GPIO_PORTA_BASE, GPIO_INT_PIN_3);
-	contLightPwm++;
+	contLightPwm += 1;
 }
 
 extern volatile int procCom4;

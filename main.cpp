@@ -102,7 +102,7 @@ int main(void) {
 	/// MODULO DI CONTROLLO DELLA BATTERIA ///
 	/// imposta il livello di soglia della batteria a 2600 che corrisponde a:
 	/// 2930/7.52*6.9
-	power BATT(2600);
+	power BATT(2500);
 
 	/// MODULO PWM PER MOTORI SERVO ///
 	PWM_SERVI KIT, MOT_SENS;
@@ -288,24 +288,33 @@ int main(void) {
 	/// i motori vanno inizializzati da queste parti, altrimenti l'impostazione delle periferiche precoce, prima che l'unita'
 	/// sia avviata provoca un fault e si entra nella interruzione di servizio per periferica non pronta.
 	PWM_MOTORI M1, M2;
-	//M1.Init();
-	//M1.delta = 0;
-	//M1.MotorGo();
-
-	//M2.Init();
-	//M2.delta = 0;
-	//M2.MotorGo();
+//	while(1){
+//	M1.Init();
+//	M1.delta = 70;
+//	M1.MotorGo();
+//
+//
+//	M2.Init();
+//	M2.delta = 70;
+//	M2.MotorGo();
+//	}
 	KIT.Init();
 	MOT_SENS.Init();
-	KIT.MotorGo(0);
+	///
+	/// imposta il perno dello sgancio delmattoncino nella posizione di blocco
+	KIT.MotorGo(75);
+	///
+	/// impsta il motore di rotazione del sensore di temperatura in posizione di zero.
 	MOT_SENS.MotorGo(0);
 
 	CL.Init();
+	/// calibra il bianco del sensore di colore
 	CL.WhiteBalance();
 	//initLightSens1();
 	//whiteBal(&COL);
 	//XB.test();
 	int dir = 1, gradi = 0;
+
 	/////////////////////////////////////////////////////////
 	///
 	///      TASK PRINCIPALE
@@ -391,8 +400,8 @@ int main(void) {
 		/// AZIONI DA COMPIERE OGNI 100ms ///
 		if (tick10 >= 10){
 			tick10 = 0;
-//			ENC0.readPos();
-//			PRINTF("POS: %d\t%d\n", ENC0.pos, ENC0.dir);
+			ENC0.readPos();
+			ENC1.readPos();
 
 		}
 		/* misura gli encoder e calcola spostamenti e velocità */
@@ -417,7 +426,7 @@ int main(void) {
 			/// controlla il colore della piastrella sottostante e lo paragona la bianco memorizzato in fase di setup
 			/// bisogna anche impostare il numero della piastrella e le sue coordinate.
 			CL.Run(&PST[0]);
-#ifndef _DEBUG_
+#ifdef _DEBUG_
 			PRINTF("Col: %d\t W: %d\n", CL.get(), CL.getWhite());
 #endif
 			/// legge la temperatura del pirometro
@@ -478,6 +487,15 @@ int main(void) {
 			PRINTF("\n");
 //
 #endif
+
+/// stampe le letture degli encoder
+#ifdef _DEBUG_
+
+			PRINTF("POS ENC0: %d\t%d\t", ENC0.dist_mm, ENC0.readDir());
+			PRINTF("POS ENC1: %d\t%d\n", ENC1.dist_mm, ENC1.readDir());
+//
+#endif
+
 			/// converte la misure grezza, letta dalla routine di interruzione in mm
 			/// la lttura del dato sei sensori e' esattamente questo dato.
 			MISURE.rawTomm();

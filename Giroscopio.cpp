@@ -43,6 +43,12 @@ Giroscopio::~Giroscopio() {
 	i2cPtr = NULL;
 }
 
+///
+/// imposta 'angolo di yaw. L'operazione e' necessaria se il valore ha un errore eccessivo e serve a rimetterlo Iin linea
+void Giroscopio::setYaw(int16_t valore){
+	yaw = valore;
+}
+
 void Giroscopio::azzeraAssi(){
 	int conteggio = 0;
 	int valore;
@@ -295,6 +301,9 @@ void Giroscopio::misuraAngoli(Jitter *J){
 			f *= tick;
 			yawF0 += f;
 #endif
+			/// offsetRequest viene chiamato dal pid al termine della rotazione di 90 gradi in modo da richiedere un aggiornamento della deriva del giroscoipo
+			/// altrimenti l'offset e' richiesto se non sta ruotando e se la variabile tempoDiReset, con cadenza 10ms ha raggiunto il
+			/// vaore 1000, cioe' sono passati 10 s.
 			if ((tempoDiReset >= 1000 && IsRotating == 0) || offsetRequest){
 // TODO: SE NON STA RUOTANDO POTREBBE EFFETTUARE UN AZZERAMENTO ASSI
 				/// le richieste a seguito di fine rotazione non possono restare

@@ -19,9 +19,9 @@ public:
 	encQuad();
 	virtual ~encQuad();
 	void qeiInit();
-	void readPos();
+	int readPos();
 	float readVel();
-	void readDir();
+	int readDir();
 	void setAddr(uint32_t add){address = add;}
 	void update();
 

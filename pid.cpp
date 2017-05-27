@@ -120,7 +120,7 @@ int digPID::Run(Giroscopio *G, PWM_MOTORI *PWM1, PWM_MOTORI * PWM2, distMis *DIS
 /// COSTRUTTORE CLASSE COMANDO
 comando::comando(){
 	azione = false; isRun = false; finished = false; numPid = -1; token = -1; tick = 0; avvia = 0;
-	/// soglia in gradi del raggiungimento
+	/// soglia in gradi del raggiungimento del valore finale, durante le rotazioni del mezzo
 	sogliaAlfa = 2;
 	/// soglia in cm/s del raggiungimento della velocita'
 	sogliaVel = 1;
@@ -141,6 +141,8 @@ void comando::setUptrasducers(Giroscopio *G, pwm *p, distMis *dist){
 int comando::RUN(digPID *p, syn_stat *s, PWM_MOTORI *PWM1, PWM_MOTORI *PWM2, encQuad * ENC1, encQuad * ENC2,
 		Giroscopio *G, Jitter *J){
 	/// controlla il time out del comando e se scaduto si ferma
+	/// Siccome il metdo RUN viene chiamato ogni 10ms lo scatto del timeout avviene
+	/// dopo 1.5s
 	if (tick > TIMEOUT_CMD){
 		/// in caso di timeout nella persistenza del comando si deve fermare
 		/// quale era o erano i pid attivo/i?
@@ -188,27 +190,29 @@ int comando::RUN(digPID *p, syn_stat *s, PWM_MOTORI *PWM1, PWM_MOTORI *PWM2, enc
 		case AVANZA:
 //			//provvede a misurare la velocita'
 //			//misuraVelocità()
-			float veloc = (ENC1->readVel() - ENC2->readVel()) /  2;
-			p->e[1] = (p->valFin - veloc);
-//			/// se l'errore e' minore di una soglia, vuoil dire che e' a regime e
-//			/// quindi inutile integrare ulteriormente.
-			if (abs(p->e[1]) > soglia  ){
-//				/// calcola l'integrale numerico del PID
-				p->calcola(INT_STEP_10_MS / 1000.0, J);
-//				/// avanti oppure indietro
-				if(p->e[1] > 0.0)
-					/// avanti
-					PWM->dir_1 = PWM->dir_2 = 1;
-				else
-					/// indietro
-					PWM->dir_1 = PWM->dir_2 = 2;
-//				/// impostazione del PWM ed invio del comando
-//				//setXPWM(C, PWM);
-			}
-			else
-				p->attivo = false;
+//			float veloc = (ENC1->readVel() - ENC2->readVel()) /  2;
+//			p->e[1] = (p->valFin - veloc);
+////			/// se l'errore e' minore di una soglia, vuoil dire che e' a regime e
+////			/// quindi inutile integrare ulteriormente.
+//			if (abs(p->e[1]) > soglia  ){
+////				/// calcola l'integrale numerico del PID
+//				p->calcola(INT_STEP_10_MS / 1000.0, J);
+////				/// avanti oppure indietro
+//				if(p->e[1] > 0.0)
+//					/// avanti
+//					PWM->dir_1 = PWM->dir_2 = 1;
+//				else
+//					/// indietro
+//					PWM->dir_1 = PWM->dir_2 = 2;
+////				/// impostazione del PWM ed invio del comando
+////				//setXPWM(C, PWM);
+//			}
+//			else
+//				p->attivo = false;
 
-			setFpwm(PWM1, PWM2, p, numPid);
+//			setFpwm(PWM1, PWM2, p, numPid);
+			PWM1->delta = 75;
+			PWM2->delta = 75;
 			PWM1->MotorGo();
 			PWM2->MotorGo();
 
@@ -227,7 +231,7 @@ int comando::RUN(digPID *p, syn_stat *s, PWM_MOTORI *PWM1, PWM_MOTORI *PWM2, enc
 			/// considera +-2° come angolo raggiunto
 			if (val > sogliaAlfa){
 				// ruota il rover
-				PWM1->delta = PWM2->delta = 50;
+				PWM1->delta = PWM2->delta = 60;
 				PWM1->direction = 1;
 				PWM2->direction = -1;
 				PWM1->MotorGo();
@@ -259,10 +263,10 @@ int comando::RUN(digPID *p, syn_stat *s, PWM_MOTORI *PWM1, PWM_MOTORI *PWM2, enc
 			if (val < 0)
 				val = -val;
 			/// considera +-2° come angolo raggiunto
-			if (val > 2){
+			if (val > sogliaAlfa){
 				G->IsRotating = true;
 				// ruota il rover
-				PWM1->delta = PWM2->delta = 50;
+				PWM1->delta = PWM2->delta = 60;
 				PWM1->direction = -1;
 				PWM2->direction = 1;
 				PWM1->MotorGo();
@@ -273,6 +277,8 @@ int comando::RUN(digPID *p, syn_stat *s, PWM_MOTORI *PWM1, PWM_MOTORI *PWM2, enc
 				PWM1->MotorStop();
 				PWM2->MotorStop();
 				G->IsRotating = false;
+				/// chiede al giroscopio, appena puo' di effettuare un offset
+				G->offsetRequest = 1;
 			}
 		break;
 

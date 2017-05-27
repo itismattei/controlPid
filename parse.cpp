@@ -192,6 +192,11 @@ void convertToToken(syn_stat *STATO, comando *cmdPtr){
 		STATO->token = RILASCIO_PACK;
 		cmdPtr->azione = true;
 		cmdPtr->avvia = true;
+		STATO->buff_reply[0] = 'P';
+		STATO->buff_reply[1] = 'T';
+		STATO->buff_reply[2] = '0';
+		STATO->buff_reply[3] = 'P' ^ 'T' ^ '0' ^ CHECK_SUM;
+
 	default:
 		/// se nessun comando e'giusto produce un errore.
 		STATO->token = ERRORE;
@@ -291,7 +296,7 @@ void inviaSensore(syn_stat *sSTAT, ALLSTRUCT * collectedD){
 	switch(sSTAT->cmd[1]){
 		// i sensori vengono numerati da quello davanti in senso antiorario
 		// la misura dfornita e' in millimetri
-		// sensore di distanza DD1
+		// sensore di distanza D1
 		case(1):
 			//risposta con ID del sensore
 			sSTAT->buff_reply[0] = 1;

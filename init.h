@@ -17,7 +17,7 @@
 #define INIT_H_
 
 
-#define 	DIM_READ_BUFF		64
+#define 	DIM_READ_BUFF		128
 #define		CHECK_SUM			0xA9
 
 //#############

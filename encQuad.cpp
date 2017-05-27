@@ -179,11 +179,12 @@ void encQuad::qeiInit(){
 }
 
 
-void encQuad::readPos(){
+int encQuad::readPos(){
 	float tmp;
 	pos = QEIPositionGet(address);
 	tmp = pos * kPos;
 	dist_mm = (int) tmp;
+	return dist_mm;
 
 }
 
@@ -196,7 +197,7 @@ float encQuad::readVel(){
 
 }
 
-void encQuad::readDir(){
+int encQuad::readDir(){
 
 	dir = QEIDirectionGet(address);
 

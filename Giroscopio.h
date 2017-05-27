@@ -29,6 +29,8 @@ public:
 	void primoAzzeramento(void);
 	void attachI2C(I2C *, uint8_t sa);
 
+	void setYaw(int16_t valore);
+
 	int16_t buffValori[maxDimBuff];
 	int16_t buffX[maxDimBuff];
 	int16_t tempReg;
