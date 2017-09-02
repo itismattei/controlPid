@@ -412,7 +412,7 @@ void I2C::InitI2C(uint32_t base){
 }
 
 /// riceve N bytes
-uint32_t I2C::I2CGetN(uint8_t reg, uint8_t numElem, uint8_t buff[]){;
+uint32_t I2C::I2CGetN(uint8_t reg, uint8_t numElem, uint8_t buff[]){
 	uint32_t i, conteggio = 0;
 	/// Impsta l'indirizzo dello slave e la modalità di scrittura
 	HWREG(BASE_ADDR + I2C_O_MSA) = (SLAVE_ADD << 1) | false;
@@ -470,12 +470,82 @@ uint32_t I2C::I2CGetN(uint8_t reg, uint8_t numElem, uint8_t buff[]){;
 }
 
 
+/// riceve N bytes senza indicazione del registro di lettura
+/// alcuni sensori non hanno un registro di lettura, come HIH8000
+uint32_t I2C::I2CGetN(uint8_t numElem, uint8_t buff[]){
+	uint32_t i, conteggio = 0;
+//	/// Impsta l'indirizzo dello slave e la modalità di scrittura
+//	HWREG(BASE_ADDR + I2C_O_MSA) = (SLAVE_ADD << 1) | false;
+//	//I2CMasterSlaveAddrSet(I2C0_BASE, slave_addr, false);
+//
+//	/// specifica l'indirizzo da leggere
+//	HWREG(BASE_ADDR + I2C_O_MDR) = reg;
+//
+//	/// invia lo START (BIT1) e il RUN (BIT0)
+//	/// da idle a transmit mode, page 1023 U.G.
+//	HWREG(BASE_ADDR + I2C_O_MCS) = I2C_MASTER_CMD_BURST_SEND_START;
+//	//I2CMasterControl(I2C0_BASE, I2C_MASTER_CMD_BURST_SEND_START);
+//
+//		//wait for MCU to finish transaction
+//	while(I2CMasterBusy(BASE_ADDR) && conteggio < 1000000)
+//  	/// sblocca l'attesa se il dispositivo non e' presente
+//    	conteggio++;
+//    if (conteggio >= 1000000)
+//    	/// e' scattato il timeout
+//    	return (0xFFFF);
+	//imposta la lettura dallo slave
+	HWREG(BASE_ADDR + I2C_O_MSA) = (SLAVE_ADD << 1) | true;
+	//I2CMasterSlaveAddrSet(I2C0_BASE, slave_addr, true);
+
+	/// Repeated START condition followed by RECEIVE    (master remains in Master Receive state). pag. 1024
+	/// repeated start
+	HWREG(BASE_ADDR + I2C_O_MCS) = I2C_MASTER_CMD_BURST_RECEIVE_START;
+	//I2CMasterControl(I2C0_BASE, I2C_MASTER_CMD_SINGLE_RECEIVE);
+
+	//wait for MCU to finish transaction
+	while(I2CMasterBusy(BASE_ADDR));
+
+	/// il primo byte e' pronto
+	//buff[0] = (HWREG(I2C0_BASE + I2C_O_MDR));
+	buff[0] = I2CMasterDataGet(BASE_ADDR);
+
+	for (i = 1; i < numElem - 1; i++){
+		/// ReceivE operation (master remains in Master Receive state).
+		HWREG(BASE_ADDR + I2C_O_MCS) = I2C_MASTER_CMD_BURST_RECEIVE_CONT;
+		//I2CMasterControl(I2C0_BASE, I2C_MASTER_CMD_SINGLE_RECEIVE);I2C_MASTER_CMD_BURST_RECEIVE_CONT
+		//wait for MCU to finish transaction
+		while(I2CMasterBusy(BASE_ADDR));
+		//// legge il dato
+		buff[i] = I2CMasterDataGet(BASE_ADDR);
+	}
+
+	/// ultimo elemento
+	///RECEIVE followed by STOP condition (master goes to Idle state).
+	HWREG(BASE_ADDR + I2C_O_MCS) = I2C_MASTER_CMD_BURST_RECEIVE_FINISH;
+	//I2CMasterControl(I2C0_BASE, I2C_MASTER_CMD_BURST_RECEIVE_FINISH);
+	//wait for MCU to finish transaction
+	while(I2CMasterBusy(BASE_ADDR));
+	buff[numElem - 1] = I2CMasterDataGet(BASE_ADDR);
+	return 0;
+}
+
+
+
 //sends an I2C command to the specified slave
 void I2C::I2CPut(uint8_t num_of_args, ...){
     // Tell the master module what address it will place on the bus when
     // communicating with the slave.
     I2CMasterSlaveAddrSet(BASE_ADDR, SLAVE_ADD, false);
 
+    if(num_of_args == 0){
+        //put data to be sent into FIFO
+        I2CMasterDataPut(BASE_ADDR, 255);
+        I2CMasterControl(BASE_ADDR, I2C_MASTER_CMD_SINGLE_SEND);
+
+        // Wait until MCU is done transferring.
+        while(I2CMasterBusy(BASE_ADDR));
+        return;
+    }
     //stores list of variable number of arguments
     va_list vargs;
 
@@ -492,6 +562,7 @@ void I2C::I2CPut(uint8_t num_of_args, ...){
     {
         //Initiate send of data from the MCU
     	/// p. 1023 U.G.: START condition followed by RECEIVE and STOP condition (master remains in Idle state).
+    	/// oppure pag.946 della U.G. TM4C123AH6PM
         I2CMasterControl(BASE_ADDR, I2C_MASTER_CMD_SINGLE_SEND);
 
         // Wait until MCU is done transferring.

@@ -64,6 +64,8 @@
 #include "power.h"
 #include "pid.h"
 
+#include "sensHum/HIH87Hum.h"
+
 
 
 /// variabili globali
@@ -88,6 +90,7 @@ int main(void) {
 	volatile int32_t arrot;
 	volatile int16_t val1 = 0, x, y, z;
 	syntaxStatus synStat;
+	uint8_t  humSens[16];
 
 	//--------------------------//
 	///definizione strutture/////
@@ -191,7 +194,19 @@ int main(void) {
 	/// messaggio d'inizio
 	PRINTF("inizializzato I2C\n");
 
+	/// imposta il canale I2C sul numero 1 che uso per il test del sensre di umidita'
+	I2C TEST_HUM_SENS(I2C1_BASE);
+	HIH8_7Hum HIH8;
+	//L'indirizzo base del sensore e' 0x27
+	HIH8.attachI2C(&TEST_HUM_SENS, 0x27);
+	//Manda solo byte su SDA e conclude con lo STOP
+	HIH8.i2cPtr->I2CPut(0);
+	for (uint32_t ccc = 0; ccc < 10000000; ccc++);
+	HIH8.i2cPtr->I2CGetN(4, humSens);
+	while(1){
 
+	}
+	/******************************************* STOP **************************************/
 	/// INIZIALIZZAZIONI MODULI E COLLEGAMENTI AI CANALI DI COMUNICAZIONE
 
 	/// inizializza il giroscopio con banda a 190Hz invece cha a 95Hz
