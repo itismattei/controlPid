@@ -8,6 +8,7 @@
 
 #define		IMPOSTATA			1
 #define		NON_IMPOSTATA		0
+#define		ERRORE_COM			2
 
 class I2C{
 public:

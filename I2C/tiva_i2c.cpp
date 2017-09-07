@@ -430,9 +430,11 @@ uint32_t I2C::I2CGetN(uint8_t reg, uint8_t numElem, uint8_t buff[]){
 	while(I2CMasterBusy(BASE_ADDR) && conteggio < 1000000)
   	/// sblocca l'attesa se il dispositivo non e' presente
     	conteggio++;
-    if (conteggio >= 1000000)
+    if (conteggio >= 1000000){
     	/// e' scattato il timeout
+    	stato |= ERRORE_COM;
     	return (0xFFFF);
+    }
 	//specify that we are going to read from slave device
 	HWREG(BASE_ADDR + I2C_O_MSA) = (SLAVE_ADD << 1) | true;
 	//I2CMasterSlaveAddrSet(I2C0_BASE, slave_addr, true);
@@ -648,9 +650,11 @@ uint32_t I2C::I2CGet(uint8_t reg){
     while(I2CMasterBusy(BASE_ADDR) && conteggio < 1000000)
     	/// sblocca l'attesa se il dispositivo non e' presente
     	conteggio++;
-    if (conteggio >= 1000000)
+    if (conteggio >= 1000000){
     	/// e' scattato il timeout
+    	stato |= ERRORE_COM;
     	return (0xFFFF);
+    }
     //specify that we are going to read from slave device
     HWREG(BASE_ADDR + I2C_O_MSA) = (SLAVE_ADD << 1) | true;
     //I2CMasterSlaveAddrSet(I2C0_BASE, slave_addr, true);

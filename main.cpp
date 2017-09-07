@@ -200,9 +200,10 @@ int main(void) {
 	//L'indirizzo base del sensore e' 0x27
 	HIH8.attachI2C(&TEST_HUM_SENS, 0x27);
 	//Manda solo byte su SDA e conclude con lo STOP
-	HIH8.i2cPtr->I2CPut(0);
-	for (uint32_t ccc = 0; ccc < 10000000; ccc++);
-	HIH8.i2cPtr->I2CGetN(4, humSens);
+	HIH8.newData();
+	for (uint32_t ccc = 0; ccc < 5000000; ccc++);
+	HIH8.readRaw();
+	HIH8.convertRaw();
 	while(1){
 
 	}
