@@ -167,8 +167,8 @@ int main(void) {
 	/// l'utilita' e' che puo' essere usato come unico puntatore per distribuire le strutture nei vari punti
 	/// del programma.
 	ALLSTRUCT allDATA;
-
-	allDATA.setup(&A, &ENC0, &sensIR, &CL, &PST[0], &SUR, &MISURE, &Rot);
+	void *GEN = NULL;
+	allDATA.setup(&A, &ENC0, &sensIR, &CL, &PST[0], &SUR, &MISURE, &Rot, GEN);
 
 	/// setup di base
 	setupMCU();
@@ -204,6 +204,10 @@ int main(void) {
 	for (uint32_t ccc = 0; ccc < 5000000; ccc++);
 	HIH8.readRaw();
 	HIH8.convertRaw();
+	/// registra la classe che gestisce i dati del sensore
+	GEN = (HIH8_7Hum *) (&HIH8);
+	allDATA.DefineGeneric(GEN);
+
 	while(1){
 
 	}

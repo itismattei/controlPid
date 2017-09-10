@@ -20,6 +20,8 @@
 #include "uartp/uartstdio.h"
 #include "pid.h"
 
+#include "sensHum/HIH87Hum.h"
+
 extern volatile uint8_t uart1buffer[], RX_PTR1, READ_PTR1;
 
 void resetAutoma(syn_stat * STATO){
@@ -389,6 +391,16 @@ void inviaSensore(syn_stat *sSTAT, ALLSTRUCT * collectedD){
 				// mentre in aInt[2] fornisce 1000
 				sSTAT->buff_reply[1] = ((int)collectedD->acc->aInt[2]  & 0xFF00) >> 8;
 				sSTAT->buff_reply[2] = (int)collectedD->acc->aInt[2]  & 0x00FF;
+		break;
+
+
+		/// gestisce sensori di tipo differente: permette al sw di gestire sensori arbitrari e non noti al
+		/// momento della progettazione del sw
+		case(12):
+				HIH8_7Hum* humPtr = static_cast<HIH8_7Hum*> (collectedD->generic);
+				sSTAT->buff_reply[0] = 11;
+				sSTAT->buff_reply[1] = humPtr->buff[0];
+				sSTAT->buff_reply[2] = humPtr->buff[1];
 		break;
 
 		default:

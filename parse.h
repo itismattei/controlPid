@@ -45,8 +45,10 @@
 class ALLSTRUCT{
 public:
 	ALLSTRUCT(){}
+	void DefineGeneric(void * valorePtr){generic = valorePtr;}
 
-	void setup(accelerometro *ACC, encQuad *ENC, TEMPER *TEMP, COLORE *color, TILE * t, survivor *SUR, distMis *DIS, Giroscopio *GYRO){
+	void setup(accelerometro *ACC, encQuad *ENC, TEMPER *TEMP, COLORE *color, TILE * t, survivor *SUR, distMis *DIS, Giroscopio *GYRO,
+			void* undefined){
 		surPtr 	= SUR;
 
 		cinPtr 		= 0;
@@ -59,6 +61,7 @@ public:
 		gyro		= GYRO;
 		encoder		= ENC;
 		acc			= ACC;
+		generic 	= undefined;
 
 	}
 
@@ -78,6 +81,7 @@ public:
 	Giroscopio  	*gyro;
 	encQuad			*encoder;
 	accelerometro 	*acc;
+	void*			generic;
 };
 
 class syntaxStatus{
