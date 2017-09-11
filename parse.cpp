@@ -40,7 +40,7 @@ void resetAutoma(syn_stat * STATO){
 ///
 /// analizza il comando che e' arrivato
 ///
-void parse(syn_stat *STATO, comando *cmdPtr, syntaxStatus *synPtr){
+void parse(syn_stat *STATO, PIDtoPWM *cmdPtr, syntaxStatus *synPtr){
 
 
 	STATO->cmd[STATO->ST] = uart1buffer[READ_PTR1];
@@ -113,7 +113,7 @@ void parse(syn_stat *STATO, comando *cmdPtr, syntaxStatus *synPtr){
 
 ///
 /// converte l'indicatore di un comando in un token
-void convertToToken(syn_stat *STATO, comando *cmdPtr){
+void convertToToken(syn_stat *STATO, PIDtoPWM *cmdPtr){
 
 	switch(STATO->cmd[0]){
 	case 'F':
@@ -462,3 +462,13 @@ uint8_t printFloat(double number, uint8_t digits){
   return 0;
 }
 
+////
+//// classe Parse
+
+void Parse::parse(PIDtoPWM *p, syntaxStatus *s){
+
+}
+
+void Parse::convertToToken(syntaxStatus *s, PIDtoPWM * p){
+
+}

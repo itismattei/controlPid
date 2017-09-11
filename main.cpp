@@ -159,7 +159,7 @@ int main(void) {
 	//dPtr = &DIST;
 
 	/// questa struttura raccoglie il comandoda eseguire e interagisce con il relativo PID
-	comando CMD1;
+	PIDtoPWM pidPwm1;
 	//DATA.distPtr = &DIST;
 	//passaggio degli indirizzi delle strutture alla struttura generale
 	//dati_a_struttura(&G, &DIST, &CIN, &COL, &TEMP, &SUR, &DATA);
@@ -366,7 +366,7 @@ int main(void) {
 		if (READ_PTR1 != RX_PTR1){
 			/// analizza il comando e imposta il valore dell'oggetto CMD (comando)
 			/// ATTENZIONE: synStat NON E' ANCORA USATO
-			 parse(&synSTATO, &CMD1, &synStat);
+			 parse(&synSTATO, &pidPwm1, &synStat);
 			 /// aggiorna il buffer
 			 READ_PTR1++;
 			 READ_PTR1 &= DIM_READ_BUFF - 1;
@@ -409,7 +409,7 @@ int main(void) {
 			/// e' eseguito il movimento sulla classe comando
 			/// viene richiesto il pid di riferimento, lo stato del comando (in modo da continuare se il comando e' valido),
 			/// i  pwm per i motori, il valore degli encoder e del giroscopio.
-			CMD1.RUN(cPid, &synSTATO, &M1, &M2, &ENC0, &ENC1, &Rot, &JIT);
+			pidPwm1.RUN(cPid, &synSTATO, &M1, &M2, &ENC0, &ENC1, &Rot, &JIT);
 			/// le misure del giroscopio invece sono effettuate solo dall'apposito pid
 
 		}
@@ -488,11 +488,11 @@ int main(void) {
 			///  RILASCIO_PACK e CMD con avvia = true. QUESTO ACCADE IN convertToToken,
 			///  nel file parse.cpp
 #ifdef _DEBUG_
-			if (CMD1.avvia == true && synSTATO.token == RILASCIO_PACK){
+			if (pidPwm1.avvia == true && synSTATO.token == RILASCIO_PACK){
 				/// rilascio del kit
 				KIT.scarico();
-				CMD1.avvia = false;
-				CMD1.isRun = false;
+				pidPwm1.avvia = false;
+				pidPwm1.isRun = false;
 			}
 #endif
 

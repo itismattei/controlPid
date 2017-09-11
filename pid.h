@@ -29,9 +29,9 @@ class digPID;
 
 ///
 /// la classe comando serve a trasformare i  dati del PID nei valori di PWM dei motori
-class comando{
+class PIDtoPWM{
 public:
-	comando();
+	PIDtoPWM();
 
 	int RUN(digPID *, syn_stat *,PWM_MOTORI *, PWM_MOTORI *, encQuad * ENC1, encQuad * ENC2, Giroscopio *G, Jitter *J);
 	void setUptrasducers(Giroscopio	*gPtr, pwm	*PWM, distMis *distanza);

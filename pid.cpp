@@ -118,7 +118,7 @@ int digPID::Run(Giroscopio *G, PWM_MOTORI *PWM1, PWM_MOTORI * PWM2, distMis *DIS
 
 ///
 /// COSTRUTTORE CLASSE COMANDO
-comando::comando(){
+PIDtoPWM::PIDtoPWM(){
 	azione = false; isRun = false; finished = false; numPid = -1; token = -1; tick = 0; avvia = 0;
 	/// soglia in gradi del raggiungimento del valore finale, durante le rotazioni del mezzo
 	sogliaAlfa = 2;
@@ -130,7 +130,7 @@ comando::comando(){
 
 ///
 /// impsotazione dei puntatori ai trasduttori
-void comando::setUptrasducers(Giroscopio *G, pwm *p, distMis *dist){
+void PIDtoPWM::setUptrasducers(Giroscopio *G, pwm *p, distMis *dist){
 	gPtr 		= G;
 	PWM 		= p;
 	distanza 	= dist;
@@ -138,7 +138,7 @@ void comando::setUptrasducers(Giroscopio *G, pwm *p, distMis *dist){
 
 ///
 /// esegue il pid selezionato
-int comando::RUN(digPID *p, syn_stat *s, PWM_MOTORI *PWM1, PWM_MOTORI *PWM2, encQuad * ENC1, encQuad * ENC2,
+int PIDtoPWM::RUN(digPID *p, syn_stat *s, PWM_MOTORI *PWM1, PWM_MOTORI *PWM2, encQuad * ENC1, encQuad * ENC2,
 		Giroscopio *G, Jitter *J){
 	/// controlla il time out del comando e se scaduto si ferma
 	/// Siccome il metdo RUN viene chiamato ogni 10ms lo scatto del timeout avviene
@@ -297,7 +297,7 @@ int comando::RUN(digPID *p, syn_stat *s, PWM_MOTORI *PWM1, PWM_MOTORI *PWM2, enc
 ///
 /// cpnverte l'uscita del pid nel giusto valore del pwm
 ///
-void comando::setFpwm(PWM_MOTORI *pwm1, PWM_MOTORI *pwm2, digPID *p, int  numPid){
+void PIDtoPWM::setFpwm(PWM_MOTORI *pwm1, PWM_MOTORI *pwm2, digPID *p, int  numPid){
 	switch(numPid){
 	case 1:
 		/// qui la curva e' lineare, ma si puo' scegliere anche una differente curva

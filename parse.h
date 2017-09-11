@@ -84,6 +84,23 @@ public:
 	void*			generic;
 };
 
+/*
+ * ///
+/// struttura che analizza la frase e ne mantiene il token del comando
+typedef struct _syn_stat{
+	int ST;
+	uint8_t 	cmd[4];			/// lunghezza del comando fissa: 4 bytes
+	uint8_t 	l_cmd;			/// lunghezza in bytes del comando
+	uint8_t		check;			/// checksum del comando
+	uint8_t 	token;			/// valore numerico del comando
+	uint8_t 	tick;			/// tempo di persistenza del comando
+	uint16_t	valid;			/// stato di validita' del comando
+	uint8_t		buff_reply[8];	/// buffer della risposta
+	uint8_t		dato_valido;	/// validita' della risposta del sensore
+	uint8_t		suspend_reply;	/// usata per i comandi che necessitano di risposta alla fine
+} syn_stat;
+ * */
+
 class syntaxStatus{
 public:
 	syntaxStatus(){valore = 0; tick = 0;}
@@ -101,14 +118,27 @@ public:
 	uint8_t		suspend_reply;	/// usata per i comandi che necessitano di risposta alla fine
 };
 
+///
+/// classe che gestisce l'analisi sintattica semplificato, molto, dei comandi
+class Parse{
+public:
+	Parse(){}
 
+	/// analizza lo stato del messaggio e carica i risultati nell sintassi, poi agisce sui comando del pid
+	void parse(PIDtoPWM *, syntaxStatus *);
+	/// trasforma un comando in un token
+	void convertToToken(syntaxStatus *, PIDtoPWM * );
+
+	/// proprieta'
+	syntaxStatus * syntStat;
+};
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void parse(syn_stat *,  comando *, syntaxStatus *);
-void convertToToken(syn_stat *, comando * );
+void parse(syn_stat *,  PIDtoPWM *, syntaxStatus *);
+void convertToToken(syn_stat *, PIDtoPWM * );
 /// reset dell'automa (o inizializzazione)
 void resetAutoma(syn_stat * STATO);
 void initModule();
