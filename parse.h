@@ -122,15 +122,20 @@ public:
 /// classe che gestisce l'analisi sintattica semplificato, molto, dei comandi
 class Parse{
 public:
-	Parse(){}
+	Parse();
 
 	/// analizza lo stato del messaggio e carica i risultati nell sintassi, poi agisce sui comando del pid
-	void parse(PIDtoPWM *, syntaxStatus *);
+	void analizza(PIDtoPWM *, syntaxStatus *);
 	/// trasforma un comando in un token
-	void convertToToken(syntaxStatus *, PIDtoPWM * );
-
+	void convertiInToken(syntaxStatus *, PIDtoPWM * );
+	inline void setSyntaxStruct(syntaxStatus *s){syntStat = s;}
+	void replyCommand(syntaxStatus *, ALLSTRUCT *);
 	/// proprieta'
 	syntaxStatus * syntStat;
+
+
+private:
+	void resetAutoma();
 };
 
 #ifdef __cplusplus

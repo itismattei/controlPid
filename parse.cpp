@@ -458,13 +458,118 @@ uint8_t printFloat(double number, uint8_t digits){
   return 0;
 }
 
+/////////////////////////////////////////
 ////
 //// classe Parse
+///
+/////////////////////////////////////////
+Parse::Parse(){
+	resetAutoma();
+}
 
-void Parse::parse(PIDtoPWM *p, syntaxStatus *s){
+void Parse::analizza(PIDtoPWM *p, syntaxStatus *s){
+
+	s->cmd[s->ST] = uart1buffer[READ_PTR1];
+
+	/// La ricezione di un comando errato non produce il cambio di stato del mezzo.
+	/// Infatti STATO->valid cambia a seguito di un comando corretto in questa funzione ma NON a seguito di un comando errato
+	/// Lo stato può quindi diventare NON_VALIDO solo a seguito di time out o perche' gia' lo era.
+	switch(s->ST){
+	case 0:
+		s->check = 0;
+		s->token = ERRORE;
+		if (s->cmd[0] >64 && s->cmd[0] < 91 ){
+			/// una lettera MAIUSCOLA e quindi un comando di azione da raspberry
+			s->l_cmd = 4;
+			s->ST = 1;
+			s->check = s->cmd[0];
+		}
+	break;
+
+	case 1:
+		s->check ^= s->cmd[1];
+		s->ST = 2;
+	break;
+
+	case 2:
+		s->check ^= CHECK_SUM;
+		if(s->check == s->cmd[2]){
+			/// ok, il messaggio e' valido
+			convertiInToken(s, p);
+			s->ST = 3;
+		}
+		else{
+			s->ST = 0;
+			s->valid = NON_VALIDO;
+		}
+	break;
+
+	case 3:
+		/// l'invio del comando e' fatto di 4 bytes e quindi passa di qui quando e' arrivato il IV byte cioe' quello
+		/// del terminatore
+		/// il comando e' ora valido
+		s->valid = VALIDO;
+	break;
+	}
+}
+
+void Parse::convertiInToken(syntaxStatus *s, PIDtoPWM * p){
 
 }
 
-void Parse::convertToToken(syntaxStatus *s, PIDtoPWM * p){
+void Parse::resetAutoma(){
+	syntStat->ST = 0;
+	syntStat->cmd[0] = syntStat->cmd[1] = 0;
+	syntStat->l_cmd = 0;
+	syntStat->valid = NON_VALIDO;
+	syntStat->token = ERRORE;
+}
 
+
+void Parse::replyCommand(syntaxStatus *s, ALLSTRUCT *DATA){
+	/// controlla se la sintazzi e' valida
+	s->check = 0;
+	/// controllo ridondante gia' effettuato
+	if (s->valid == VALIDO){
+		/// analizza il token e per il momento risposnde alle richieste di dati
+		/// i tokens sono: LETTURA_SENSORE (con nuero di sensore in sSTAT.cmd[1])
+		switch(s->token){
+
+		/// le psecifiche prevedono che la misura dei gradi sia richiesta con il comando 'G'
+		/// oppure con il comando 'D' seguito dall'intero 6 (lettura del sesto dato o sensore)
+		case MISURA_GRADI:
+			s->buff_reply[0] = 'G';
+			s->buff_reply[1] = (DATA->gyro->yaw  & 0xFF00) >> 8;
+			s->buff_reply[2] = DATA->gyro->yaw  & 0x00FF;
+
+		break;
+
+		/// fornisce la risposta alla lettura di un sensore
+		case LETTURA_SENSORE:
+			/// prepara solamente il buffer di risposta
+			//inviaSensore(s, DATA);
+		break;
+		}
+
+		/// se il dato e' valido viene trasmesso al richiedente (raspberry)
+		if (s->dato_valido == 1){
+			s->check  = 0;
+		/// calcolo checksum
+			for(int i = 0; i < 3; i++)
+				/// calcola il checksum
+				s->check ^= s->buff_reply[i];
+
+			/// aggiunge la chiave 0xA9
+			s->check ^= CHECK_SUM;
+			s->buff_reply[3] = s->check;
+			s->buff_reply[4] = '*';
+		}
+		/// invia i 4 byte su seriale. L'ultimo e' invato dalla funzione sendReply
+		/// per la risposta ai comandi, il protocollo prevede:
+		/// 'X' 'T/F' '0' oppure valore lettura , check_sum '*', quindi 4 byte
+		//sendReply(s, 4);
+	}
+	/// ripulisce il buffer di risposta
+	for (int  i = 0; i < 5; i++)
+		s->buff_reply[i] = 0;
 }
