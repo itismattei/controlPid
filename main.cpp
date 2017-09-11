@@ -206,8 +206,10 @@ int main(void) {
 	HIH8.convertRaw();
 	/// registra la classe che gestisce i dati del sensore
 	GEN = (HIH8_7Hum *) (&HIH8);
+	/// aggiorna l'indirizzo della struttura dati del sensore.
 	allDATA.DefineGeneric(GEN);
-
+	for (uint32_t ccc = 0; ccc < 5000000; ccc++);
+	HIH8.readRaw();
 	while(1){
 
 	}
