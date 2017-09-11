@@ -64,7 +64,6 @@
 #include "power.h"
 #include "pid.h"
 
-#include "sensHum/HIH87Hum.h"
 
 
 
@@ -194,23 +193,7 @@ int main(void) {
 	/// messaggio d'inizio
 	PRINTF("inizializzato I2C\n");
 
-	/// imposta il canale I2C sul numero 1 che uso per il test del sensre di umidita'
-	I2C TEST_HUM_SENS(I2C1_BASE);
-	HIH8_7Hum HIH8;
-	//L'indirizzo base del sensore e' 0x27
-	HIH8.attachI2C(&TEST_HUM_SENS, 0x27);
-	//Manda solo byte su SDA e conclude con lo STOP
-	HIH8.newData();
-	for (uint32_t ccc = 0; ccc < 5000000; ccc++);
-	HIH8.readRaw();
-	HIH8.convertRaw();
-	/// registra la classe che gestisce i dati del sensore
-	GEN = (HIH8_7Hum *) (&HIH8);
-	allDATA.DefineGeneric(GEN);
 
-	while(1){
-
-	}
 	/******************************************* STOP **************************************/
 	/// INIZIALIZZAZIONI MODULI E COLLEGAMENTI AI CANALI DI COMUNICAZIONE
 
