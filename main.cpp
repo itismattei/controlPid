@@ -2,8 +2,8 @@
  * main.c
  */
 
-/*  Vari test sui dispositivi del rover
-	Created on: 20/gen/2017
+/*  Test sul sensore di umidita'
+	Created on: 20/sett/2017
  *
  *	Si realizzano alcuni testi di movimento, allineamento e lettura sensori
  *  NOTE: Provata la comunicazione con raspberry: invio di 3 comandi , F, B, S.
