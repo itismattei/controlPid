@@ -1,23 +1,10 @@
 /*
- * main.c
- */
-
-/*  Vari test sui dispositivi del rover
-	Created on: 20/gen/2017
+ * main.cpp
+ * ottobre 2017
  *
- *	Si realizzano alcuni testi di movimento, allineamento e lettura sensori
- *  NOTE: Provata la comunicazione con raspberry: invio di 3 comandi , F, B, S.
- *        risultato ok.
- *        Provata la comunicazione con raspberry dei sensori di distanza 1 e 3.
- *        risultato dipendente dallo sleep della raspberry. Comunicazione ok,
- *        al piu' con un ritardo di un ciclo.
+ * VERSIONE derivata DALLA ROBOCUP DI FOLIGNO
+ * USO: test dei sensori e sviluppo di correzione nelle misure
  *
- *  RIMOSSA LA STRUCT GLB e SOSTITUITA CON LA CLASSE ALLSTRUCT CHE PERMETTE DI AVERE TUTTE LE STRUCT
- *  DISPNIBILE NEL PROGRAMMA.
- *
- *  CORREZIONE DEL JITTER SULL'INTERVALLO DI INTEGRAZIONE
- *
- *  AGGIUNTO VETTORE DI COEFFICIENTI PER IL PID
  *
  */
 
@@ -440,7 +427,7 @@ int main(void) {
 			/// dell'interruzione AD.
 			/// Ricordarsi: il dato n.6 e'lo stato della batteria
 			/*		   ***			*/
-			/** AVVIA IL CAMPIONAMENTO **/
+			/** AVVIA IL CAMPIONAMENTO DI ADC **/
 			ROM_ADCProcessorTrigger(ADC0_BASE, 0);
 			/// legge gli encoder
 //			ENC0.readPos();
