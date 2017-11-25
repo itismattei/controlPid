@@ -87,6 +87,9 @@ void parse(syn_stat *STATO, comando *cmdPtr, syntaxStatus *synPtr){
 		if(STATO->check == STATO->cmd[2]){
 			/// ok, il messaggio e' valido
 			convertToToken(STATO, cmdPtr);
+#ifdef _DEBUG_
+			PRINTF("cmd valido\n");
+#endif
 			STATO->ST = 3;
 		}
 		else{

@@ -321,12 +321,27 @@ int main(void) {
 //
 //		while (++contatore < 50000000);
 //	}
+
+	/************************************************************/
+	/*  			ECO SERIALE									*/
+	/************************************************************/
 	while(1){
 
 
-/************************************************************/
-/*  			ATTIVITA' SVOLTE AD OGNI CICLO				*/
-/************************************************************/
+		// controllo di messaggio sulla seriale 1 (ricevuto comando da rasp
+		if (READ_PTR1 != RX_PTR1){
+
+			 UARTCharPut(UART1_BASE, uart1buffer[READ_PTR1]);
+			 /// aggiorna il buffer
+			 READ_PTR1++;
+			 READ_PTR1 &= DIM_READ_BUFF - 1;
+		}
+
+	}
+
+	///
+	/// NON ESEGUITO
+	while(1){
 
 
 		// controllo di messaggio sulla seriale 1 (ricevuto comando da rasp
@@ -344,7 +359,10 @@ int main(void) {
 			/// avendo terminato la risposta, la validità dell'automa
 			/// va rimossa e viene quindi resettato
 			resetAutoma(&synSTATO);
-			//PRINTF("comando ricevuto: %c\n", synSTATO.cmd[0]);
+#ifdef _DEBUG_
+			PRINTF("comando ricevuto: %c\n", synSTATO.cmd[0]);
+#endif
+
 		}
 		/// invia la risposta per i comandi di rotazione, quando sono stati eseguiti
 //		if(pidPtr->rispondi == TRUE){
