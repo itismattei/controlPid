@@ -35,9 +35,14 @@ distMis::~distMis() {
 /// estrae dal dato grezzo la misura
 void distMis::rawTomm(){
 
-	/// per adesso facciamo un amisura approssimata:
-	/// 3V = 3800 -> 1/3= 0,33cm 0.3V = 380 -> 1/30cm = 0,033
-	/// 1/d = (0.3 - 0,033) / (3800 - 380)
+	//   NUMERAZIONE DEI SENSORI DI DISTANZA
+	//          1
+	//       +--!--+
+	//     1 <     > 3
+	//       |     |
+	//     2 <     > 4
+	//
+
 
 	/*
 	 * f: inverso della distanza
@@ -56,115 +61,12 @@ void distMis::rawTomm(){
 	 * q3 = f - k3 * dI = 0,2 - k3 * 2916 = -0.1111372
 	 * */
 
-	//float f, d, k = 0.87 * (0.2857 - 0.03125)/(3723.0 - 496.0);
-	float f, d;
-	float m[4] = {5.60984E-05, 6.55586E-05, 1.07152e-4, 0.0 };
-	float q[4] = {0.01611, 0.005897452, -0.08579, 0.0};
-	float a[3] = {1e-8, 4e-5, 0.024};
-	float b[3] = {6e-9, 5e-5, 0.0099};
-	float c[3] = {2e-9, 2e-6, 0.0063};
-	float g[3] = {7e-9, -1e-5, 0.0238};
-	float e[3] = {1e-7, -2e-4, 0.1085};
-
-//	m[0] = 5.60984E-05;
-//	m[1] = 6.55586E-05;
-//	m[2] = 1.07152e-4;
-//	m[3] = 8.65196E-05;
-//	q[0] = 0.01611;
-//	q[1] = 0.005897452;
-//	q[2] = -0.08579;
-//	q[3] = -0.065974265;
 
 	/// conversione del dato grezzo in cm
-	for (int i = 0; i < 6; i++){
-		/// per i sensori 2 e 5 vanno bene
-//		if (i ==2 || i == 5){
-//			/// distnza superiori a 40cm non vengono calcolate
-//			if (dI[i] < 400)
-//				dI[i] = 400;
-//			if (dI[i] < 970){
-//				/// si usa la prima retta interpolante
-//				f = m[0] * dI[i] + q[0];
-//			}
-//			else if (dI[i] < 2050){
-//				/// intervallo 5 - 7 cm
-//				f = m[1] * dI[i] + q[1];
-//				}
-//				else if (dI[i] < 3745){
-//					/// intervallo 5 - 3.5 cm
-//					f = m[2] * dI[i] + q[2];
-//					}
-//	//				else if (dI[i] < 3711){
-//	//					f = m[3] * dI[i] + q[3];
-//	//				}
-//
-//			if (dI[i] >= 3745){
-//				/// valori minori di 3.5cm non hanno senso
-//				dI[i] = 3745;
-//				f =  m[2] * 3711.0 + q[2];
-//			}
-//
-//		}
-//
-//		if (i == 1)
-//			f = a[0]*dI[i]*dI[i] + a[1] * dI[i] + a[2];
-//		if (i == 4)
-//			f = b[0]*dI[i]*dI[i] + b[1] * dI[i] + b[2];
-//		if (i == 3){
-//			/// il sensore viene interpolato con 3 spezzoni di parabola
-//			if (dI[i] < 940){
-//				f = c[0]*dI[i]*dI[i] + c[1] * dI[i] + c[2];
-//			}
-//			else {if (dI[i] < 1170)
-//					f = e[0]*dI[i]*dI[i] + e[1] * dI[i] + e[2];
-//				   else
-//					f = g[0]*dI[i]*dI[i] + g[1] * dI[i] + g[2];
-//			}
-//		}
-//
-// 		/// la distanza (in cm) e' 1 / f
-//		d = 1 / f * 10;			/// distanza in mm
+	for (int i = 0; i < 5; i++){
 
 		d_mm[i] = dI[i];
 	}
 }
 
-
-///
-/// estrae dal dato grezzo la misura
-void distMis::rawTomm1(){
-	// implementazione sintetica, con uso di powf.
-
-	//valori "esatti" solo per i primi quattro sensori
-	//ricavati per regress lineare su logaritmi delle misure
-	//di Bricca e compagni 22 aprile 2016
-	//
-	//          3
-	//       +--!--+
-	//     2 <     > ?
-	//       |     |
-	//     1 <     > 0
-	//
-	float k[5]={19389.0,   24330.0,   21930.0,  305162.2871,     19389.0};
-	float m[5]={-1.0331,   -1.0742,   -1.05414,   -1.201951,    -1.05414};
-    float d;
-	/// conversione del dato grezzo
-	// per ogni sensore i:
-	for (int i = 0; i < 5; i++){
-
-
-		 //formula:
-		 //  ln(y) = m ln(x) + q   (x: dato grezzo dI, y: dist in cm).
-		 // quindi y = e^(m ln(x) + q)
-		 // quindi y = e^q * x^m
-		 //    pongo e^q = k:
-		 // y = k*pow(x,m)
-
-
-		d = dI[i];
-		if( d > 3600) d = 3600.0;
-		if( d < 650 ) d = 650.0;
-		d_mm[i] = (int) ((k[i]*powf(d,m[i]))*10.0);
-	}
-}
 

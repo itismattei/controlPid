@@ -5,7 +5,7 @@
  * VERSIONE derivata DALLA ROBOCUP DI FOLIGNO
  * USO: test dei sensori e sviluppo di correzione nelle misure
  *
- *
+ * taratura ed interpolazione dei sensori di distanza
  */
 
 
@@ -17,6 +17,7 @@
 #include "inc/hw_memmap.h"
 #include "inc/hw_types.h"
 #include "inc/hw_gpio.h"
+#include "driverlib/adc.h"
 #include "driverlib/i2c.h"
 #include "driverlib/sysctl.h"
 #include "driverlib/gpio.h"
@@ -311,16 +312,16 @@ int main(void) {
 	//XB.sendString("Ciao\n", 5);
 	//PRINTF("Telemetria\n");
 
-//	while(1){
-//		int contatore = 0;
-//		for (i= 60; i < 64; i++)
-//			UARTCharPut(UART1_BASE, i);
-//
-//		/// infine invia il terminatore di stringa '*'
-//		UARTCharPut(UART1_BASE, '*');
-//
-//		while (++contatore < 50000000);
-//	}
+
+	//***********************************
+	/** primo campionamento **/
+	ADCProcessorTrigger(ADC0_BASE, 0);
+	//***********************************
+
+
+	///
+	/// CICLO PRINCIPALE
+	///
 	while(1){
 
 
@@ -328,8 +329,8 @@ int main(void) {
 /*  			ATTIVITA' SVOLTE AD OGNI CICLO				*/
 /************************************************************/
 
-
-		// controllo di messaggio sulla seriale 1 (ricevuto comando da rasp
+		/// ESEGUIT AD OGNI CICLO
+		// controllo di messaggio sulla seriale 1 (ricevuto comando da rasp)
 		if (READ_PTR1 != RX_PTR1){
 			/// analizza il comando e imposta il valore dell'oggetto CMD (comando)
 			/// ATTENZIONE: synStat NON E' ANCORA USATO
@@ -346,14 +347,7 @@ int main(void) {
 			resetAutoma(&synSTATO);
 			//PRINTF("comando ricevuto: %c\n", synSTATO.cmd[0]);
 		}
-		/// invia la risposta per i comandi di rotazione, quando sono stati eseguiti
-//		if(pidPtr->rispondi == TRUE){
-//			rispostaRotazione(pidPtr, &synSTATO);
-//			pidPtr->rispondi = FALSE;
-//		}
 
-
-//
 		/*********************/
 		/* AZIONI CADENZATE  */
 		/*********************/
@@ -387,11 +381,12 @@ int main(void) {
 		/// AZIONI DA COMPIERE OGNI 100ms ///
 		if (tick10 >= 10){
 			tick10 = 0;
+			/// legge la posizione segnalata dagli endcoder
 			ENC0.readPos();
 			ENC1.readPos();
 
 		}
-		/* misura gli encoder e calcola spostamenti e velocità */
+
 		//////////////////////////////////
 		/// AZIONI DA COMPIERE OGNI 1s ///
 		if (tick100 >= 100){
@@ -399,7 +394,9 @@ int main(void) {
 			uint32_t micros = TimerValueGet(WTIMER2_BASE, TIMER_A);
 			mJ = misuraJitter - micros;
 			mJ /= 100;
+#ifdef _DEBUG_JITTER
 			PRINTF("micros: %u delta (0.1 ms) %u\t", micros, mJ);
+#endif
 			misuraJitter = micros;
 
 			PRINTF("ang_rot %d \t", Rot.yaw);
@@ -427,13 +424,26 @@ int main(void) {
 			/// dell'interruzione AD.
 			/// Ricordarsi: il dato n.6 e'lo stato della batteria
 			/*		   ***			*/
-			/** AVVIA IL CAMPIONAMENTO DI ADC **/
-			ROM_ADCProcessorTrigger(ADC0_BASE, 0);
-			/// legge gli encoder
-//			ENC0.readPos();
-//			ENC0.readDir();
-//			ENC1.readPos();
-//			ENC1.readDir();
+			/// TODO *** ATTENZIONE VERIFICARE SE PUO' ESSERE MESSO NEL CICLO DA 100ms oppure se può essere messo il solo
+			///      *** START OF COnvERSION */
+			if (ADCDataReadyFlag == 1){
+				/// c'e' un dato campionato pronto, ad esempio la batteria, e viene copiato
+				ADCDataReadyFlag = 0;
+				/// converte la misure grezza, letta dalla routine di interruzione in mm
+				/// la lettura del dato sei sensori e' esattamente questo dato.
+				MISURE.rawTomm();
+				/// memorizza anche il livello della batteria della logica
+				BATT.battLevel = MISURE.dI[5];
+#ifdef _DEBUG_
+				PRINTF("Liv batteria: %d\n", BATT.battLevel);
+
+#endif
+				//***********************************
+				/** (RI)AVVIA IL CAMPIONAMENTO DI ADC **/
+				ADCProcessorTrigger(ADC0_BASE, 0);
+				//***********************************
+			}
+
 			//HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_5 << 2))) |=  GPIO_PIN_5;
 			if (BATT.battLevel > BATT.safeLevel){
 				HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_3 << 2))) ^=  GREEN_LED;
@@ -483,9 +493,7 @@ int main(void) {
 //
 #endif
 
-			/// converte la misure grezza, letta dalla routine di interruzione in mm
-			/// la lttura del dato sei sensori e' esattamente questo dato.
-			MISURE.rawTomm();
+
 #ifndef _DEBUG_
 //				/// ricopia nella struttare DIST:
 			for(int attesa = 0; attesa < 5; attesa++){
@@ -509,56 +517,12 @@ int main(void) {
 			PRINTF("\n");
 
 #endif
-			if (ADCDataReadyFlag == 1){
-				/// c'e' un dato campionato pronto, ad esempio la batteria, e viene copiato
-				ADCDataReadyFlag = 0;
-				BATT.battLevel = MISURE.dI[5];
-#ifdef _DEBUG_
-				PRINTF("Liv batteria: %d\n", BATT.battLevel);
-#endif
-			}
+
 			//// reset del contatore
 			tick100 = 0;
 
-			//// 45 puo' essere il pwm minimo per far andare i motori con batteria a 11.3V
-/*			M1.delta = 45;
-			M1.MotorGo();
-			M2.delta = 45;
-			M2.MotorGo();
-			while(1);*/
 		}
 
-		/** 	AZIONI SPECIALI		**/
-		// Allineamento cingoli
-
-			/*if(G.IsPresent == OK)
-				if( contatore == 1){
-					/// ogni 10 ms effettua il calcolo del PID
-					contatore = 0;
-					HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_0 << 2))) |=  GPIO_PIN_0;
-					PID(&G, pidPtr, &PWM, &CIN);
-					setXPWM(&CTRL[1], &PWM);
-					procCom = 0;
-					HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_0 << 2))) &=  ~GPIO_PIN_0;
-					blink++;
-					/// lampeggio del led con periodo di 2 s.
-					if (blink >= 100){
-						HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + ((GPIO_PIN_2 | GPIO_PIN_1) << 2))) = 0;
-						HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_3 << 2))) ^= GPIO_PIN_3;
-						blink = 0;
-					}
-				///provvede ad integrare la misura della velcita' angolare ogni 10 ms
-				//misuraAngoli(&G);
-				//PRINTF("asse x: %d\t", G.pitch);
-				//PRINTF("\tasse y: %d\t", G.roll);
-				//PRINTF("\tasse z: %d\n", G.yaw);
-				//PRINTF("uscita PID: %d\n", C.uscita);
-			}*/
-
-			/* RISPOSTA AL COMANDO */
-			//inviaSensore(&synSTATO, &DATA);
-
-		//}
 	}
 }
 

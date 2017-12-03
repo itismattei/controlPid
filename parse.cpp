@@ -342,7 +342,7 @@ void inviaSensore(syn_stat *sSTAT, ALLSTRUCT * collectedD){
 //			sSTAT->buff_reply[1] = D->d_mm[5] ;
 //			break;
 
-		//lettura giroscopio (angolo tra 0 e 360°)
+		//lettura giroscopio (angolo tra -180 e 180°)
 		case(6):
 				sSTAT->buff_reply[0] = 6;
 				sSTAT->buff_reply[1] = (collectedD->gyro->yaw & 0xFF00) >> 8;

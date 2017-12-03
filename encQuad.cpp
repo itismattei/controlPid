@@ -44,6 +44,7 @@ encQuad::encQuad() {
 	zero_pos 	= 0;
 	/// velocita' calcolata sul un intervallo di 1ms
 	vel_period = ROM_SysCtlClockGet() / 80000;
+	///TODO DETERMINARE IL VALORE DEL COEFFICIENTE
 	kPos = 1.0;
 }
 

@@ -15,7 +15,6 @@ class distMis {
 public:
 	distMis();
 	virtual ~distMis();
-	void rawTomm1(void);
 
 	void rawTomm(void);
 

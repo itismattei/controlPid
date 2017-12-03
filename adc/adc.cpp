@@ -151,10 +151,11 @@ void initHW_ADC(){
 	ADCSequenceStepConfigure(ADC0_BASE, 0, 3, ADC_CTL_CH3 );
 	/// PD.3
 	ADCSequenceStepConfigure(ADC0_BASE, 0, 4, ADC_CTL_CH4 );
+	/// il sensore n. 5 e' la lettura della partizione della tensione della batteria della logica
 	/// PD.2
 	ADCSequenceStepConfigure(ADC0_BASE, 0, 5, ADC_CTL_CH5 | ADC_CTL_IE | ADC_CTL_END);
 	/// abilita il sequencer 0
-	ADCSequenceEnable(ADC0_BASE, 0);
+	ROM_ADCSequenceEnable(ADC0_BASE, 0);
 
 	/// abilta l'interruzione del sequencer 0
 	ADCIntClear(ADC0_BASE, 0);
