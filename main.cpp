@@ -1,9 +1,10 @@
 /*
  * main.cpp
- * ottobre 2017
+ * gennaio  2018
  *
  * VERSIONE derivata DALLA ROBOCUP DI FOLIGNO
  * USO: test dei sensori e sviluppo di correzione nelle misure
+ * VERSIONE CHE EFFETTUA L?ECO VERSO LA RASPBERRY E SERVE A PROVARE IL CANALE DI COMUNICAZIONE UART
  *
  *
  */
