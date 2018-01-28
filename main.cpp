@@ -6,6 +6,9 @@
  * USO: test dei sensori e sviluppo di correzione nelle misure
  *
  * taratura ed interpolazione dei sensori di distanza
+ * gennaio 2018: prova di avanzamento del rover e di allinemamento dei cingoli.
+ * si usano le letture degli encoder e si cerca di porre un controllo in retroazione
+ * sui valori letti.
  */
 
 
@@ -143,7 +146,7 @@ int main(void) {
 	//pidPtr = CTRL;
 	//dPtr = &DIST;
 
-	/// questa struttura raccoglie il comandoda eseguire e interagisce con il relativo PID
+	/// questa struttura raccoglie il comando da eseguire e interagisce con il relativo PID
 	comando CMD1;
 	//DATA.distPtr = &DIST;
 	//passaggio degli indirizzi delle strutture alla struttura generale

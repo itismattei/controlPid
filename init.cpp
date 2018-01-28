@@ -12,6 +12,9 @@
 #include "sens_col_ir/sens1.h"
 
 
+/// date:	28-01-2018
+volatile uint8_t vers[] = "1.0 <- robocup\0";
+
 
 void initModule(){
 	;

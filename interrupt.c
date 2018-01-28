@@ -34,7 +34,6 @@ void UART1IntHandler(void)
     // Get the interrrupt status.
     //
     ui32Status = ROM_UARTIntStatus(UART1_BASE, true);
-
     //
     // Clear the asserted interrupts.
     //
@@ -65,18 +64,10 @@ volatile int contLightPwm = 0;
 void IntGPIOd(void){
 
 	GPIOIntClear(GPIO_PORTD_BASE, GPIO_INT_PIN_1);
-	while(1);
+
+	/// incrementa il contatore delle transizioni del pwm prodotto dal sensore
+	/// di luminosita'
 	contLightPwm++;
-//    //
-//    // Set PB3 high to indicate entry to this interrupt handler.
-//    //
-//    GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_2, GPIO_PIN_2);
-//
-//
-//    //
-//    // Wait two seconds.
-//    //
-//    Delay(1);
 //
 //    GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_2, 0);
 }

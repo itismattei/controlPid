@@ -126,6 +126,11 @@ comando::comando(){
 	sogliaVel = 1;
 	/// valore finale
 	valFin = 0.0;
+	/// inizializzazione dei coefficienti degli intervalli di correzione del delta pwm per cingoli che hanno differenti attriti
+	cCor[0] = 100;
+	cCor[1] = 10;
+	cCor[2] = -100;
+	cCor[3] = -10;
 }
 
 ///
@@ -143,6 +148,14 @@ int comando::RUN(digPID *p, syn_stat *s, PWM_MOTORI *PWM1, PWM_MOTORI *PWM2, enc
 	/// controlla il time out del comando e se scaduto si ferma
 	/// Siccome il metdo RUN viene chiamato ogni 10ms lo scatto del timeout avviene
 	/// dopo 1.5s
+	///
+#ifdef _DEBUG_
+	/// forse l'esecuzione del pid poiche' tick < TIMEOUT_CMD
+	tick = 0;
+	numPid = AVANZA;
+	////
+#endif
+
 	if (tick > TIMEOUT_CMD){
 		/// in caso di timeout nella persistenza del comando si deve fermare
 		/// quale era o erano i pid attivo/i?
@@ -215,6 +228,8 @@ int comando::RUN(digPID *p, syn_stat *s, PWM_MOTORI *PWM1, PWM_MOTORI *PWM2, enc
 			PWM2->delta = 75;
 			PWM1->MotorGo();
 			PWM2->MotorGo();
+			/// serve una correzione del PWM qualora si avessero letture differenti degli encoder.
+			correctPwm(ENC1, ENC2, PWM1, PWM2);
 
 		break;
 
@@ -294,6 +309,7 @@ int comando::RUN(digPID *p, syn_stat *s, PWM_MOTORI *PWM1, PWM_MOTORI *PWM2, enc
 }
 
 
+
 ///
 /// cpnverte l'uscita del pid nel giusto valore del pwm
 ///
@@ -313,3 +329,31 @@ void comando::setFpwm(PWM_MOTORI *pwm1, PWM_MOTORI *pwm2, digPID *p, int  numPid
 
 }
 
+
+///
+/// metodo che provvede a correggere il pwm dirante l'avanzmanto
+void comando::correctPwm(encQuad * ENC1, encQuad * ENC2, PWM_MOTORI *PWM1, PWM_MOTORI *PWM2){
+
+	int diff = ENC2->readPos() - ENC1->readPos();
+	/// relazione tra incremento del delta e diff tra lettura:
+	/// kCor *= (1 + diff * 1e-5) se diff e' in 10-100
+	/// kCor *= 1.005 se diff > 100
+	/// kCor *= 1.0 se diff in 0 - 10
+//	cCor[0] = 100;
+//	cCor[1] = 10;
+//	cCor[2] = -100;
+//	cCor[3] = -10;
+	if (diff > cCor[0])
+		PWM1->kCor *= 1.005;
+	else
+		if (diff > cCor[1])
+			PWM1->kCor *= (1 + diff * 1e-5);
+		else
+			if (diff < cCor[2])
+				PWM1->kCor *= 0.995;
+			else
+				if (diff < cCor[3])
+					PWM1->kCor *= (1 + diff * 1e-5);
+				/// se nessuno dei rami precedenti si e' attivato vuol dire che lo scartamento
+				/// e' inferiore alle 10 unità e non viene modificato kCor
+}

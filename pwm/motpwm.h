@@ -17,7 +17,7 @@ public:
 	static int numPwm;
 
 public:
-	PWM_MOTORI(){numPwm ++; direction = 1; numMot = numPwm; Init(); }
+	PWM_MOTORI(){numPwm ++; direction = 1; numMot = numPwm; Init();}
 	~PWM_MOTORI(){if (numPwm > 0) numPwm --;}
 
 	void Init();
@@ -33,7 +33,13 @@ public:
 	int direction;
 	uint32_t numPin;
 	uint32_t numMot;
-	float k;
+	/// fattore di correzione
+	float kCor;
+
+private:
+	void correction(float c = 1.0);
+
+
 };
 
 

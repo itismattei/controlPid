@@ -37,6 +37,7 @@ public:
 	void setUptrasducers(Giroscopio	*gPtr, pwm	*PWM, distMis *distanza);
 	void setFpwm(PWM_MOTORI *, PWM_MOTORI *, digPID *, int);
 
+
 	bool azione;			//indica se e' un comando di azione
 	bool isRun;				// indica se il comando sta andando
 	bool finished;			// indica se il comando e' giunto al termine
@@ -54,6 +55,10 @@ public:
 	int 	sogliaAlfa;			// soglia di angolo raggiunto
 	int 	sogliaVel;			// soglia di velocita' raggiunte
 	float 	valFin;			// imposta il valore finale a cui deve giungere il comando. Puo' essere una velocita', una rotazione, una distanza,...
+
+private:
+	void correctPwm(encQuad * ENC1, encQuad * ENC2, PWM_MOTORI *, PWM_MOTORI *);
+	int cCor[4];
 
 };
 

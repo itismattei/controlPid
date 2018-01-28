@@ -89,6 +89,8 @@ void PWM_MOTORI::Init(){
 	    /// spegne i PWM
 	    numPin = PWM_OUT_5;
 	    MotorStop();
+	    /// imposta il parametro di correzione al7& in più perché il cingolo 1 ha più atrito
+	    correction(1.076);
 
 	}
 	else{
@@ -143,7 +145,8 @@ void PWM_MOTORI::Init(){
 		/// spegne i PWM
 		numPin = PWM_OUT_2;
 		MotorStop();
-
+		/// imposta in modo predefinito il parametro di correzione : valore 1.0
+		correction();
 	}
 }
 
@@ -184,9 +187,7 @@ void PWM_MOTORI::MotorGo(){
 			/// imposta il pwm in modalita' negata
 			HWREG(PWM0_BASE + PWM_O_INVERT) |= PWM_OUT_5_BIT;
 		}
-		/// correzione
-		k = 1.076;
-		f = NCont * delta * k / 100;
+		f = NCont * delta * kCor / 100;
 		valPwm = (int) f;
 		PWMPulseWidthSet(PWM0_BASE, numPin, valPwm);
 	break;
@@ -201,10 +202,26 @@ void PWM_MOTORI::MotorGo(){
 			/// imposta il pwm in modalita' negata
 			HWREG(PWM0_BASE + PWM_O_INVERT) |= PWM_OUT_2_BIT;
 		}
-		k = 1.0;
-		f = NCont * delta * k / 100;
+		f = NCont * delta * kCor / 100;
 		valPwm = (int) f;
 		PWMPulseWidthSet(PWM0_BASE, numPin, valPwm);
+	break;
+	}
+}
+
+
+void PWM_MOTORI::correction(float c){
+	float f;
+
+	switch (numMot){
+	case 1:
+		/// correzione
+		kCor = 1.076;
+		f = NCont * delta * kCor / 100;
+	break;
+	case 2:
+		kCor = c;
+		f = NCont * delta * kCor / 100;
 	break;
 	}
 }
