@@ -58,7 +58,10 @@ public:
 
 private:
 	void correctPwm(encQuad * ENC1, encQuad * ENC2, PWM_MOTORI *, PWM_MOTORI *);
+	/// fattori di correzione dell'allineamento dei cingoli
 	int cCor[4];
+	/// memroizzazione della differenza precedente tra le letture degli encoder
+	int diffEnc;
 
 };
 

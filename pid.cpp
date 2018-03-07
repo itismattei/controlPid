@@ -311,7 +311,7 @@ int comando::RUN(digPID *p, syn_stat *s, PWM_MOTORI *PWM1, PWM_MOTORI *PWM2, enc
 
 
 ///
-/// cpnverte l'uscita del pid nel giusto valore del pwm
+/// coverte l'uscita del pid nel giusto valore del pwm
 ///
 void comando::setFpwm(PWM_MOTORI *pwm1, PWM_MOTORI *pwm2, digPID *p, int  numPid){
 	switch(numPid){
@@ -334,7 +334,8 @@ void comando::setFpwm(PWM_MOTORI *pwm1, PWM_MOTORI *pwm2, digPID *p, int  numPid
 /// metodo che provvede a correggere il pwm dirante l'avanzmanto
 void comando::correctPwm(encQuad * ENC1, encQuad * ENC2, PWM_MOTORI *PWM1, PWM_MOTORI *PWM2){
 
-	int diff = ENC2->readPos() - ENC1->readPos();
+	int diffR = ENC2->readPos() - ENC1->readPos();
+	int diff = diffR - diffEnc;
 	/// relazione tra incremento del delta e diff tra lettura:
 	/// kCor *= (1 + diff * 1e-5) se diff e' in 10-100
 	/// kCor *= 1.005 se diff > 100
@@ -356,4 +357,6 @@ void comando::correctPwm(encQuad * ENC1, encQuad * ENC2, PWM_MOTORI *PWM1, PWM_M
 					PWM1->kCor *= (1 + diff * 1e-5);
 				/// se nessuno dei rami precedenti si e' attivato vuol dire che lo scartamento
 				/// e' inferiore alle 10 unità e non viene modificato kCor
+	///aggiornamento della differenza per il passo successivo
+	diffEnc = diffR;
 }
