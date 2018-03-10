@@ -387,12 +387,20 @@ int main(void) {
 			/// legge la posizione segnalata dagli endcoder
 			ENC0.readPos();
 			ENC1.readPos();
-
 		}
 
 		//////////////////////////////////
 		/// AZIONI DA COMPIERE OGNI 1s ///
 		if (tick100 >= 100){
+
+#ifdef _DEBUG_ENC_
+			PRINTF("\n");
+			PRINTF("POS ENC0: %d\t%d\t", ENC0.dist_mm, ENC0.readDir());
+			PRINTF("POS ENC1: %d\t%d\n", ENC1.dist_mm, ENC1.readDir());
+			PRINTF("\n");
+			M1.MotorStop();
+			M2.MotorStop();
+#endif
 
 			uint32_t micros = TimerValueGet(WTIMER2_BASE, TIMER_A);
 			mJ = misuraJitter - micros;
