@@ -131,10 +131,17 @@ comando::comando(){
 	cCor[1] = 10;
 	cCor[2] = -100;
 	cCor[3] = -10;
+	distanza = NULL;
+}
+
+/// costruttore con parametri
+comando::comando(distMis *d){
+	comando();
+	distanza = d;
 }
 
 ///
-/// impsotazione dei puntatori ai trasduttori
+/// impostazione dei puntatori ai trasduttori
 void comando::setUptrasducers(Giroscopio *G, pwm *p, distMis *dist){
 	gPtr 		= G;
 	PWM 		= p;
@@ -153,17 +160,21 @@ int comando::RUN(digPID *p, syn_stat *s, PWM_MOTORI *PWM1, PWM_MOTORI *PWM2, enc
 	/// forse l'esecuzione del pid poiche' tick < TIMEOUT_CMD
 	tick = 0;
 	numPid = AVANZA;
+	s->token = AVANTI;
 	////
 #endif
 
-	if (tick > TIMEOUT_CMD){
+	///
+	/// CONTROLLO DEL TIMEOUT OPPURE SELEZIONE DEL PID
+	/// controlla anche la distaza raw misurata dal sensore 0, quello anteriore.
+	if (tick > TIMEOUT_CMD || distanza->dI[0] > 3100){
 		/// in caso di timeout nella persistenza del comando si deve fermare
 		/// quale era o erano i pid attivo/i?
 		s->token = STOP;
 		s->valid = NON_VALIDO;
 
 		/// deve anche mettere i pid in stato disattivo (.attivo = false)
-		if (numPid > 0 && numPid < 3)
+		if (numPid >= 0 && numPid < 3)
 			(p + numPid)->attivo = false;
 		/// se il comando va in timeout, isRun diventa falso
 		isRun = false;
@@ -331,7 +342,7 @@ void comando::setFpwm(PWM_MOTORI *pwm1, PWM_MOTORI *pwm2, digPID *p, int  numPid
 
 
 ///
-/// metodo che provvede a correggere il pwm dirante l'avanzmanto
+/// metodo che provvede a correggere il pwm durante l'avanzmanto
 void comando::correctPwm(encQuad * ENC1, encQuad * ENC2, PWM_MOTORI *PWM1, PWM_MOTORI *PWM2){
 
 	int diffR = ENC2->readPos() - ENC1->readPos();

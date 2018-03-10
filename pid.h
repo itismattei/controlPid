@@ -32,6 +32,7 @@ class digPID;
 class comando{
 public:
 	comando();
+	comando(distMis	*d);
 
 	int RUN(digPID *, syn_stat *,PWM_MOTORI *, PWM_MOTORI *, encQuad * ENC1, encQuad * ENC2, Giroscopio *G, Jitter *J);
 	void setUptrasducers(Giroscopio	*gPtr, pwm	*PWM, distMis *distanza);
@@ -60,7 +61,7 @@ private:
 	void correctPwm(encQuad * ENC1, encQuad * ENC2, PWM_MOTORI *, PWM_MOTORI *);
 	/// fattori di correzione dell'allineamento dei cingoli
 	int cCor[4];
-	/// memroizzazione della differenza precedente tra le letture degli encoder
+	/// memorizzazione della differenza precedente tra le letture degli encoder
 	int diffEnc;
 
 };
