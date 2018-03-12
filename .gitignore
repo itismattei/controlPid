@@ -35,3 +35,4 @@
 /main.cpp.orig
 /Release
 .launches/controlPid1.launch
+.launches/controlPid.launch

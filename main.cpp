@@ -278,7 +278,7 @@ int main(void) {
 
 	/// i motori vanno inizializzati da queste parti, altrimenti l'impostazione delle periferiche precoce, prima che l'unita'
 	/// sia avviata provoca un fault e si entra nella interruzione di servizio per periferica non pronta.
-	PWM_MOTORI M1, M2;
+	PWM_MOTORI M0, M1;
 //	while(1){
 //	M1.Init();
 //	M1.delta = 70;
@@ -373,7 +373,7 @@ int main(void) {
 			/// e' eseguito il movimento sulla classe comando
 			/// viene richiesto il pid di riferimento, lo stato del comando (in modo da continuare se il comando e' valido),
 			/// i  pwm per i motori, il valore degli encoder e del giroscopio.
-			CMD1.RUN(cPid, &synSTATO, &M1, &M2, &ENC0, &ENC1, &Rot, &JIT);
+			CMD1.RUN(cPid, &synSTATO, &M0, &M1, &ENC0, &ENC1, &Rot, &JIT);
 			/// le misure del giroscopio invece sono effettuate solo dall'apposito pid
 
 		}
@@ -394,12 +394,13 @@ int main(void) {
 		if (tick100 >= 100){
 
 #ifdef _DEBUG_ENC_
+			M0.MotorStop();
+			M1.MotorStop();
+			for (volatile int i = 1000000; i > 0; i--);
 			PRINTF("\n");
 			PRINTF("POS ENC0: %d\t%d\t", ENC0.dist_mm, ENC0.readDir());
 			PRINTF("POS ENC1: %d\t%d\n", ENC1.dist_mm, ENC1.readDir());
 			PRINTF("\n");
-			M1.MotorStop();
-			M2.MotorStop();
 #endif
 
 			uint32_t micros = TimerValueGet(WTIMER2_BASE, TIMER_A);

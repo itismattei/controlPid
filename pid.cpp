@@ -167,7 +167,15 @@ int comando::RUN(digPID *p, syn_stat *s, PWM_MOTORI *PWM1, PWM_MOTORI *PWM2, enc
 	///
 	/// CONTROLLO DEL TIMEOUT OPPURE SELEZIONE DEL PID
 	/// controlla anche la distaza raw misurata dal sensore 0, quello anteriore.
-	if (tick > TIMEOUT_CMD || distanza->dI[0] > 3100){
+	bool prossimoOstacolo = false;
+	if (distanza != NULL){
+		if (distanza->dI[0] > 3100)
+			prossimoOstacolo = true;
+		else
+			prossimoOstacolo = false;
+	}
+
+	if (tick > TIMEOUT_CMD || prossimoOstacolo){
 		/// in caso di timeout nella persistenza del comando si deve fermare
 		/// quale era o erano i pid attivo/i?
 		s->token = STOP;
@@ -240,7 +248,7 @@ int comando::RUN(digPID *p, syn_stat *s, PWM_MOTORI *PWM1, PWM_MOTORI *PWM2, enc
 			PWM1->MotorGo();
 			PWM2->MotorGo();
 			/// serve una correzione del PWM qualora si avessero letture differenti degli encoder.
-			correctPwm(ENC1, ENC2, PWM1, PWM2);
+			//correctPwm(ENC1, ENC2, PWM1, PWM2);
 
 		break;
 
