@@ -7,6 +7,8 @@
 
 #include "HIH87Hum.h"
 #include "stdlib.h"
+#include "../init.h"		// per float2string
+#include <stdio.h>
 
 HIH8_7Hum::HIH8_7Hum() {
 	// TODO Auto-generated constructor stub
@@ -49,16 +51,16 @@ void HIH8_7Hum::newData(){
 ///
 /// converte il dato raw in dato di umidita' e temperatura
 HIH8_7Hum & HIH8_7Hum::convertToHum(){
-	/// analizza se il dat e' valido
+	/// analizza se il dato e' valido
 	if (i2cPtr->stato != IMPOSTATA || (buff[0] & 0x80) != 0){
-		/// bit S = 1, oppure connessionecon errori: dato  non valido
+		/// bit S = 1, oppure connessione con errori: dato  non valido
 		dataValid = false;
 	}
 	else{
 
 		/// dato valido
 		dataValid = true;
-		if ((buff[0] & 0x40) == 1)
+		if ((buff[0] & 0x40) == 0x40)
 			dataOld= true;
 		else
 			dataOld = false;
@@ -99,4 +101,28 @@ HIH8_7Hum & HIH8_7Hum::convertToTemp(){
 /// converte i dati raw in dati di temperatura ed umidita'
 void HIH8_7Hum::convertRaw(){
 	convertToHum().convertToTemp();
+	if (dataValid && !dataOld)
+		toString();
+}
+
+/// converte i valori presenti in hum e temp in stringhe di uint8_t
+/// "costa" circa 90kb di flash
+void HIH8_7Hum::toString(){
+	/// converte un float o un double a vettore di uint8_t
+	//float2string(hum, humidity);
+	//float2string(temp, temperature);
+	/// "costa" 5kb di flash
+	if (hum < 0.0001 || hum > 1000)
+		/// stampa in notazione scientifica
+		sprintf(humidity, "%8.5e", hum);
+	else
+		/// stampa in notazione con punto separatore
+		sprintf(humidity, "%f", hum);
+
+	if (temp < 0.0001 || temp > 1000)
+		sprintf(temperature, "%8.5e", temp);
+	else
+		sprintf(temperature, "%f", temp);
+
+
 }

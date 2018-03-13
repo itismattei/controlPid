@@ -42,3 +42,25 @@ void dati_a_struttura(gyro *G, distanza *D, cinematica *CIN, colore *COL, temper
 //	GLB->encoder	= ENC;
 //	GLB->acc		= ACC;
 //}
+
+#include <iomanip> // setprecision
+#include <sstream> // stringstream
+
+using namespace std;
+///
+/// converte un float o un double a vettore di uint8_t
+//void float2string(float f, uint8_t valore[]){
+//	stringstream s1;
+//	string txt;
+//	/// carica il float nello stream
+//	s1 << f;
+//	/// converte lo stream in stringa
+//	txt = s1.str();
+//	uint8_t i;
+//	for (i = 0; i < txt.length(); i++){
+//		valore[i] = txt[i];
+//	}
+//	/// inserisco il terminatore di stringa
+//	valore[i] = '\0';
+
+//}

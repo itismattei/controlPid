@@ -88,12 +88,8 @@ extern "C" {
 void setupUART(int);
 void PRINT_WELCOME(void);
 
-
-
 #ifdef __cplusplus
 }
 #endif
-
-
 
 #endif /* INIT_H_ */

@@ -27,8 +27,11 @@ public:
 	void readRaw();
 	void convertRaw();
     void newData();
+    void toString();
     float hum;
     float temp;
+    char humidity[16];
+    char temperature[16];
 
 
 private:
@@ -40,6 +43,7 @@ public:
 	/// proprieta'
 	I2C *i2cPtr;
 	uint8_t buff[8];
+	uint8_t temper[16], umid[16];
 	bool dataValid, dataOld;
 };
 
