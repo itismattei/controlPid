@@ -137,6 +137,7 @@ int main(void) {
 				PRINTF("Dato valido \n");
 				PRINTF("Um: %s\n", HIH8.humidity);
 				PRINTF("T: %s\n", HIH8.temperature);
+				PRINTF("Stop\n");
 			}
 			if (HIH8.dataOld)
 				PRINTF("Dato vecchio\n");
