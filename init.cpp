@@ -13,6 +13,7 @@
 
 
 /// date:	28-01-2018
+/// Release del software
 volatile uint8_t vers[] = "1.0 <- robocup\0";
 
 

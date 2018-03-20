@@ -104,6 +104,9 @@ int main(void) {
 	/// imposta gli indirizzi dei due moduli
 	ENC0.setAddr(QEI0_BASE);
 	ENC1.setAddr(QEI1_BASE);
+	/// imposta i coefficienti di conversione letture->mm
+	ENC0.setCoeff(0.225);
+	ENC1.setCoeff(0.231);
 
 
 	//volatile double d = 1.9845637456;
@@ -396,7 +399,9 @@ int main(void) {
 #ifdef _DEBUG_ENC_
 			M0.MotorStop();
 			M1.MotorStop();
-			for (volatile int i = 1000000; i > 0; i--);
+			for (volatile int i = 5000000; i > 0; i--);
+			ENC0.readPos();
+			ENC1.readPos();
 			PRINTF("\n");
 			PRINTF("POS ENC0: %d\t%d\t", ENC0.dist_mm, ENC0.readDir());
 			PRINTF("POS ENC1: %d\t%d\n", ENC1.dist_mm, ENC1.readDir());

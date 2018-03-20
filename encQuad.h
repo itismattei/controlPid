@@ -23,6 +23,7 @@ public:
 	float readVel();
 	int readDir();
 	void setAddr(uint32_t add){address = add;}
+	void setCoeff(float c){ kPos = c;}
 	void update();
 
 	/// prorpieta'

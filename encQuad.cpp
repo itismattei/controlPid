@@ -44,9 +44,11 @@ encQuad::encQuad() {
 	zero_pos 	= 0;
 	/// velocita' calcolata sul un intervallo di 1ms
 	vel_period = ROM_SysCtlClockGet() / 80000;
-	///TODO DETERMINARE IL VALORE DEL COEFFICIENTE
+	/// imposta il valore di kPos a 1. Successivamente potra venire modificato in fase di
+	/// taratura, richiamando il metodo setCoeff(float)
 	kPos = 1.0;
 }
+
 
 encQuad::~encQuad() {
 	// TODO Auto-generated destructor stub
