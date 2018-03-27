@@ -28,6 +28,10 @@ public:
 	bool		run;			/// indica se il dispositivo funziona
 	int vel;
 
+	float M[5][8];
+	float Q[5][8];
+private:
+	void setM_Q();
 };
 
 #endif /* DISTMIS_H_ */
