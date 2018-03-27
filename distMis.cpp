@@ -100,7 +100,6 @@ void distMis::rawTomm(){
 			/// trovato l'intervallo di conversione può uscire dal for
 			break;
 		}
-		d_mm[i] = dI[i];
 	}
 
 	/// sensore S1
@@ -109,7 +108,7 @@ void distMis::rawTomm(){
 			d_mm[1] = 150.0;
 			break;
 		}
-		if (dI[0] >= 1000 && dI[0] < 1140){
+		if (dI[1] >= 1000 && dI[1] < 1140){
 			d_mm[1] = M[1][i] * dI[1] + Q[1][i];
 			/// trovato l'intervallo di conversione può uscire dal for
 			break;
@@ -149,9 +148,153 @@ void distMis::rawTomm(){
 			/// trovato l'intervallo di conversione può uscire dal for
 			break;
 		}
-		d_mm[i] = dI[i];
 	}
 
+
+	/// sensore S2
+	for (int i = 0; i < 7; i++){
+		if (dI[2] < 960){
+			d_mm[2] = 160.0;
+			break;
+		}
+		if (dI[2] >= 960 && dI[2] < 1120){
+			d_mm[2] = M[2][i] * dI[2] + Q[2][i];
+			/// trovato l'intervallo di conversione può uscire dal for
+			break;
+		}
+		if (dI[2] >= 1120 && dI[2] < 1340){
+			d_mm[2] = M[2][i] * dI[2] + Q[2][i];
+			/// trovato l'intervallo di conversione può uscire dal for
+			break;
+		}
+		if (dI[2] >= 1340 && dI[2] < 1660){
+			d_mm[2] = M[2][i] * dI[2] + Q[2][i];
+			/// trovato l'intervallo di conversione può uscire dal for
+			break;
+		}
+		if (dI[2] >= 1660 && dI[2] < 2050){
+			d_mm[2] = M[2][i] * dI[2] + Q[2][i];
+			/// trovato l'intervallo di conversione può uscire dal for
+			break;
+		}
+		if (dI[2] >= 2050 && dI[2] < 2700){
+			d_mm[2] = M[2][i] * dI[2] + Q[2][i];
+			/// trovato l'intervallo di conversione può uscire dal for
+			break;
+		}
+		if (dI[2] >= 2700 && dI[2] < 3120){
+			d_mm[2] = M[2][i] * dI[2] + Q[2][i];
+			/// trovato l'intervallo di conversione può uscire dal for
+			break;
+		}
+		if (dI[2] >= 3120 && dI[2] < 3500){
+			d_mm[2] = M[2][i] * dI[2] + Q[2][i];
+			/// trovato l'intervallo di conversione può uscire dal for
+			break;
+		}
+		if (dI[2] >= 3500){
+			d_mm[2] = 40.0;
+			/// trovato l'intervallo di conversione può uscire dal for
+			break;
+		}
+	}
+
+	/// sensore S3
+	for (int i = 0; i < 7; i++){
+		if (dI[3] < 940){
+			d_mm[3] = 160.0;
+			break;
+		}
+		if (dI[3] >= 940 && dI[3] < 1093){
+			d_mm[3] = M[3][i] * dI[3] + Q[3][i];
+			/// trovato l'intervallo di conversione può uscire dal for
+			break;
+		}
+		if (dI[3] >= 1093 && dI[3] < 1300){
+			d_mm[3] = M[3][i] * dI[3] + Q[3][i];
+			/// trovato l'intervallo di conversione può uscire dal for
+			break;
+		}
+		if (dI[3] >= 1300 && dI[3] < 1575){
+			d_mm[3] = M[3][i] * dI[3] + Q[3][i];
+			/// trovato l'intervallo di conversione può uscire dal for
+			break;
+		}
+		if (dI[3] >= 1575 && dI[2] < 2035){
+			d_mm[3] = M[3][i] * dI[3] + Q[3][i];
+			/// trovato l'intervallo di conversione può uscire dal for
+			break;
+		}
+		if (dI[3] >= 2035 && dI[3] < 2664){
+			d_mm[3] = M[3][i] * dI[3] + Q[3][i];
+			/// trovato l'intervallo di conversione può uscire dal for
+			break;
+		}
+		if (dI[3] >= 2664 && dI[3] < 3150){
+			d_mm[3] = M[3][i] * dI[3] + Q[3][i];
+			/// trovato l'intervallo di conversione può uscire dal for
+			break;
+		}
+		if (dI[3] >= 3150 && dI[3] < 3700){
+			d_mm[3] = M[3][i] * dI[3] + Q[3][i];
+			/// trovato l'intervallo di conversione può uscire dal for
+			break;
+		}
+		if (dI[3] >= 3700){
+			d_mm[3] = 40.0;
+			/// trovato l'intervallo di conversione può uscire dal for
+			break;
+		}
+	}
+
+
+	/// sensore S4
+	for (int i = 0; i < 7; i++){
+		if (dI[4] < 944){
+			d_mm[4] = 160.0;
+			break;
+		}
+		if (dI[4] >= 944 && dI[4] < 1070){
+			d_mm[4] = M[4][i] * dI[4] + Q[4][i];
+			/// trovato l'intervallo di conversione può uscire dal for
+			break;
+		}
+		if (dI[4] >= 1070 && dI[4] < 1195){
+			d_mm[4] = M[4][i] * dI[4] + Q[4][i];
+			/// trovato l'intervallo di conversione può uscire dal for
+			break;
+		}
+		if (dI[4] >= 1195 && dI[4] < 1420){
+			d_mm[4] = M[4][i] * dI[4] + Q[4][i];
+			/// trovato l'intervallo di conversione può uscire dal for
+			break;
+		}
+		if (dI[4] >= 1420 && dI[4] < 1820){
+			d_mm[4] = M[4][i] * dI[4] + Q[4][i];
+			/// trovato l'intervallo di conversione può uscire dal for
+			break;
+		}
+		if (dI[4] >= 1820 && dI[4] < 2450){
+			d_mm[4] = M[4][i] * dI[4] + Q[4][i];
+			/// trovato l'intervallo di conversione può uscire dal for
+			break;
+		}
+		if (dI[4] >= 2450 && dI[4] < 2980){
+			d_mm[4] = M[4][i] * dI[4] + Q[4][i];
+			/// trovato l'intervallo di conversione può uscire dal for
+			break;
+		}
+		if (dI[4] >= 2980 && dI[4] < 3500){
+			d_mm[4] = M[4][i] * dI[4] + Q[4][i];
+			/// trovato l'intervallo di conversione può uscire dal for
+			break;
+		}
+		if (dI[4] >= 3500){
+			d_mm[4] = 40.0;
+			/// trovato l'intervallo di conversione può uscire dal for
+			break;
+		}
+	}
 
 }
 
