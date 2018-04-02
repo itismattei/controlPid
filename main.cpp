@@ -54,7 +54,7 @@
 #include "pwm/motpwm.h"
 #include "power.h"
 #include "pid.h"
-#include "maze.h"
+#include "maze/maze.h"
 
 
 /// variabili globali
@@ -109,9 +109,9 @@ int main(void) {
 //	ENC0.setCoeff(0.225);
 //	ENC1.setCoeff(0.231);
 
-//	maze M;
-//	cell C(1,2);
-//	M.carica(C);
+	maze M;
+	cell C(1,2);
+	M.carica(C);
 
 	//volatile double d = 1.9845637456;
 	//gyro G;
@@ -163,7 +163,7 @@ int main(void) {
 	/// del programma.
 	ALLSTRUCT allDATA;
 
-	allDATA.setup(&A, &ENC0, &sensIR, &CL, &PST[0], &SUR, &MISURE, &Rot);
+	allDATA.setup(&A, &ENC0, &ENC1, &sensIR, &CL, &PST[0], &SUR, &MISURE, &Rot);
 
 	/// setup di base
 	setupMCU();
@@ -542,6 +542,7 @@ int main(void) {
 
 			/// aggiornamento delle strutture dati del labirinto
 			// todo da aggiungere
+			M.run(allDATA);
 			//// reset del contatore
 			tick100 = 0;
 

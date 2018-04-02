@@ -377,8 +377,8 @@ void inviaSensore(syn_stat *sSTAT, ALLSTRUCT * collectedD){
 		case(10):
 				sSTAT->buff_reply[0] = 10;
 				//cast necessario, bisogna passare un intero
-				sSTAT->buff_reply[1] = ((int)collectedD->encoder->dist_mm  & 0xFF00) >> 8;
-				sSTAT->buff_reply[2] = (int)collectedD->encoder->dist_mm  & 0x00FF;
+				sSTAT->buff_reply[1] = ((int)collectedD->encoder0->dist_mm  & 0xFF00) >> 8;
+				sSTAT->buff_reply[2] = (int)collectedD->encoder0->dist_mm  & 0x00FF;
 				break;
 
 		/// inserire qui il codice per il senspre n. 11: il valore di angolo dell'accelerometro

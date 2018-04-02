@@ -46,7 +46,7 @@ class ALLSTRUCT{
 public:
 	ALLSTRUCT(){}
 
-	void setup(accelerometro *ACC, encQuad *ENC, TEMPER *TEMP, COLORE *color, TILE * t, survivor *SUR, distMis *DIS, Giroscopio *GYRO){
+	void setup(accelerometro *ACC, encQuad *ENC, encQuad *ENC1, TEMPER *TEMP, COLORE *color, TILE * t, survivor *SUR, distMis *DIS, Giroscopio *GYRO){
 		surPtr 	= SUR;
 
 		cinPtr 		= 0;
@@ -57,7 +57,8 @@ public:
 		temperat 	= TEMP;
 		DSTptr 		= DIS;
 		gyro		= GYRO;
-		encoder		= ENC;
+		encoder0	= ENC;
+		encoder0	= ENC1;
 		acc			= ACC;
 
 	}
@@ -76,7 +77,7 @@ public:
 	/* classe */
 	distMis 		*DSTptr;
 	Giroscopio  	*gyro;
-	encQuad			*encoder;
+	encQuad			*encoder0, *encoder1;
 	accelerometro 	*acc;
 };
 
