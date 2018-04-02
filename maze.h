@@ -12,26 +12,39 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <list>
+
 
 class cell{
 public:
-	cell();
-	virtual ~cell();
+	cell() {x = 0; y = 0; isDiscovered = false;}
+	cell(int a, int b){x = a; y = b; isDiscovered = true;}
+	/// costruttore di copia
+	cell(const cell &c){ x = c.x; y = c.y; isDiscovered = c.isDiscovered;}
+	virtual ~cell(){;}
+
+	void setRC(int a, int b){x = a; y = b;}
 
 	// proprieta'
-	int16_t 	x;
-	int16_t 	y;
-	bool		isDiscovered;
+	int16_t 		x;
+	int16_t 		y;
+	bool			isDiscovered;
+	uint8_t 		w[4];
+
 
 };
 
+#include <list>
+using namespace std;
 
 class maze {
 public:
 	maze();
 	virtual ~maze();
 
-	cell grid[200];
+	maze & carica(cell &c) {L.push_back(c); return *this;}
+
+	list<cell> L;
 	int floor;
 };
 
