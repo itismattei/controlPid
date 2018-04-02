@@ -54,7 +54,7 @@
 #include "pwm/motpwm.h"
 #include "power.h"
 #include "pid.h"
-
+#include "maze.h"
 
 
 /// variabili globali
@@ -100,14 +100,18 @@ int main(void) {
 	sensPtr = &MOT_SENS;
 
 	/// MODULI ENCODER ///
-	encQuad ENC0, ENC1;
-	/// imposta gli indirizzi dei due moduli
-	ENC0.setAddr(QEI0_BASE);
-	ENC1.setAddr(QEI1_BASE);
-	/// imposta i coefficienti di conversione letture->mm
-	ENC0.setCoeff(0.225);
-	ENC1.setCoeff(0.231);
+	encQuad ENC0(QEI0_BASE), ENC1(QEI1_BASE);
+//	encQuad ENC0, ENC1;
+//	/// imposta gli indirizzi dei due moduli
+//	ENC0.setAddr(QEI0_BASE);
+//	ENC1.setAddr(QEI1_BASE);
+//	/// imposta i coefficienti di conversione letture->mm
+//	ENC0.setCoeff(0.225);
+//	ENC1.setCoeff(0.231);
 
+//	maze M;
+//	cell C(1,2);
+//	M.carica(C);
 
 	//volatile double d = 1.9845637456;
 	//gyro G;
@@ -536,10 +540,12 @@ int main(void) {
 
 #endif
 
+			/// aggiornamento delle strutture dati del labirinto
+			// todo da aggiungere
 			//// reset del contatore
 			tick100 = 0;
 
-		}
+		} /// fine delle azioni da compiere ogni 1s
 
 	}
 }

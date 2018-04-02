@@ -169,7 +169,8 @@ int comando::RUN(digPID *p, syn_stat *s, PWM_MOTORI *PWM1, PWM_MOTORI *PWM2, enc
 	/// controlla anche la distaza raw misurata dal sensore 0, quello anteriore.
 	bool prossimoOstacolo = false;
 	if (distanza != NULL){
-		if (distanza->dI[0] > 3100)
+		/// distanza compresa tra 150 e 200 mm
+		if (distanza->dI[0] > 3300)
 			prossimoOstacolo = true;
 		else
 			prossimoOstacolo = false;
@@ -220,6 +221,22 @@ int comando::RUN(digPID *p, syn_stat *s, PWM_MOTORI *PWM1, PWM_MOTORI *PWM2, enc
 		}
 		switch(numPid){
 		case AVANZA:
+			/// l'avanzamento inizia con un delta = 65 ed arriva fino ad un delta = 80
+			if (PWM1->delta < 65)
+				PWM1->delta = 65;
+			else
+				if (PWM1->delta > 80)
+					PWM1->delta = 80;
+				else
+					PWM1->delta += 1;
+
+			if (PWM2->delta < 65)
+				PWM2->delta = 65;
+			else
+				if (PWM2->delta > 80)
+					PWM2->delta = 80;
+				else
+					PWM2->delta += 1;
 //			//provvede a misurare la velocita'
 //			//misuraVelocità()
 //			float veloc = (ENC1->readVel() - ENC2->readVel()) /  2;
@@ -243,8 +260,8 @@ int comando::RUN(digPID *p, syn_stat *s, PWM_MOTORI *PWM1, PWM_MOTORI *PWM2, enc
 //				p->attivo = false;
 
 //			setFpwm(PWM1, PWM2, p, numPid);
-			PWM1->delta = 75;
-			PWM2->delta = 75;
+//			PWM1->delta = 75;
+//			PWM2->delta = 75;
 			PWM1->MotorGo();
 			PWM2->MotorGo();
 			/// serve una correzione del PWM qualora si avessero letture differenti degli encoder.

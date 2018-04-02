@@ -102,6 +102,7 @@ void distMis::rawTomm(){
 			break;
 		}
 		if (dI[0] >= 3240 && dI[0] < 3470){
+			/// ditanza compresa tra 150 e 200 mm
 			i = 6;
 			d_mm[0] = M[0][i] * dI[0] + Q[0][i];
 			/// trovato l'intervallo di conversione può uscire dal for

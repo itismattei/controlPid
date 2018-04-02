@@ -12,12 +12,19 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include "inc/hw_memmap.h"
 
 
 class encQuad {
 public:
 	encQuad();
+	encQuad(uint32_t add){ setAddr(add);
+	///
+	/// imposta i coefficienti di conversione.
+	if (add == QEI0_BASE) setCoeff(0.225); if (add == QEI1_BASE) setCoeff(0.231); }
+
 	virtual ~encQuad();
+
 	void qeiInit();
 	int readPos();
 	float readVel();
