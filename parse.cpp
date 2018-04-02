@@ -232,7 +232,7 @@ void rispondiComando(syn_stat *sSTAT, ALLSTRUCT *collectedD){
 		/// i tokens sono: LETTURA_SENSORE (con nuero di sensore in sSTAT.cmd[1])
 		switch(sSTAT->token){
 
-		/// le psecifiche prevedono che la misura dei gradi sia richiesta con il comando 'G'
+		/// le specifiche prevedono che la misura dei gradi sia richiesta con il comando 'G'
 		/// oppure con il comando 'D' seguito dall'intero 6 (lettura del sesto dato o sensore)
 		case MISURA_GRADI:
 			sSTAT->buff_reply[0] = 'G';
