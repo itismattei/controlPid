@@ -428,6 +428,7 @@ int main(void) {
 			/// bisogna anche impostare il numero della piastrella e le sue coordinate.
 			CL.Run(&PST[0]);
 #ifdef _DEBUG_
+			/// il colore NERO e' circa il valore del BIANCO diviso 2,6 - 2,7
 			PRINTF("Col: %d\t W: %d\n", CL.get(), CL.getWhite());
 #endif
 			/// legge la temperatura del pirometro

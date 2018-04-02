@@ -102,7 +102,10 @@ void adcISR(void){
 	volatile uint32_t attesa;
 	ADCIntClear(ADC0_BASE, 0);
 	//numByte = ADCSequenceData_Get(ADC0_BASE, 0, dPtr->dI);    // Read ADC Value.
-	numByte = ADCSequenceData_Get(ADC0_BASE, 0, distMisPtr->dI);    // Read ADC Value.
+	/// legge il valore della conversione AD e la pone in dI.
+	/// il valore presente e' il valore di conversione della tensione in uscita
+	/// dal sensore.
+	numByte = ADCSequenceData_Get(ADC0_BASE, 0, distMisPtr->dI);
 	/// finito di trascrivere i dati, spegne il pin di segnalazione
 	HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_5 << 2))) &=  ~GPIO_PIN_5;
 	/// segnala la fine della routine di servizio e la disponibilita' dei dati.
