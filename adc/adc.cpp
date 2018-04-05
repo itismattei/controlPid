@@ -146,7 +146,6 @@ void initHW_ADC(){
 	ADCSequenceStepConfigure(ADC0_BASE, 0, 0, ADC_CTL_CH0);
 	/// PE.2
 	ADCSequenceStepConfigure(ADC0_BASE, 0, 1, ADC_CTL_CH1);
-
 	// PE.1
 	ADCSequenceStepConfigure(ADC0_BASE, 0, 2, ADC_CTL_CH2 );
 	//GPIOPinTypeADC(GPIO_PORTE_BASE, GPIO_PIN_0); //Ain3
@@ -156,7 +155,12 @@ void initHW_ADC(){
 	ADCSequenceStepConfigure(ADC0_BASE, 0, 4, ADC_CTL_CH4 );
 	/// il sensore n. 5 e' la lettura della partizione della tensione della batteria della logica
 	/// PD.2
-	ADCSequenceStepConfigure(ADC0_BASE, 0, 5, ADC_CTL_CH5 | ADC_CTL_IE | ADC_CTL_END);
+	ADCSequenceStepConfigure(ADC0_BASE, 0, 5, ADC_CTL_CH5 );
+	/// modifica per ROMECUP
+	/// il sensore n.6 rileva la tensione di batteria dei motori
+	ADCSequenceStepConfigure(ADC0_BASE, 0, 6, ADC_CTL_CH6 );
+	/// il sensore n.7 rileva la tensione dovuta al asensore di gas.
+	ADCSequenceStepConfigure(ADC0_BASE, 0, 7, ADC_CTL_CH7 | ADC_CTL_IE | ADC_CTL_END);
 	/// abilita il sequencer 0
 	ROM_ADCSequenceEnable(ADC0_BASE, 0);
 

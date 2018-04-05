@@ -246,36 +246,36 @@ void PWM_SERVI::Init(){
 		/// mentre PE4 e' una uscita digitale che combianta con il segnale PWM stabilisce la potenza al motore ed il verso di rotazione
 		/// In pratica se PE4 = '0' e PE5 ha un PWM, supponendo che il motore giri in senso orario, allora
 		/// quando PE4 = '1' e PE5 ha lo stesso PWM ma con polarita' invertita, il motore ruota in senso orario.
-		ROM_GPIOPinTypeGPIOOutput(GPIO_PORTD_BASE, GPIO_PIN_0);
+		//ROM_GPIOPinTypeGPIOOutput(GPIO_PORTD_BASE, GPIO_PIN_0);
 
 		/// azzeramento delle uscite dei pin
-		HWREG(GPIO_PORTD_BASE + (GPIO_O_DATA + (GPIO_PIN_0) << 2)) =  0;
+		///HWREG(GPIO_PORTD_BASE + (GPIO_O_DATA + (GPIO_PIN_0) << 2)) =  0;
 
 	    ROM_SysCtlPWMClockSet(SYSCTL_PWMDIV_32);  //divisore per 32
 	    ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_PWM1); //modulo pwm numero 1
 
 	    //Configure PD0 Pins as PWM
-	    ROM_GPIOPinConfigure(GPIO_PD0_M1PWM0);  //modulo 1 generatore 0
+	    ///ROM_GPIOPinConfigure(GPIO_PD0_M1PWM0);  //modulo 1 generatore 0
 
-	    ROM_GPIOPinTypePWM(GPIO_PORTD_BASE, GPIO_PIN_0);
+	    ///ROM_GPIOPinTypePWM(GPIO_PORTD_BASE, GPIO_PIN_0);
 
 	    //il generatore e' il numero 0
-	    ROM_PWMGenConfigure(PWM1_BASE, PWM_GEN_0, PWM_GEN_MODE_UP_DOWN | PWM_GEN_MODE_NO_SYNC);
-
-	    //Imposta il periodo del PWM rispetto al clock
-	    ROM_PWMGenPeriodSet(PWM1_BASE, PWM_GEN_0, NCont);
-
-	    // Enable the PWM generator
-	    ROM_PWMGenEnable(PWM1_BASE, PWM_GEN_0);
-
-	    // Turn on the Output pins (quello di M1PWM6)
-	    ROM_PWMOutputState(PWM1_BASE, PWM_OUT_0_BIT, true);
-	    /// PWM non invertito
-	    ROM_PWMOutputInvert(PWM1_BASE, PWM_OUT_0_BIT, false);
-
-	    /// spegne i PWM
-	    numPin = PWM_OUT_0;
-	    MotorStop();
+//	    ROM_PWMGenConfigure(PWM1_BASE, PWM_GEN_0, PWM_GEN_MODE_UP_DOWN | PWM_GEN_MODE_NO_SYNC);
+//
+//	    //Imposta il periodo del PWM rispetto al clock
+//	    ROM_PWMGenPeriodSet(PWM1_BASE, PWM_GEN_0, NCont);
+//
+//	    // Enable the PWM generator
+//	    ROM_PWMGenEnable(PWM1_BASE, PWM_GEN_0);
+//
+//	    // Turn on the Output pins (quello di M1PWM6)
+//	    ROM_PWMOutputState(PWM1_BASE, PWM_OUT_0_BIT, true);
+//	    /// PWM non invertito
+//	    ROM_PWMOutputInvert(PWM1_BASE, PWM_OUT_0_BIT, false);
+//
+//	    /// spegne i PWM
+//	    numPin = PWM_OUT_0;
+//	    MotorStop();
 
 	}
 	else{
@@ -326,8 +326,10 @@ void PWM_SERVI::MotorGo(int16_t gradi){
 	uint32_t valFin;
 	case 1:
 
-		valFin = convertDeg2Pwm(gradi);
-		ROM_PWMPulseWidthSet(PWM1_BASE, PWM_OUT_0, valFin / 100);
+		/// DISABILITA IL SERVO DEDICATO ALLO SCARICO DEL MATTONCINO
+		/// NELLA ROMECUP NON SERVE
+//		valFin = convertDeg2Pwm(gradi);
+//		ROM_PWMPulseWidthSet(PWM1_BASE, PWM_OUT_0, valFin / 100);
 	break;
 
 	case 2:
@@ -343,7 +345,7 @@ void PWM_SERVI::MotorStop(){
 	///
 	/// Spegne il pwm corrispondente
 	case 1:
-		ROM_PWMPulseWidthSet(PWM1_BASE, PWM_OUT_0, 0);
+		//ROM_PWMPulseWidthSet(PWM1_BASE, PWM_OUT_0, 0);
 	break;
 
 	case 2:

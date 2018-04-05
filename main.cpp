@@ -456,8 +456,12 @@ int main(void) {
 				MISURE.rawTomm();
 				/// memorizza anche il livello della batteria della logica
 				BATT.battLevel = MISURE.dI[5];
+
 #ifdef _DEBUG_
 				PRINTF("Liv batteria: %d\n", BATT.battLevel);
+				/// legge il valore di tensione del sensore di gas
+				/// prova per romecup2018
+				PRINTF("Sens. gas %d\n", MISURE.dI[7]);
 
 #endif
 				//***********************************
