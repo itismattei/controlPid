@@ -70,7 +70,7 @@ public:
 
 	inline void Init(){ initLightSens1(); initTimer4(10);}
 	/// legge il valore di luminanza
-	inline int read(){ return readCol() ; }
+	inline int read(){ isValid = true; luminanza = readCol(); return luminanza;}
 	/// legge il valore di luminanza
 	inline int get(void){ return luminanza; }
 	/// restituisce il valore del bianco
@@ -79,7 +79,9 @@ public:
 	//Imposta il livello di bianco, ipotizzando che all'inizio la piastrella sia bianca.
 	inline void WhiteBalance(){ bianco = read(); }
 
+	/// legge il colore rilevato e lo restituisce come parametro d'uscita
 	int readCol();
+
 	void Run(TILE * tP);
 
 	/// proprieta'
@@ -88,6 +90,7 @@ public:
 	int 	blu;
 	int 	luminanza;
 	int 	bianco;
+	bool 	isValid;
 };
 
 

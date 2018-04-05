@@ -259,7 +259,7 @@ void TEMPER::attachI2C(I2C * p, uint8_t sa){
 
 
 COLORE::COLORE(){
-	 luminanza = 0; bianco = 0;
+	 luminanza = 0; bianco = 0; isValid = false;
 }
 
 void COLORE::Run(TILE * tP){
