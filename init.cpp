@@ -11,7 +11,9 @@
 #include "parse.h"
 #include "sens_col_ir/sens1.h"
 
-
+/// date:	09-04-2018
+/// Release del software
+volatile uint8_t vers[] = "1.1 <- oratorio\0";
 
 void initModule(){
 	;

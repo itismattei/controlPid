@@ -261,6 +261,7 @@ void setupUART(int num){
 	g_ui32Base = g_ui32UARTBase[num];
 }
 
+extern volatile uint8_t vers[];
 ///
 /// messaggio di benvenuto
 void PRINT_WELCOME(void){
@@ -271,6 +272,9 @@ void PRINT_WELCOME(void){
 	PRINTF("Lettura dal clock\n");
 	valore = ROM_SysCtlClockGet();
 	PRINTF("Frequenza del clock %d\n", valore);
+	/// stampa la release del software presente nel rover
+	for(i = 0; i < 10000; i++);
+	PRINTF("\n%s\n", vers);
 }
 
 
