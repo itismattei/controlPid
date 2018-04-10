@@ -55,6 +55,7 @@
 #include "power.h"
 #include "pid.h"
 
+#include "sensHum/HIH87Hum.h"
 
 
 /// variabili globali
@@ -156,7 +157,9 @@ int main(void) {
 	/// del programma.
 	ALLSTRUCT allDATA;
 
-	allDATA.setup(&A, &ENC0, &sensIR, &CL, &PST[0], &SUR, &MISURE, &Rot);
+	HIH8_7Hum HIH8;
+
+	allDATA.setup(&A, &ENC0, &sensIR, &CL, &PST[0], &SUR, &MISURE, &Rot, &HIH8);
 
 	/// setup di base
 	setupMCU();
@@ -182,15 +185,13 @@ int main(void) {
 	/// messaggio d'inizio
 	PRINTF("inizializzato I2C\n");
 
+	/// imposta il canale I2C sul numero 1 che uso per il test del sensore di umidita'
+	I2C TEST_HUM_SENS(I2C1_BASE);
 
-	/// INIZIALIZZAZIONI MODULI E COLLEGAMENTI AI CANALI DI COMUNICAZIONE
-
-	/// inizializza il giroscopio con banda a 190Hz invece cha a 95Hz
-	Rot.attachI2C(&BUS_COMM[0], GYRO_ADDR);
-	Rot.initGyro(ODR_190 | Z_AXIS);
-	/// collegato sensore di temperatura al bus I2C
-	sensIR.attachI2C(&BUS_COMM[1], TEMP_ADDR);
-	sensIR.taraturaTemp();
+	//L'indirizzo base del sensore e' 0x27
+	HIH8.attachI2C(&TEST_HUM_SENS, 0x27);
+	//Manda solo byte su SDA e conclude con lo STOP
+	HIH8.newData();
 
 	tick10 = tick100 = 0;
 	/// inizializza il timer 0 e genera un tick da 10 ms
@@ -311,17 +312,13 @@ int main(void) {
 	///      TASK PRINCIPALE
 	///
 	/////////////////////////////////////////////////////////
-	//setupUART(1);
-	//XB.sendString("Ciao\n", 5);
-	//PRINTF("Telemetria\n");
-
 
 	//***********************************
 	/** primo campionamento **/
 	ADCProcessorTrigger(ADC0_BASE, 0);
 	//***********************************
 
-
+	int campionaHum = 1;
 	///
 	/// CICLO PRINCIPALE
 	///
@@ -358,25 +355,25 @@ int main(void) {
 		/////////////////////////////////////
 		/// AZIONI DA COMPIERE OGNI 10 ms ///
 		/// aggiorna il PID ogni tick del timer che sono 10ms
-		if (procCom == 1 ){
-			//UARTCharPutNonBlocking(UART1_BASE, 'c');
-			procCom = 0;
-			contatore++;
-			millis10++;
-			//lampeggio_led++;
-			if (Rot.IsPresent == OK){
-				/// aggiorna l'angolo di yaw
-				Rot.misuraAngoli(&JIT);
-
-			}
-
-			/// e' eseguito il movimento sulla classe comando
-			/// viene richiesto il pid di riferimento, lo stato del comando (in modo da continuare se il comando e' valido),
-			/// i  pwm per i motori, il valore degli encoder e del giroscopio.
-			CMD1.RUN(cPid, &synSTATO, &M1, &M2, &ENC0, &ENC1, &Rot, &JIT);
-			/// le misure del giroscopio invece sono effettuate solo dall'apposito pid
-
-		}
+//		if (procCom == 1 ){
+//			//UARTCharPutNonBlocking(UART1_BASE, 'c');
+//			procCom = 0;
+//			contatore++;
+//			millis10++;
+//			//lampeggio_led++;
+//			if (Rot.IsPresent == OK){
+//				/// aggiorna l'angolo di yaw
+//				Rot.misuraAngoli(&JIT);
+//
+//			}
+//
+//			/// e' eseguito il movimento sulla classe comando
+//			/// viene richiesto il pid di riferimento, lo stato del comando (in modo da continuare se il comando e' valido),
+//			/// i  pwm per i motori, il valore degli encoder e del giroscopio.
+//			CMD1.RUN(cPid, &synSTATO, &M1, &M2, &ENC0, &ENC1, &Rot, &JIT);
+//			/// le misure del giroscopio invece sono effettuate solo dall'apposito pid
+//
+//		}
 		/// effettua i calcoli solo se il giroscopio e' presente
 		/// TODO: il PID viene calcolato ongi 10ms oppure ogni 20ms? Come è meglio?
 
@@ -384,144 +381,54 @@ int main(void) {
 		/// AZIONI DA COMPIERE OGNI 100ms ///
 		if (tick10 >= 10){
 			tick10 = 0;
-			/// legge la posizione segnalata dagli endcoder
-			ENC0.readPos();
-			ENC1.readPos();
-
+//			/// legge la posizione segnalata dagli endcoder
+//			ENC0.readPos();
+//			ENC1.readPos();
+			////dato ogni 100 ms
+			if (campionaHum == 1){
+				//Campiona il dato per il prossimo ciclo
+				HIH8.newData();
+				campionaHum = 0;
+			}
+			else{
+				/// converte il dato letto al ciclo precedente
+				HIH8.readRaw();
+				HIH8.convertRaw();
+				campionaHum = 1;
+			}
+//
 		}
 
 		//////////////////////////////////
 		/// AZIONI DA COMPIERE OGNI 1s ///
 		if (tick100 >= 100){
-
-			uint32_t micros = TimerValueGet(WTIMER2_BASE, TIMER_A);
-			mJ = misuraJitter - micros;
-			mJ /= 100;
-#ifdef _DEBUG_JITTER
-			PRINTF("micros: %u delta (0.1 ms) %u\t", micros, mJ);
-#endif
-			misuraJitter = micros;
-
-			PRINTF("ang_rot %d \t", Rot.yaw);
-			printFloat(Rot.tick, 4);
-			//PRINTF("\t");
-			//printFloat(Rot.corr, 7);
-			A.misuraAccelerazioni();
-			PRINTF("\tAz: %d\n", A.aInt[2]);
-			//PRINTF("\n");
-
-			/// controlla il colore della piastrella sottostante e lo paragona la bianco memorizzato in fase di setup
-			/// bisogna anche impostare il numero della piastrella e le sue coordinate.
-			CL.Run(&PST[0]);
-#ifdef _DEBUG_
-			/// il colore NERO e' circa il valore del BIANCO diviso 2,6 - 2,7
-			PRINTF("Col: %d\t W: %d\n", CL.get(), CL.getWhite());
-#endif
-			/// legge la temperatura del pirometro
-			if(sensIR.readTemp() > sensIR.T_tar + 10.0)
-				/// ha torvato un ferito
-				sensIR.isSurvivor = IS_SURVIVOR;
-			else
-				sensIR.isSurvivor = NO_SURVIVOR;
-			/// TODO controllare se riesce a funzionare mentre legge le accelerazioni su I2C
-			/// avvia il campionamento degli ADC. I dati vengono posti nell'oggetto MISURE dalla routine di servizio
-			/// dell'interruzione AD.
-			/// Ricordarsi: il dato n.6 e'lo stato della batteria
-			/*		   ***			*/
-			/// TODO *** ATTENZIONE VERIFICARE SE PUO' ESSERE MESSO NEL CICLO DA 100ms oppure se può essere messo il solo
-			///      *** START OF COnvERSION */
-			if (ADCDataReadyFlag == 1){
-				/// c'e' un dato campionato pronto, ad esempio la batteria, e viene copiato
-				ADCDataReadyFlag = 0;
-				/// converte la misure grezza, letta dalla routine di interruzione in mm
-				/// la lettura del dato sei sensori e' esattamente questo dato.
-				MISURE.rawTomm();
-				/// memorizza anche il livello della batteria della logica
-				BATT.battLevel = MISURE.dI[5];
-#ifdef _DEBUG_
-				PRINTF("Liv batteria: %d\n", BATT.battLevel);
-
-#endif
-				//***********************************
-				/** (RI)AVVIA IL CAMPIONAMENTO DI ADC **/
-				ADCProcessorTrigger(ADC0_BASE, 0);
-				//***********************************
+			/// converte il dato letto al ciclo precedente
+			//HIH8.readRaw();
+			//HIH8.convertRaw();
+			/// registra la classe che gestisce i dati del sensore
+			if(HIH8.dataValid && ! HIH8.dataOld){
+				PRINTF("Dato valido \n");
+				PRINTF("Um: %s\n", HIH8.humidity);
+				PRINTF("T: %s\n", HIH8.temperature);
+				PRINTF("Stop\n");
 			}
+			if (HIH8.dataOld)
+				PRINTF("Dato vecchio\n");
 
-			//HWREG(GPIO_PORTB_BASE + (GPIO_O_DATA + (GPIO_PIN_5 << 2))) |=  GPIO_PIN_5;
-			if (BATT.battLevel > BATT.safeLevel){
 				HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_3 << 2))) ^=  GREEN_LED;
 				/// si assicura che il led rosso sia spento
 				HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_1 << 2))) &=  ~GPIO_PIN_1;
-			}
-
-			else{
-				/// segnala che la batteria sta finendo, facendo lampeggiare il rosso
-				HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_1 << 2))) ^=  GPIO_PIN_1;
-				/// spegne il led verde
-				HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_3 << 2))) &=  ~GREEN_LED;
-			}
-
-			////
-			//// VIENE ESEGUITA QUANDO IL COMANDO E' RILASCIO KIT (comando 'P' da raspberry)
-			///  E QUANDO il COMANDO e' SULLO STATO AVVIA. RILASCIATO IL PACK il COMANDO
-			///  PONE avvia = false e NON lo RIESEGUIRA' più finché token sarà di nuovo
-			///  RILASCIO_PACK e CMD con avvia = true. QUESTO ACCADE IN convertToToken,
-			///  nel file parse.cpp
-#ifdef _DEBUG_
-			if (CMD1.avvia == true && synSTATO.token == RILASCIO_PACK){
-				/// rilascio del kit
-				KIT.scarico();
-				CMD1.avvia = false;
-				CMD1.isRun = false;
-			}
-#endif
-
-			/// MISURA IL SENSORE DI ACCELERAZIONE
-			A.misuraAccelerazioni();
-/// stampe dei valori dei sensori di distanza.
-#ifdef _DEBUG_
-			for(int i = 0; i < 5; i++){
-
-				PRINTF("val%d: %d \t", i, MISURE.dI[i]);
-			}
-			PRINTF("\n");
+//			}
 //
-#endif
+//			else{
+//				/// segnala che la batteria sta finendo, facendo lampeggiare il rosso
+//				HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_1 << 2))) ^=  GPIO_PIN_1;
+//				/// spegne il led verde
+//				HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_3 << 2))) &=  ~GREEN_LED;
+//			}
 
-/// stampe le letture degli encoder
-#ifdef _DEBUG_
-
-			PRINTF("POS ENC0: %d\t%d\t", ENC0.dist_mm, ENC0.readDir());
-			PRINTF("POS ENC1: %d\t%d\n", ENC1.dist_mm, ENC1.readDir());
-//
-#endif
-
-
-#ifndef _DEBUG_
-//				/// ricopia nella struttare DIST:
-			for(int attesa = 0; attesa < 5; attesa++){
-//					if (attesa == 3)
-//						continue;
-				PRINTF("mm(%d): %d \t", attesa, MISURE.d_mm[attesa]);
-			}
-#endif
-
-#ifndef _DEBUG_
-
-			contatore = 0;
-			PRINTF("%d\tasse z: %d\t",tempCont++, Rot.yaw);
-			printFloat(Rot.yawF, 4);
-			PRINTF("\t");
-			printFloat(Rot.yawF0, 4);
-//					if (A.isPresent == true){
-//						PRINTF("\t");
-//						A.misuraAccelerazioni();
-//					}
-			PRINTF("\n");
-
-#endif
-
+			//Campiona il dato per il prossimo ciclo
+			HIH8.newData();
 			//// reset del contatore
 			tick100 = 0;
 

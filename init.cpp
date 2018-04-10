@@ -13,7 +13,7 @@
 
 
 /// date:	28-01-2018
-volatile uint8_t vers[] = "1.0 <- robocup\0";
+volatile uint8_t vers[] = "1.0.1 <- oratorio\0";
 
 
 void initModule(){
