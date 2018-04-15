@@ -373,15 +373,16 @@ void inviaSensore(syn_stat *sSTAT, ALLSTRUCT * collectedD){
 				sSTAT->buff_reply[2] = 0;
 				break;
 
-		//distanza percorsa (cm)
+		//distanza percorsa (mm)
 		case(10):
 				sSTAT->buff_reply[0] = 10;
 				//cast necessario, bisogna passare un intero
-				sSTAT->buff_reply[1] = ((int)collectedD->encoder0->dist_mm  & 0xFF00) >> 8;
-				sSTAT->buff_reply[2] = (int)collectedD->encoder0->dist_mm  & 0x00FF;
+				/// invia inoltre la lettura del dato senza il contributo delle rotazioni
+				sSTAT->buff_reply[1] = ((int)collectedD->encoder0->dist_mmNR  & 0xFF00) >> 8;
+				sSTAT->buff_reply[2] = (int)collectedD->encoder0->dist_mmNR  & 0x00FF;
 				break;
 
-		/// inserire qui il codice per il senspre n. 11: il valore di angolo dell'accelerometro
+		/// inserire qui il codice per il sensore n. 11: il valore di angolo dell'accelerometro
 		case(11):
 				sSTAT->buff_reply[0] = 11;
 				//cast necessario, bisogna passare un intero. Il valore restituito e' in
@@ -389,6 +390,26 @@ void inviaSensore(syn_stat *sSTAT, ALLSTRUCT * collectedD){
 				// mentre in aInt[2] fornisce 1000
 				sSTAT->buff_reply[1] = ((int)collectedD->acc->aInt[2]  & 0xFF00) >> 8;
 				sSTAT->buff_reply[2] = (int)collectedD->acc->aInt[2]  & 0x00FF;
+		break;
+
+		/// aggiunta per ROMECUP 2018: sensore gas e nota a 4 khz
+		/// inserire qui il codice per il sens0re n. 2: il valore del gas presente nel percorso
+		case(12):
+				sSTAT->buff_reply[0] = 12;
+				//cast necessario, bisogna passare un intero. Il valore restituito e' in
+				/// attenzione: il dato e' posto nel vettore che legge le distanza
+				/// tuttavia il dato e' "grezzo" (= valore prelevato dall'ADC)
+				sSTAT->buff_reply[1] = ((int)collectedD->DSTptr->dI[6]  & 0xFF00) >> 8;
+				sSTAT->buff_reply[2] = (int)collectedD->DSTptr->dI[6]  & 0x00FF;
+		break;
+
+		/// inserire qui il codice per il sensore n. 13: il valore che identifica la nota a 4 kHz
+		case(13):
+				sSTAT->buff_reply[0] = 13;
+				//cast necessario, bisogna passare un intero. Il valore restituito e' in
+
+				sSTAT->buff_reply[1] = ((int)collectedD->DSTptr->dI[7]  & 0xFF00) >> 8;
+				sSTAT->buff_reply[2] = (int)collectedD->DSTptr->dI[7]  & 0x00FF;
 		break;
 
 		default:

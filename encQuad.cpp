@@ -47,6 +47,8 @@ encQuad::encQuad() {
 	/// imposta il valore di kPos a 1. Successivamente potra venire modificato in fase di
 	/// taratura, richiamando il metodo setCoeff(float)
 	kPos = 1.0;
+	/// inizializzazione del differenziale tra lettura in linea retta e durante le rotazioni
+	deltaNR_R = 0;
 }
 
 
@@ -187,6 +189,23 @@ int encQuad::readPos(){
 	pos = QEIPositionGet(address);
 	tmp = pos * kPos;
 	dist_mm = (int) tmp;
+	return dist_mm;
+
+}
+
+int encQuad::readPos(Giroscopio * G){
+	float tmp;
+	pos = QEIPositionGet(address);
+	tmp = pos * kPos;
+	dist_mm = (int) tmp;
+	/// in caso di rotazione deve effettaure delle correzione: evita di aggiungere la lettura degli encoder
+	/// durante la rotazione
+	if (G->IsRotating){
+		deltaNR_R = dist_mm - dist_mmNR;
+	}
+	else{
+		dist_mmNR = dist_mm - deltaNR_R;
+	}
 	return dist_mm;
 
 }

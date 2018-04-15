@@ -25,7 +25,10 @@ distMis::distMis() {
 		run = false;
 		kf = 1.0;
 	}
+	/// AGGIUNTA ROMECUP 2018
+	/// dI[6] 0 dI[7] contengono le letture del sensore gas e della nota a 4 khz
 
+	dI[6] = dI[7] = 0;
 }
 
 distMis::~distMis() {

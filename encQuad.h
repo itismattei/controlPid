@@ -13,6 +13,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include "inc/hw_memmap.h"
+#include "Giroscopio.h"
 
 
 class encQuad {
@@ -27,6 +28,7 @@ public:
 
 	void qeiInit();
 	int readPos();
+	int readPos(Giroscopio *G);
 	float readVel();
 	int readDir();
 	void setAddr(uint32_t add){address = add;}
@@ -44,7 +46,9 @@ public:
 	/// distanza percorsa in mm
 	int			dist_mm;
 	float 		kPos;
-
+	/// distanza in mm escluse le rotazioni
+	int 		dist_mmNR;
+	int 		deltaNR_R;
 };
 
 #endif /* ENCQUAD_H_ */
