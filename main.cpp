@@ -1,8 +1,8 @@
 /*
  * main.cpp
- * ottobre 2017
+ * aprile 2018
  *
- * VERSIONE derivata DALLA ROBOCUP DI FOLIGNO
+ * VERSIONE per ROMECUP 2018
  * USO: test dei sensori e sviluppo di correzione nelle misure
  *
  * taratura ed interpolazione dei sensori di distanza

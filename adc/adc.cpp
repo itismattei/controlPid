@@ -41,7 +41,11 @@ void initAdc(volatile distMis *d){
 }
 
 ///
-/// estrae i dati  dopo la lettura dei 5 sensori
+/// estrae i dati  dopo la lettura degli 8 sensori
+/// il puntatore pADCBuffer contine l'indirizzo dell'area di memoria in cui caricare i dati prelevati dal buffer
+/// del convertitore AD.
+
+/// la successiva funzione adcISR passa un puntatorte globale all'area di memoria dove si trova buffer per
 int32_t ADCSequenceData_Get(uint32_t ui32Base, uint32_t ui32SequenceNum, uint32_t pADCBuffer[]){
 
     uint32_t ui32Count;
