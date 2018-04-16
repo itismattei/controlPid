@@ -156,7 +156,7 @@ int comando::RUN(digPID *p, syn_stat *s, PWM_MOTORI *PWM1, PWM_MOTORI *PWM2, enc
 	/// Siccome il metdo RUN viene chiamato ogni 10ms lo scatto del timeout avviene
 	/// dopo 1.5s
 	///
-#ifdef _DEBUG_
+#ifndef _DEBUG_
 	/// forse l'esecuzione del pid poiche' tick < TIMEOUT_CMD
 	tick = 0;
 	numPid = AVANZA;

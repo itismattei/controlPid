@@ -380,7 +380,7 @@ int main(void) {
 			/// e' eseguito il movimento sulla classe comando
 			/// viene richiesto il pid di riferimento, lo stato del comando (in modo da continuare se il comando e' valido),
 			/// i  pwm per i motori, il valore degli encoder e del giroscopio.
-			CMD1.RUN(cPid, &synSTATO, &M0, &M1, &ENC0, &ENC1, &Rot, &JIT);
+			///CMD1.RUN(cPid, &synSTATO, &M0, &M1, &ENC0, &ENC1, &Rot, &JIT);
 			/// le misure del giroscopio invece sono effettuate solo dall'apposito pid
 
 		}
@@ -461,7 +461,9 @@ int main(void) {
 				PRINTF("Liv batteria: %d\n", BATT.battLevel);
 				/// legge il valore di tensione del sensore di gas
 				/// prova per romecup2018
-				PRINTF("Sens. gas %d\n", MISURE.dI[7]);
+				PRINTF("Sens. gas %d\n", MISURE.dI[6]);
+				PRINTF("Nota 4khz %d\n", MISURE.dI[7]);
+
 
 #endif
 				//***********************************
