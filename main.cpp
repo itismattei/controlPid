@@ -58,7 +58,7 @@
 
 
 /// variabili globali
-volatile int procCom = 0, tick10, tick100, millis10 = 0;
+volatile int procCom = 0, tick10, tick20, tick100, millis10 = 0;
 volatile int procCom4 = 0;
 volatile int ADCDataReadyFlag = 0;
 /// buffer per la seriale che riceve i dati dalla raspPi
@@ -380,7 +380,7 @@ int main(void) {
 			/// e' eseguito il movimento sulla classe comando
 			/// viene richiesto il pid di riferimento, lo stato del comando (in modo da continuare se il comando e' valido),
 			/// i  pwm per i motori, il valore degli encoder e del giroscopio.
-			///CMD1.RUN(cPid, &synSTATO, &M0, &M1, &ENC0, &ENC1, &Rot, &JIT);
+			CMD1.RUN(cPid, &synSTATO, &M0, &M1, &ENC0, &ENC1, &Rot, &JIT);
 			/// le misure del giroscopio invece sono effettuate solo dall'apposito pid
 
 		}
@@ -395,6 +395,33 @@ int main(void) {
 			ENC0.readPos();
 			ENC1.readPos();
 		}
+
+		/// TODO: 20 ms o 10 ms?
+		if (tick20 >= 20){
+			tick20 = 0;
+			if (ADCDataReadyFlag == 1){
+			/// c'e' un dato campionato pronto, ad esempio la batteria, e viene copiato
+			ADCDataReadyFlag = 0;
+			/// converte la misure grezza, letta dalla routine di interruzione in mm
+			/// la lettura del dato sei sensori e' esattamente questo dato.
+			MISURE.rawTomm();
+			/// memorizza anche il livello della batteria della logica
+			BATT.battLevel = MISURE.dI[5];
+
+#ifdef _DEBUG_
+			PRINTF("Liv batteria: %d\n", BATT.battLevel);
+			/// legge il valore di tensione del sensore di gas
+			/// prova per romecup2018
+			PRINTF("Sens. gas %d\n", MISURE.dI[7]);
+			PRINTF("Nota 4khz %d\n", MISURE.dI[6]);
+#endif
+			//***********************************
+			/** (RI)AVVIA IL CAMPIONAMENTO DI ADC **/
+			ADCProcessorTrigger(ADC0_BASE, 0);
+			//***********************************
+			}
+		}
+
 
 		//////////////////////////////////
 		/// AZIONI DA COMPIERE OGNI 1s ///
@@ -420,12 +447,12 @@ int main(void) {
 #endif
 			misuraJitter = micros;
 
-			PRINTF("ang_rot %d \t", Rot.yaw);
+	//		PRINTF("ang_rot %d \t", Rot.yaw);
 			printFloat(Rot.tick, 4);
 			//PRINTF("\t");
 			//printFloat(Rot.corr, 7);
 			A.misuraAccelerazioni();
-			PRINTF("\tAz: %d\n", A.aInt[2]);
+//			PRINTF("\tAz: %d\n", A.aInt[2]);
 			//PRINTF("\n");
 
 			/// controlla il colore della piastrella sottostante e lo paragona la bianco memorizzato in fase di setup
@@ -461,8 +488,8 @@ int main(void) {
 				PRINTF("Liv batteria: %d\n", BATT.battLevel);
 				/// legge il valore di tensione del sensore di gas
 				/// prova per romecup2018
-				PRINTF("Sens. gas %d\n", MISURE.dI[6]);
-				PRINTF("Nota 4khz %d\n", MISURE.dI[7]);
+				PRINTF("Sens. gas %d\n", MISURE.dI[7]);
+				PRINTF("Nota 4khz %d\n", MISURE.dI[6]);
 
 
 #endif

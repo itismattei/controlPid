@@ -47,6 +47,7 @@ encQuad::encQuad() {
 	/// imposta il valore di kPos a 1. Successivamente potra venire modificato in fase di
 	/// taratura, richiamando il metodo setCoeff(float)
 	kPos = 1.0;
+	dist_mmNR = 0;
 	/// inizializzazione del differenziale tra lettura in linea retta e durante le rotazioni
 	deltaNR_R = 0;
 }

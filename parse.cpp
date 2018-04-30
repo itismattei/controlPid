@@ -88,10 +88,12 @@ void parse(syn_stat *STATO, comando *cmdPtr, syntaxStatus *synPtr){
 			/// ok, il messaggio e' valido
 			convertToToken(STATO, cmdPtr);
 			STATO->ST = 3;
+			PRINTF("ric. %d\n", STATO->cmd[1] );
 		}
 		else{
 			STATO->ST = 0;
 			STATO->valid = NON_VALIDO;
+			PRINTF("ERRORE\n\n");
 		}
 		//PRINTF("2-%d\n", uart1buffer[READ_PTR1]);
 	break;
@@ -102,7 +104,9 @@ void parse(syn_stat *STATO, comando *cmdPtr, syntaxStatus *synPtr){
 		/// il comando e' ora valido
 		STATO->valid = VALIDO;
 		//PRINTF("3-%d\n", uart1buffer[READ_PTR1]);
-		//PRINTF("cmd OK!\n\n");
+#ifdef _VD_
+		PRINTF("cmd OK!\n\n");
+#endif
 	break;
 
 	}
@@ -378,8 +382,8 @@ void inviaSensore(syn_stat *sSTAT, ALLSTRUCT * collectedD){
 				sSTAT->buff_reply[0] = 10;
 				//cast necessario, bisogna passare un intero
 				/// invia inoltre la lettura del dato senza il contributo delle rotazioni
-				sSTAT->buff_reply[1] = ((int)collectedD->encoder0->dist_mmNR  & 0xFF00) >> 8;
-				sSTAT->buff_reply[2] = (int)collectedD->encoder0->dist_mmNR  & 0x00FF;
+				sSTAT->buff_reply[1] = ((int)collectedD->encoder0->dist_mm  & 0xFF00) >> 8;
+				sSTAT->buff_reply[2] = (int)collectedD->encoder0->dist_mm  & 0x00FF;
 				break;
 
 		/// inserire qui il codice per il sensore n. 11: il valore di angolo dell'accelerometro
@@ -420,6 +424,9 @@ void inviaSensore(syn_stat *sSTAT, ALLSTRUCT * collectedD){
 		break;
 	}
 
+
+	for (int i = 0; i < 3; i++)
+	PRINTF("valore %d\n", sSTAT->buff_reply[i]);
 	/// tiene nella struttura della sintassi se il dato richiesto e' valido oppure non lo e'
 	if (datoValido == 1)
 		sSTAT->dato_valido = 1;

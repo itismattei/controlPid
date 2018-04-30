@@ -22,7 +22,7 @@
 #include "sens_col_ir/sens.h"
 
 
-extern volatile int procCom, tick10, tick100;
+extern volatile int procCom, tick10, tick20, tick100;
 extern pwm *servo;
 extern temperatura * TEMPptr;
 
@@ -40,7 +40,9 @@ void Timer0ISR(void){
     /// updates timer counters
     procCom = 1;
     tick10++;
+    tick20++;
     tick100++;
+
 
 }
 

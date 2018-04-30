@@ -168,13 +168,13 @@ int comando::RUN(digPID *p, syn_stat *s, PWM_MOTORI *PWM1, PWM_MOTORI *PWM2, enc
 	/// CONTROLLO DEL TIMEOUT OPPURE SELEZIONE DEL PID
 	/// controlla anche la distaza raw misurata dal sensore 0, quello anteriore.
 	bool prossimoOstacolo = false;
-	if (distanza != NULL){
-		/// distanza compresa tra 150 e 200 mm
-		if (distanza->dI[0] > 3300)
-			prossimoOstacolo = true;
-		else
-			prossimoOstacolo = false;
-	}
+//	if (distanza != NULL){
+//		/// distanza compresa tra 150 e 200 mm
+//		if (distanza->dI[0] > 3300)
+//			prossimoOstacolo = true;
+//		else
+//			prossimoOstacolo = false;
+//	}
 
 	if (tick > TIMEOUT_CMD || prossimoOstacolo){
 		/// in caso di timeout nella persistenza del comando si deve fermare
