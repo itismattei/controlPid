@@ -22,6 +22,7 @@ public:
 
 	void Init();
 	void pwmPower();
+	void setDelta(int v){ if (v > 1 && v < 100) delta = v; else delta = 0;}
 	void MotorGo();
 	void MotorStop();
 	inline void setDir(int dir){ direction = dir;}

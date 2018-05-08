@@ -428,9 +428,14 @@ int main(void) {
 		if (tick100 >= 100){
 
 #ifdef _DEBUG_ENC_
-			M0.MotorStop();
-			M1.MotorStop();
-			for (volatile int i = 5000000; i > 0; i--);
+//			M0.delta = M1.delta = 80;
+//			M0.direction = -1;
+//			M1.direction = -1;
+//			M0.MotorGo();
+//			M1.MotorGo();
+			//M0.MotorStop();
+			//M1.MotorStop();
+			//for (volatile int i = 5000000; i > 0; i--);
 			ENC0.readPos();
 			ENC1.readPos();
 			PRINTF("\n");

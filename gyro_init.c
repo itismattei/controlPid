@@ -24,7 +24,7 @@
 
 void blinkBlueLed(){
 	volatile uint32_t i;
-	/// per segnalalre la presenza del giroscopio lampeggia 2 volte
+	/// per segnalare la presenza del giroscopio lampeggia 2 volte
 	GPIOPinWrite(GPIO_PORTF_BASE, BLUE_LED, BLUE_LED);
 	for (i = 3000000; i > 0; i--);
 	GPIOPinWrite(GPIO_PORTF_BASE, BLUE_LED, 0);

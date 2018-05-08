@@ -52,7 +52,7 @@ void PWM_MOTORI::Init(){
 		/// anche se potrebbero gia' esserlo stato inaltre parti del programma
 	    /// il primo pwm motori deve abilitare PE5
 		ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);
-		/// mentre PE4 e' una uscita digitale che combianta con il segnale PWM stabilisce la potenza al motore ed il verso di rotazione
+		/// mentre PE4 e' una uscita digitale che combinata con il segnale PWM stabilisce la potenza al motore ed il verso di rotazione
 		/// In pratica se PE4 = '0' e PE5 ha un PWM, supponendo che il motore giri in senso orario, allora
 		/// quando PE4 = '1' e PE5 ha lo stesso PWM ma con polarita' invertita, il motore ruota in senso orario.
 
@@ -89,7 +89,7 @@ void PWM_MOTORI::Init(){
 	    /// spegne i PWM
 	    numPin = PWM_OUT_5;
 	    MotorStop();
-	    /// imposta il parametro di correzione al7& in più perché il cingolo 1 ha più atrito
+	    /// imposta il parametro di correzione al 7,6% in più perché il cingolo 1 ha più attrito
 	    correction(1.076);
 
 	}
@@ -107,7 +107,7 @@ void PWM_MOTORI::Init(){
 		/// anche se potrebbero gia' esserlo stato inaltre parti del programma
 		/// il secondo pwm motori deve abilitare PB4
 		ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOB);
-		/// mentre PE4 e' una uscita digitale che combianta con il segnale PWM stabilisce la potenza al motore ed il verso di rotazione
+		/// mentre PA5 e' una uscita digitale che combianta con il segnale PWM stabilisce la potenza al motore ed il verso di rotazione
 		/// In pratica se PA5 = '0' e PB4 ha un PWM, supponendo che il motore giri in senso orario, allora
 		/// quando PA5 = '1' e PB4 ha lo stesso PWM ma con polarita' invertita, il motore ruota in senso orario.
 
@@ -179,13 +179,22 @@ void PWM_MOTORI::MotorGo(){
 	case 1:
 		if (direction == 1){
 			//PWMOutputInvert(PWM0_BASE, PWM_OUT_5_BIT, false);
+			/// i pin sono PE4 e PE5 dello schema elettrico
+			/// PE4 e' il segnale fisso mentre PE5 e' il PWM
 			/// imposta il pwm in modalita' affermata
 			HWREG(PWM0_BASE + PWM_O_INVERT) &= ~(PWM_OUT_5_BIT);
-			}
+			/// occorre agire anche sul pin PE4 che va azzerato
+			HWREG(GPIO_PORTE_BASE + (GPIO_O_DATA + (GPIO_PIN_4) << 2)) &=  ~GPIO_PIN_4;
+		}
+
 		else{
 			//PWMOutputInvert(PWM0_BASE, PWM_OUT_5_BIT, true);
+			/// i pin sono PE4 e PE5 dello schema elettrico
+			/// PE4 e' il segnale fisso mentre PE5 e' il PWM
 			/// imposta il pwm in modalita' negata
 			HWREG(PWM0_BASE + PWM_O_INVERT) |= PWM_OUT_5_BIT;
+			/// occorre agire anche sul pin PE4 che va settato
+			HWREG(GPIO_PORTE_BASE + (GPIO_O_DATA + (GPIO_PIN_4) << 2)) |=  GPIO_PIN_4;
 		}
 		f = NCont * delta * kCor / 100;
 		valPwm = (int) f;
@@ -194,13 +203,19 @@ void PWM_MOTORI::MotorGo(){
 	case 2:
 		if (direction == 1){
 			//PWMOutputInvert(PWM0_BASE, PWM_OUT_5_BIT, false);
+			/// i pin sono PA5 e PB4 dello schema elettrico
+			/// PA5 e' il segnale fisso mentre PB4 e' il PWM
 			/// imposta il pwm in modalita' affermata
 			HWREG(PWM0_BASE + PWM_O_INVERT) &= ~(PWM_OUT_2_BIT);
+			/// occorre agire anche sul pin PA5 che va azzerato
+			HWREG(GPIO_PORTA_BASE + (GPIO_O_DATA + (GPIO_PIN_5) << 2)) &=  ~GPIO_PIN_5;
 			}
 		else{
 			//PWMOutputInvert(PWM0_BASE, PWM_OUT_5_BIT, true);
 			/// imposta il pwm in modalita' negata
 			HWREG(PWM0_BASE + PWM_O_INVERT) |= PWM_OUT_2_BIT;
+			/// occorre agire anche sul pin PA5 che va settato
+			HWREG(GPIO_PORTA_BASE + (GPIO_O_DATA + (GPIO_PIN_5) << 2)) |=  GPIO_PIN_5;
 		}
 		f = NCont * delta * kCor / 100;
 		valPwm = (int) f;
@@ -225,6 +240,8 @@ void PWM_MOTORI::correction(float c){
 	break;
 	}
 }
+
+
 
 ///
 /// inizializzazione per i  servi

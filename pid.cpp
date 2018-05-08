@@ -282,7 +282,7 @@ int comando::RUN(digPID *p, syn_stat *s, PWM_MOTORI *PWM1, PWM_MOTORI *PWM2, enc
 			/// considera +-2° come angolo raggiunto
 			if (val > sogliaAlfa){
 				// ruota il rover
-				PWM1->delta = PWM2->delta = 60;
+				PWM1->delta = PWM2->delta = 80;
 				PWM1->direction = 1;
 				PWM2->direction = -1;
 				PWM1->MotorGo();
@@ -317,7 +317,7 @@ int comando::RUN(digPID *p, syn_stat *s, PWM_MOTORI *PWM1, PWM_MOTORI *PWM2, enc
 			if (val > sogliaAlfa){
 				G->IsRotating = true;
 				// ruota il rover
-				PWM1->delta = PWM2->delta = 60;
+				PWM1->delta = PWM2->delta = 80;
 				PWM1->direction = -1;
 				PWM2->direction = 1;
 				PWM1->MotorGo();
