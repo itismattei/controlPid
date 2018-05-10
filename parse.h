@@ -58,7 +58,7 @@ public:
 		DSTptr 		= DIS;
 		gyro		= GYRO;
 		encoder0	= ENC;
-		encoder0	= ENC1;
+		encoder1	= ENC1;
 		acc			= ACC;
 
 	}

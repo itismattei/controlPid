@@ -107,6 +107,8 @@ void PWM_MOTORI::Init(){
 		/// anche se potrebbero gia' esserlo stato inaltre parti del programma
 		/// il secondo pwm motori deve abilitare PB4
 		ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOB);
+		/// e la periferica PORT A
+		ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
 		/// mentre PA5 e' una uscita digitale che combianta con il segnale PWM stabilisce la potenza al motore ed il verso di rotazione
 		/// In pratica se PA5 = '0' e PB4 ha un PWM, supponendo che il motore giri in senso orario, allora
 		/// quando PA5 = '1' e PB4 ha lo stesso PWM ma con polarita' invertita, il motore ruota in senso orario.

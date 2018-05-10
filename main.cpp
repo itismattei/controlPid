@@ -100,7 +100,8 @@ int main(void) {
 	sensPtr = &MOT_SENS;
 
 	/// MODULI ENCODER ///
-	encQuad ENC0(QEI0_BASE), ENC1(QEI1_BASE);
+	encQuad ENC0(QEI0_BASE);
+	encQuad ENC1(QEI1_BASE);
 //	encQuad ENC0, ENC1;
 //	/// imposta gli indirizzi dei due moduli
 //	ENC0.setAddr(QEI0_BASE);
@@ -109,9 +110,9 @@ int main(void) {
 //	ENC0.setCoeff(0.225);
 //	ENC1.setCoeff(0.231);
 
-	maze M;
-	cell C(1,2);
-	M.carica(C);
+	//maze M;
+	//cell C(1,2);
+	//M.carica(C);
 
 	//volatile double d = 1.9845637456;
 	//gyro G;
@@ -155,6 +156,9 @@ int main(void) {
 
 	/// questa struttura raccoglie il comando da eseguire e interagisce con il relativo PID
 	comando CMD1;
+	/// i motori vanno inizializzati da queste parti, altrimenti l'impostazione delle periferiche precoce, prima che l'unita'
+	/// sia avviata provoca un fault e si entra nella interruzione di servizio per periferica non pronta.
+	PWM_MOTORI M0, M1;
 	//DATA.distPtr = &DIST;
 	//passaggio degli indirizzi delle strutture alla struttura generale
 	//dati_a_struttura(&G, &DIST, &CIN, &COL, &TEMP, &SUR, &DATA);
@@ -283,19 +287,6 @@ int main(void) {
 	/// task principale
 	int tempCont = 0;
 
-	/// i motori vanno inizializzati da queste parti, altrimenti l'impostazione delle periferiche precoce, prima che l'unita'
-	/// sia avviata provoca un fault e si entra nella interruzione di servizio per periferica non pronta.
-	PWM_MOTORI M0, M1;
-//	while(1){
-//	M1.Init();
-//	M1.delta = 70;
-//	M1.MotorGo();
-//
-//
-//	M2.Init();
-//	M2.delta = 70;
-//	M2.MotorGo();
-//	}
 	KIT.Init();
 	MOT_SENS.Init();
 	///
@@ -408,13 +399,6 @@ int main(void) {
 			/// memorizza anche il livello della batteria della logica
 			BATT.battLevel = MISURE.dI[5];
 
-#ifdef _DEBUG_
-			PRINTF("Liv batteria: %d\n", BATT.battLevel);
-			/// legge il valore di tensione del sensore di gas
-			/// prova per romecup2018
-			PRINTF("Sens. gas %d\n", MISURE.dI[7]);
-			PRINTF("Nota 4khz %d\n", MISURE.dI[6]);
-#endif
 			//***********************************
 			/** (RI)AVVIA IL CAMPIONAMENTO DI ADC **/
 			ADCProcessorTrigger(ADC0_BASE, 0);
@@ -427,15 +411,28 @@ int main(void) {
 		/// AZIONI DA COMPIERE OGNI 1s ///
 		if (tick100 >= 100){
 
+#ifdef _DEBUG_
+			PRINTF("Liv batteria: %d\n", BATT.battLevel);
+
+#endif
+
+#ifdef _ROME_DEB_
+			/// legge il valore di tensione del sensore di gas
+			/// prova per romecup2018
+			PRINTF("Sens. gas %d\n", MISURE.dI[7]);
+			PRINTF("Nota 4khz %d\n", MISURE.dI[6]);
+#endif
+
+
 #ifdef _DEBUG_ENC_
-//			M0.delta = M1.delta = 80;
-//			M0.direction = -1;
-//			M1.direction = -1;
-//			M0.MotorGo();
-//			M1.MotorGo();
+			M0.delta = M1.delta = 60;
+			M0.direction = -1;
+			M1.direction = -1;
+			//M0.MotorGo();
+			//M1.MotorGo();
 			//M0.MotorStop();
 			//M1.MotorStop();
-			//for (volatile int i = 5000000; i > 0; i--);
+			for (volatile int i = 5000000; i > 0; i--);
 			ENC0.readPos();
 			ENC1.readPos();
 			PRINTF("\n");
@@ -580,7 +577,7 @@ int main(void) {
 
 			/// aggiornamento delle strutture dati del labirinto
 			// todo da aggiungere
-			M.run(allDATA);
+			//M.run(allDATA);
 			//// reset del contatore
 			tick100 = 0;
 

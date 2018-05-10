@@ -19,11 +19,7 @@
 class encQuad {
 public:
 	encQuad();
-	encQuad(uint32_t add){ setAddr(add);
-	///
-	/// imposta i coefficienti di conversione.
-	if (add == QEI0_BASE) setCoeff(0.225); if (add == QEI1_BASE) setCoeff(0.231); }
-
+	encQuad(uint32_t add);
 	virtual ~encQuad();
 
 	void qeiInit();
@@ -49,6 +45,9 @@ public:
 	/// distanza in mm escluse le rotazioni
 	int 		dist_mmNR;
 	int 		deltaNR_R;
+
+private:
+	void ctorIn(void);
 };
 
 #endif /* ENCQUAD_H_ */
