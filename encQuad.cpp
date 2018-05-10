@@ -24,25 +24,6 @@
 #include "uartp/uart.h"
 
 
-void encQuad::ctorIn(void){
-	address 	= 0;
-	/// DA CONTROLLARE SE 80000 VA BENE
-	fscala 		= 80000;
-	zero_pos 	= 0;
-	/// velocita' calcolata sul un intervallo di 1ms
-	vel_period = ROM_SysCtlClockGet() / 80000;
-	/// imposta il valore di kPos a 1. Successivamente potra venire modificato in fase di
-	/// taratura, richiamando il metodo setCoeff(float)
-	kPos = 1.0;
-	dist_mmNR = 0;
-	/// inizializzazione del differenziale tra lettura in linea retta e durante le rotazioni
-	deltaNR_R = 0;
-	dist_mm = 0;
-	vel = 0.0;
-	pos = 0;
-	dir = 1;
-}
-
 void UnlockPD7_01()
 {
 	HWREG(GPIO_PORTD_BASE + GPIO_O_LOCK) 	 = GPIO_LOCK_KEY;
@@ -55,48 +36,13 @@ void UnlockPD7_01()
 }
 
 encQuad::encQuad() {
-	// TODO Auto-generated constructor stub
-//	address 	= 0;
-//	/// DA CONTROLLARE SE 80000 VA BENE
-//	fscala 		= 80000;
-//	zero_pos 	= 0;
-//	/// velocita' calcolata sul un intervallo di 1ms
-//	vel_period = ROM_SysCtlClockGet() / 80000;
-//	/// imposta il valore di kPos a 1. Successivamente potra venire modificato in fase di
-//	/// taratura, richiamando il metodo setCoeff(float)
-//	kPos = 1.0;
-//	dist_mmNR = 0;
-//	/// inizializzazione del differenziale tra lettura in linea retta e durante le rotazioni
-//	deltaNR_R = 0;
-//	dist_mm = 0;
-//	vel = 0.0;
-//	pos = 0;
-//	dir = 1;
+	/// inizializza le proprieta'
 	ctorIn();
 }
 
 encQuad::encQuad(uint32_t add){
-
+	/// inizializza le proprieta'
 	ctorIn();
-//	address 	= 0;
-//	/// DA CONTROLLARE SE 80000 VA BENE
-//	fscala 		= 80000;
-//	zero_pos 	= 0;
-//	/// velocita' calcolata sul un intervallo di 1ms
-//	vel_period = ROM_SysCtlClockGet() / 80000;
-//	/// imposta il valore di kPos a 1. Successivamente potra venire modificato in fase di
-//	/// taratura, richiamando il metodo setCoeff(float)
-//	kPos = 1.0;
-//	dist_mmNR = 0;
-//	/// inizializzazione del differenziale tra lettura in linea retta e durante le rotazioni
-//	deltaNR_R = 0;
-//	dist_mm = 0;
-//	vel = 0.0;
-//	pos = 0;
-//	dir = 1;
-
-
-
 	setAddr(add);
 ///
 /// imposta i coefficienti di conversione.
@@ -105,8 +51,6 @@ encQuad::encQuad(uint32_t add){
 	else if (add == QEI1_BASE)
 			setCoeff(0.231);
 }
-
-
 
 encQuad::~encQuad() {
 	// TODO Auto-generated destructor stub
@@ -293,3 +237,21 @@ void encQuad::update(){
 
 }
 
+void encQuad::ctorIn(void){
+	address 	= 0;
+	/// DA CONTROLLARE SE 80000 VA BENE
+	fscala 		= 80000;
+	zero_pos 	= 0;
+	/// velocita' calcolata sul un intervallo di 1ms
+	vel_period = ROM_SysCtlClockGet() / 80000;
+	/// imposta il valore di kPos a 1. Successivamente potra venire modificato in fase di
+	/// taratura, richiamando il metodo setCoeff(float)
+	kPos = 1.0;
+	dist_mmNR = 0;
+	/// inizializzazione del differenziale tra lettura in linea retta e durante le rotazioni
+	deltaNR_R = 0;
+	dist_mm = 0;
+	vel = 0.0;
+	pos = 0;
+	dir = 1;
+}
