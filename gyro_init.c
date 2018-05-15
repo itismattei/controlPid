@@ -204,7 +204,12 @@ void setupMCU(void){
 	while(HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_0 << 2))) == GPIO_PIN_0);
 	//while(HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_0 << 2))) == GPIO_PIN_0);
 
-
+	/// DEBUG TEMPI DEL CICLO PRINCIPALE
+	/// Premuto il tasto SW2 che e' collegato a PF0, si cambia la funzione del pin portandolo
+	/// in uscita in modo da portelo usare per debug dei tempi reali di ciclo.
+	HWREG(GPIO_PORTF_BASE + GPIO_O_DIR) 	|= GPIO_PIN_0;
+	/// PF0 = 0 logico
+	HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_0 << 2))) &=  ~GPIO_PIN_0;
 
 	//setup PB0 per scopi di debug
 	/// ******** NON PUO' ESSERE USATO QUANDO SI IMPOSTA LA UART1 *******

@@ -294,7 +294,8 @@ void Giroscopio::misuraAngoli(Jitter *J){
 			/// integrazione rettangolare: valore letto * fondo scala * intervallo di tempo di integrazione (var.: tick)
 			/// posto a 10ms
 			f = z * DPS * kz;
-			f *= (tick + corr);
+			//f *= (tick + corr);
+			f *= tick;
 			yawF += f;
 #ifdef	_DEBUG_
 			f = tmp * DPS * kz;

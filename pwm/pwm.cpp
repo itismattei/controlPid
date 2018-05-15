@@ -90,7 +90,7 @@ void PWM_MOTORI::Init(){
 	    numPin = PWM_OUT_5;
 	    MotorStop();
 	    /// imposta il parametro di correzione al 7,6% in più perché il cingolo 1 ha più attrito
-	    correction(1.076);
+	    correction(1.206);
 
 	}
 	else{
@@ -230,17 +230,17 @@ void PWM_MOTORI::MotorGo(){
 void PWM_MOTORI::correction(float c){
 	float f;
 
-	switch (numMot){
-	case 1:
+	//switch (numMot){
+	//case 1:
 		/// correzione
-		kCor = 1.076;
-		f = NCont * delta * kCor / 100;
-	break;
-	case 2:
 		kCor = c;
 		f = NCont * delta * kCor / 100;
-	break;
-	}
+	//break;
+	//case 2:
+	//	kCor = c;
+	//	f = NCont * delta * kCor / 100;
+	//break;
+	//}
 }
 
 

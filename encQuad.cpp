@@ -224,7 +224,7 @@ float encQuad::readVel(){
 int encQuad::readDir(){
 
 	dir = QEIDirectionGet(address);
-
+	return dir;
 }
 
 ///

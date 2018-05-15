@@ -96,8 +96,9 @@ int main(void) {
 	power BATT(2500);
 
 	/// MODULO PWM PER MOTORI SERVO ///
-	PWM_SERVI KIT, MOT_SENS;
-	sensPtr = &MOT_SENS;
+	/// disabilitati per olimpiade di robotica
+	//PWM_SERVI KIT, MOT_SENS;
+	//sensPtr = &MOT_SENS;
 
 	/// MODULI ENCODER ///
 	encQuad ENC0(QEI0_BASE);
@@ -110,9 +111,9 @@ int main(void) {
 //	ENC0.setCoeff(0.225);
 //	ENC1.setCoeff(0.231);
 
-	//maze M;
-	//cell C(1,2);
-	//M.carica(C);
+	maze M;
+	cell C(1,2);
+	M.carica(C);
 
 	//volatile double d = 1.9845637456;
 	//gyro G;
@@ -287,14 +288,14 @@ int main(void) {
 	/// task principale
 	int tempCont = 0;
 
-	KIT.Init();
-	MOT_SENS.Init();
+	//KIT.Init();
+	//MOT_SENS.Init();
 	///
 	/// imposta il perno dello sgancio delmattoncino nella posizione di blocco
-	KIT.MotorGo(75);
+	//KIT.MotorGo(75);
 	///
 	/// impsta il motore di rotazione del sensore di temperatura in posizione di zero.
-	MOT_SENS.MotorGo(0);
+	//MOT_SENS.MotorGo(0);
 
 	CL.Init();
 	/// calibra il bianco del sensore di colore
@@ -360,7 +361,7 @@ int main(void) {
 			//UARTCharPutNonBlocking(UART1_BASE, 'c');
 			procCom = 0;
 			contatore++;
-			millis10++;
+			//millis10++;
 			//lampeggio_led++;
 			if (Rot.IsPresent == OK){
 				/// aggiorna l'angolo di yaw
@@ -368,12 +369,15 @@ int main(void) {
 
 			}
 
+
+
 			/// e' eseguito il movimento sulla classe comando
 			/// viene richiesto il pid di riferimento, lo stato del comando (in modo da continuare se il comando e' valido),
 			/// i  pwm per i motori, il valore degli encoder e del giroscopio.
 			CMD1.RUN(cPid, &synSTATO, &M0, &M1, &ENC0, &ENC1, &Rot, &JIT);
 			/// le misure del giroscopio invece sono effettuate solo dall'apposito pid
-
+			/// PF0 in modalita' blink, per misurare se il tempo sono realmente 10ms
+			HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_0 << 2))) ^=  GPIO_PIN_0;
 		}
 		/// effettua i calcoli solo se il giroscopio e' presente
 		/// TODO: il PID viene calcolato ongi 10ms oppure ogni 20ms? Come è meglio?
@@ -415,6 +419,9 @@ int main(void) {
 			PRINTF("Liv batteria: %d\n", BATT.battLevel);
 
 #endif
+#ifdef _DEBUG_
+            PRINTF("asse z: %d\n", Rot.yaw);
+#endif
 
 #ifdef _ROME_DEB_
 			/// legge il valore di tensione del sensore di gas
@@ -426,13 +433,13 @@ int main(void) {
 
 #ifdef _DEBUG_ENC_
 			M0.delta = M1.delta = 60;
-			M0.direction = -1;
-			M1.direction = -1;
-			//M0.MotorGo();
-			//M1.MotorGo();
+			M0.direction = 1;
+			M1.direction = 1;
+			M0.MotorGo();
+			M1.MotorGo();
 			//M0.MotorStop();
 			//M1.MotorStop();
-			for (volatile int i = 5000000; i > 0; i--);
+			//for (volatile int i = 5000000; i > 0; i--);
 			ENC0.readPos();
 			ENC1.readPos();
 			PRINTF("\n");
@@ -490,7 +497,7 @@ int main(void) {
 				PRINTF("Liv batteria: %d\n", BATT.battLevel);
 				/// legge il valore di tensione del sensore di gas
 				/// prova per romecup2018
-				PRINTF("Sens. gas %d\n", MISURE.dI[7]);
+				PRINTF("Sens. gas %d\t", MISURE.dI[7]);
 				PRINTF("Nota 4khz %d\n", MISURE.dI[6]);
 
 
@@ -521,14 +528,14 @@ int main(void) {
 			///  PONE avvia = false e NON lo RIESEGUIRA' più finché token sarà di nuovo
 			///  RILASCIO_PACK e CMD con avvia = true. QUESTO ACCADE IN convertToToken,
 			///  nel file parse.cpp
-#ifdef _DEBUG_
-			if (CMD1.avvia == true && synSTATO.token == RILASCIO_PACK){
-				/// rilascio del kit
-				KIT.scarico();
-				CMD1.avvia = false;
-				CMD1.isRun = false;
-			}
-#endif
+//#ifdef _DEBUG_
+//			if (CMD1.avvia == true && synSTATO.token == RILASCIO_PACK){
+//				/// rilascio del kit
+//				KIT.scarico();
+//				CMD1.avvia = false;
+//				CMD1.isRun = false;
+//			}
+//#endif
 
 			/// MISURA IL SENSORE DI ACCELERAZIONE
 			A.misuraAccelerazioni();
@@ -549,7 +556,7 @@ int main(void) {
 			PRINTF("POS ENC1: %d\t%d\n", ENC1.dist_mm, ENC1.readDir());
 //
 #endif
-
+			PRINTF("#######\n\n");
 
 #ifndef _DEBUG_
 //				/// ricopia nella struttare DIST:
