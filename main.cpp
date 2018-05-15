@@ -320,7 +320,6 @@ int main(void) {
 	ADCProcessorTrigger(ADC0_BASE, 0);
 	//***********************************
 
-
 	///
 	/// CICLO PRINCIPALE
 	///
@@ -366,10 +365,7 @@ int main(void) {
 			if (Rot.IsPresent == OK){
 				/// aggiorna l'angolo di yaw
 				Rot.misuraAngoli(&JIT);
-
 			}
-
-
 
 			/// e' eseguito il movimento sulla classe comando
 			/// viene richiesto il pid di riferimento, lo stato del comando (in modo da continuare se il comando e' valido),
@@ -413,6 +409,7 @@ int main(void) {
 
 		//////////////////////////////////
 		/// AZIONI DA COMPIERE OGNI 1s ///
+
 		if (tick100 >= 100){
 
 #ifdef _DEBUG_
@@ -467,7 +464,7 @@ int main(void) {
 			/// controlla il colore della piastrella sottostante e lo paragona la bianco memorizzato in fase di setup
 			/// bisogna anche impostare il numero della piastrella e le sue coordinate.
 			CL.Run(&PST[0]);
-#ifdef _DEBUG_
+#ifdef _DEBUG_COL
 			/// il colore NERO e' circa il valore del BIANCO diviso 2,6 - 2,7
 			PRINTF("Col: %d\t W: %d\n", CL.get(), CL.getWhite());
 #endif

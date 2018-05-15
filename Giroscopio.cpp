@@ -275,6 +275,22 @@ void Giroscopio::misuraAngoli(Jitter *J){
 	else
 		valore = i2cPtr->I2CGet(STATUS_REG);
 
+	///
+	/// qui effettua la correzione sul jitter dell'intervallo di integrazione
+	///
+	float corr = 0.0;
+	//int32_t diff[2];
+	int32_t diff, delta;
+	uint32_t millis;
+	//	restituisce l'attuale valore del TIMER2 ed ha salvato nelle proprieta' della calsse quello precedente
+	millis = J->setActualGyro();
+	//millis1 = TimerValueGet(TIMER0_BASE, TIMER_A);
+	//PRINTF("T0 %u\t%u\n", millis, millis1);
+	//diff[0] = J->prevValueGyro - millis;
+	diff = J->prevValueGyro - millis;
+	delta = diff - 100;
+	corr = (delta) / 10;
+
 	if (valore != 0){
 		tempoDiReset++;
 		/// legge i dati da tutti i registri del giroscopio
@@ -293,8 +309,9 @@ void Giroscopio::misuraAngoli(Jitter *J){
 #endif
 			/// integrazione rettangolare: valore letto * fondo scala * intervallo di tempo di integrazione (var.: tick)
 			/// posto a 10ms
-			f = z * DPS * kz;
-			//f *= (tick + corr);
+			//f = z * DPS * kz;
+			/// viene temuto conto della correzione del jitter
+			f *= (tick + corr);
 			f *= tick;
 			yawF += f;
 #ifdef	_DEBUG_
@@ -331,23 +348,6 @@ void Giroscopio::misuraAngoli(Jitter *J){
 			yaw = (int16_t) yawF;
 		}
 
-		///
-		/// qui effettua la correzione sulla jitter dell'intervallo di integrazione
-		///
-		float corr = 0.0;
-		int32_t diff;
-		J->setActualGyro();
-		if (J->prevValueGyro != 0){
-			/// effettua l'aggiornamento
-			diff = J->prevValueGyro - J->jitter_timerGyro;
-			//PRINTF("DeltaJitter %d\n", diff);
-			if (diff < 0)
-				diff = -diff;
-			/// se sono passati esattamente 10ms allora diff = 100, altrimenti la differenza sara' il jitter;
-			/// supponendo che diff - 100 = 1, allora corr = 1e-4 => 100 us
-			corr = (float)(diff - 100) / 10000.0;
-		}
-		J->prevValueGyro = J->jitter_timerGyro;
 
 		if((asseOn & ALL_AXIS) == ALL_AXIS){
 			if(i2cPtr == NULL)
@@ -393,6 +393,20 @@ void Giroscopio::misuraAngoli(Jitter *J){
 			pitch += (uint16_t) f;
 		}
 	}
+/// stampe sul jitter
+#ifdef _DEBUG_
+		if (delta != 0)
+			PRINTF("jitter %d\n", delta);
+#endif
+
+#ifdef _DEBUG_VB_   /// Debug prolisso (verbose)
+		//if (diff[0] != diff[1])
+		PRINTF("***### jitter %u\t", millis);
+		printFloat(corr, 2);
+		PRINTF("\n");
+		//diff[1] = diff[0];
+#endif
+
 }
 
 ///
