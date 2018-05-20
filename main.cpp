@@ -315,6 +315,10 @@ int main(void) {
 	//PRINTF("Telemetria\n");
 
 
+	///
+	/// IMPOSTA I MOTORI AL 50%
+	M0.setDelta(50); M1.setDelta(50);
+
 	//***********************************
 	/** primo campionamento **/
 	ADCProcessorTrigger(ADC0_BASE, 0);
@@ -411,7 +415,14 @@ int main(void) {
 		/// AZIONI DA COMPIERE OGNI 1s ///
 
 		if (tick100 >= 100){
-
+			/// effettua un offset ritardato a fine rotazione
+			if (Rot.offsetDelayed == 1){
+				Rot.azzeraAssi();
+				Rot.offsetDelayed = 0;
+#ifdef _DEBUG_
+				PRINTF("delay OFF\n");
+#endif
+			}
 #ifdef _DEBUG_
 			PRINTF("Liv batteria: %d\n", BATT.battLevel);
 
@@ -428,8 +439,8 @@ int main(void) {
 #endif
 
 
-#ifdef _DEBUG_ENC_
-			M0.delta = M1.delta = 50;
+#ifdef _DEBUG_ENC__
+			//M0.delta = M1.delta = 50;
 			M0.direction = 1;
 			M1.direction = 1;
 			M0.MotorGo();

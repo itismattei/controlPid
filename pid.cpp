@@ -11,6 +11,7 @@
 #include "pid.h"
 #include "pwm\pwm.h"
 #include "init.h"		///serve per le costanti dei token
+#include "uartp/uartstdio.h"
 
 
 
@@ -148,6 +149,7 @@ void comando::setUptrasducers(Giroscopio *G, pwm *p, distMis *dist){
 	distanza 	= dist;
 }
 
+volatile static int statoDebugComando = 0;
 ///
 /// esegue il pid selezionato
 int comando::RUN(digPID *p, syn_stat *s, PWM_MOTORI *PWM1, PWM_MOTORI *PWM2, encQuad * ENC1, encQuad * ENC2,
@@ -158,9 +160,13 @@ int comando::RUN(digPID *p, syn_stat *s, PWM_MOTORI *PWM1, PWM_MOTORI *PWM2, enc
 	///
 #ifdef _DEBUG_
 	/// forse l'esecuzione del pid poiche' tick < TIMEOUT_CMD
-	tick = 0;
-	numPid = AVANZA;
-	s->token = AVANTI;
+	if (statoDebugComando == 0){
+		tick = 0;
+		numPid = RUOTA_SINISTRA;
+		valFin = -90.0;
+		s->token = INDIETRO;
+		statoDebugComando = 1;
+	}
 	////
 #endif
 
@@ -178,6 +184,7 @@ int comando::RUN(digPID *p, syn_stat *s, PWM_MOTORI *PWM1, PWM_MOTORI *PWM2, enc
 
 	if (tick > TIMEOUT_CMD || prossimoOstacolo){
 		/// in caso di timeout nella persistenza del comando si deve fermare
+		/// il contaotre di timeout (tick) viene resettato in convertToToken(syn_stat *STATO, comando *cmdPtr)
 		/// quale era o erano i pid attivo/i?
 		s->token = STOP;
 		s->valid = NON_VALIDO;
@@ -275,7 +282,7 @@ int comando::RUN(digPID *p, syn_stat *s, PWM_MOTORI *PWM1, PWM_MOTORI *PWM2, enc
 			/// dal PWM perche' i motori, a differenza della regolazione della velocita' dovranno
 			/// fermarsi.
 
-			val = G->yaw - valFin;
+			val =  G->yaw - (int)valFin;
 			/// calcola il valore assoluto della differenza tra il valore da raggiungere ed i valore attuale
 			if (val < 0)
 				val = -val;
@@ -289,6 +296,7 @@ int comando::RUN(digPID *p, syn_stat *s, PWM_MOTORI *PWM1, PWM_MOTORI *PWM2, enc
 				PWM2->MotorGo();
 				/// blocca gli aggiornamenti del giroscopio
 				G->IsRotating = true;
+				PRINTF("Z= %d\n", val);
 			}
 			else{
 				/// termina la rotazione
@@ -298,6 +306,12 @@ int comando::RUN(digPID *p, syn_stat *s, PWM_MOTORI *PWM1, PWM_MOTORI *PWM2, enc
 				G->IsRotating = false;
 				/// chiede al giroscopio, appena puo' di effettuare un offset
 				G->offsetRequest = 1;
+				/// e di effettuare anche un offset ritardato
+				G->offsetDelayed = 1;
+				/// termina il comando
+				s->token = STOP;
+				/// ed attiva il timeout
+				tick = 151;
 			}
 
 //			p->e[1] = (float) (p->valFin - gPtr->yaw);
@@ -330,6 +344,12 @@ int comando::RUN(digPID *p, syn_stat *s, PWM_MOTORI *PWM1, PWM_MOTORI *PWM2, enc
 				G->IsRotating = false;
 				/// chiede al giroscopio, appena puo' di effettuare un offset
 				G->offsetRequest = 1;
+				/// e di effettuare anche un offset ritardato
+				G->offsetDelayed = 1;
+				/// termina il comando
+				s->token = STOP;
+				/// ed attiva il timeout
+				tick = 151;
 			}
 		break;
 

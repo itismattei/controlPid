@@ -31,7 +31,7 @@ Giroscopio::Giroscopio() {
 	tempReg = 0;
 	posizione = 0;
 	yawF0 = corr = 0.0;
-	IsRotating = offsetRequest = 0;
+	IsRotating = offsetRequest = offsetDelayed =  0;
 	i2cPtr = NULL;
 	rev[0] = 'G';
 	rev[1] = 'y';
@@ -338,13 +338,10 @@ void Giroscopio::misuraAngoli(Jitter *J){
 			/// con cadenza 10ms ha raggiunto il valore 1000, cioe' sono passati 10 s.
 			if ((tempoDiReset >= 1000 && IsRotating == 0) || offsetRequest){
 // TODO: SE NON STA RUOTANDO POTREBBE EFFETTUARE UN AZZERAMENTO ASSI
-				/// le richieste a seguito di fine rotazione non possono restare
-				/// attive più di una volta.
-				offsetRequest = 0;
 				/// sono passati 10 secondi e dovrebbe ricalcolare l'offset degli assi
 				/// dovrebbe calcolare se G->yawF è cambiato di almeno 1 grado rispetto ai 5 secondi precedenti
 				/// se non è cambiato dovrebbe azzerare la parte frazionaria
-				if ((yawF - yawP < 1.0) && (yawF - yawP > -1.0)){
+				if (((yawF - yawP < 1.0) && (yawF - yawP > -1.0)) && !offsetRequest){
 					/// dopo 5 secondi non ho avuto variazioni significative e quindi ho integrato l'errore del
 					/// sensore
 					yawF = yawP;
@@ -355,6 +352,11 @@ void Giroscopio::misuraAngoli(Jitter *J){
 					yawP = (float) tmp;
 					PRINTF("\noffset\n");
 					azzeraAssi();
+					/// le richieste a seguito di fine rotazione producono  un po' di problemi.
+					/// Infatti il giroscopio impiega qualche decina di ms prima di stabilizzarsi e
+					/// quindi azzeraAssi() andrebbe richiamato a distanza di 100ms dalla fine
+					/// della rotazione
+					offsetRequest = 0;
 				}
 				tempoDiReset = 0;
 			}

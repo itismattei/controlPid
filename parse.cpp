@@ -155,7 +155,10 @@ void convertToToken(syn_stat *STATO, comando *cmdPtr){
 		cmdPtr->azione = true;
 		cmdPtr->numPid = 1;
 		/// imposta il valore finale del PID
-		cmdPtr->valFin -= 90;
+		/// nella rotazione a destra considerando il riferimento x^ nella direzione di avanzamento ed y^ ruotato di 90 gradi
+		/// in senso antiorario. Poiché la rotazione antioraria e' misurata dal giroscopio come velocita' negativa, allora
+		/// la rotazione a destra e' di +90°
+		cmdPtr->valFin += 90;
 		STATO->buff_reply[0] = 'R';
 		STATO->buff_reply[1] = 'T';
 		STATO->buff_reply[2] = '0';
@@ -166,7 +169,7 @@ void convertToToken(syn_stat *STATO, comando *cmdPtr){
 		cmdPtr->azione = true;
 		cmdPtr->numPid = 2;
 		/// imposta il valore finale del PID
-		cmdPtr->valFin += 90;
+		cmdPtr->valFin -= 90;
 		STATO->buff_reply[0] = 'L';
 		STATO->buff_reply[1] = 'T';
 		STATO->buff_reply[2] = '0';

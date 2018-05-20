@@ -69,7 +69,7 @@ public:
 	int temp;
 	/// viene attiato dal pid durante la rotazione in modo da non resettare il giroscopio.
 	char IsRotating;
-	char offsetRequest;
+	char offsetRequest, offsetDelayed;
 	char rev[10];
 	/// fattore di correzione del jitter nell'intgrazione dell'angolo
 	float corr;
