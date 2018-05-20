@@ -156,7 +156,7 @@ int comando::RUN(digPID *p, syn_stat *s, PWM_MOTORI *PWM1, PWM_MOTORI *PWM2, enc
 	/// Siccome il metdo RUN viene chiamato ogni 10ms lo scatto del timeout avviene
 	/// dopo 1.5s
 	///
-#ifndef _DEBUG_
+#ifdef _DEBUG_
 	/// forse l'esecuzione del pid poiche' tick < TIMEOUT_CMD
 	tick = 0;
 	numPid = AVANZA;
@@ -222,18 +222,18 @@ int comando::RUN(digPID *p, syn_stat *s, PWM_MOTORI *PWM1, PWM_MOTORI *PWM2, enc
 		switch(numPid){
 		case AVANZA:
 			/// l'avanzamento inizia con un delta = 65 ed arriva fino ad un delta = 80
-			if (PWM1->delta < 65)
-				PWM1->delta = 65;
+			if (PWM1->delta <= 50)
+				PWM1->delta = 50;
 			else
-				if (PWM1->delta > 80)
+				if (PWM1->delta >= 80)
 					PWM1->delta = 80;
 				else
 					PWM1->delta += 1;
 
-			if (PWM2->delta < 65)
-				PWM2->delta = 65;
+			if (PWM2->delta <= 50)
+				PWM2->delta = 50;
 			else
-				if (PWM2->delta > 80)
+				if (PWM2->delta >= 80)
 					PWM2->delta = 80;
 				else
 					PWM2->delta += 1;

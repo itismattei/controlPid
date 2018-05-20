@@ -429,7 +429,7 @@ int main(void) {
 
 
 #ifdef _DEBUG_ENC_
-			M0.delta = M1.delta = 60;
+			M0.delta = M1.delta = 50;
 			M0.direction = 1;
 			M1.direction = 1;
 			M0.MotorGo();

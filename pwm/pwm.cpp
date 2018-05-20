@@ -90,7 +90,7 @@ void PWM_MOTORI::Init(){
 	    numPin = PWM_OUT_5;
 	    MotorStop();
 	    /// imposta il parametro di correzione al 7,6% in più perché il cingolo 1 ha più attrito
-	    correction(1.206);
+	    correction(1.106);
 
 	}
 	else{

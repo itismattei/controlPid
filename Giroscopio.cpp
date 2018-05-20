@@ -44,7 +44,7 @@ Giroscopio::~Giroscopio() {
 }
 
 ///
-/// imposta 'angolo di yaw. L'operazione e' necessaria se il valore ha un errore eccessivo e serve a rimetterlo Iin linea
+/// imposta l'angolo di yaw. L'operazione e' necessaria se il valore ha un errore eccessivo e serve a rimetterlo in linea
 void Giroscopio::setYaw(int16_t valore){
 	yaw = valore;
 }
@@ -288,10 +288,19 @@ void Giroscopio::misuraAngoli(Jitter *J){
 	//PRINTF("T0 %u\t%u\n", millis, millis1);
 	//diff[0] = J->prevValueGyro - millis;
 	diff = J->prevValueGyro - millis;
+	/// il delta e' la differenza tra il valore ottenuto dal registro del timer2 ed il valore 100 la cui unita' sono
+	/// i decimi di millisecondo, quindi 100 = 10 ms
 	delta = diff - 100;
-	corr = (delta) / 10;
+	/// se delta fosse maggiore di 1000 (100 ms) non avrebbe più senso integrare perche' si sarebbero persi 10 cicli
+	if (delta > 1000)
+		/// corr e' il valore di correzione in millisecondi
+		corr = 0.0;
+	else
+		/// occorre prestare attenzione al fatto che l'unita' di misura di tick sono i secondi
+		/// (quindi tick = 0.01 s) e per questo occorre dividere per 10000
+		corr = (float) delta / 10000.0;
 
-	if (valore != 0){
+	if (valore != 0){ /// valore contiene il risultato dello stato del sensore
 		tempoDiReset++;
 		/// legge i dati da tutti i registri del giroscopio
 		/// stato = readI2C_N_Byte(OUT_X_L_M, 6, buff);			/// compass
@@ -299,9 +308,11 @@ void Giroscopio::misuraAngoli(Jitter *J){
 			if(i2cPtr == NULL)
 				I2CReceiveN(GYRO_ADDR, OUT_Z_L | MUL_READ , 2, buffer);
 			else
+				/// legge dall'indirizzo dell'asse z i sue byte del risultato
 				i2cPtr->I2CGetN(OUT_Z_L | MUL_READ , 2, buffer);
 			z = (int16_t)((buffer[1]<< 8) + buffer[0]);
 			tmp = z;
+			/// z0 e' il valore medio ottenuto durante il setup degli assi.
 			z = z - z0;
 #ifdef _DEBUG_
 			/// usa la retta di regressione
@@ -309,19 +320,22 @@ void Giroscopio::misuraAngoli(Jitter *J){
 #endif
 			/// integrazione rettangolare: valore letto * fondo scala * intervallo di tempo di integrazione (var.: tick)
 			/// posto a 10ms
-			//f = z * DPS * kz;
-			/// viene temuto conto della correzione del jitter
+			f = z * DPS * kz;
+			/// viene tenuto conto della correzione del jitter
 			f *= (tick + corr);
-			f *= tick;
+			//f *= tick;
+			/// aggiunge la variazione di angolo (ottenuta dal prodotto
+			/// velocità di rotazione x detaT x coeff. di linearita')
 			yawF += f;
 #ifdef	_DEBUG_
 			f = tmp * DPS * kz;
-			f *= tick;
+			//f *= tick;
+			f *= (tick + corr);
 			yawF0 += f;
 #endif
-			/// offsetRequest viene chiamato dal pid al termine della rotazione di 90 gradi in modo da richiedere un aggiornamento della deriva del giroscoipo
-			/// altrimenti l'offset e' richiesto se non sta ruotando e se la variabile tempoDiReset, con cadenza 10ms ha raggiunto il
-			/// vaore 1000, cioe' sono passati 10 s.
+			/// offsetRequest viene chiamato dal pid al termine della rotazione di 90 gradi in modo da richiedere un aggiornamento della deriva
+			/// del giroscoipo, altrimenti l'offset e' richiesto se non sta ruotando e se la variabile tempoDiReset,
+			/// con cadenza 10ms ha raggiunto il valore 1000, cioe' sono passati 10 s.
 			if ((tempoDiReset >= 1000 && IsRotating == 0) || offsetRequest){
 // TODO: SE NON STA RUOTANDO POTREBBE EFFETTUARE UN AZZERAMENTO ASSI
 				/// le richieste a seguito di fine rotazione non possono restare
@@ -344,7 +358,7 @@ void Giroscopio::misuraAngoli(Jitter *J){
 				}
 				tempoDiReset = 0;
 			}
-			/// riporta il valore ad intero
+			/// riporta il valore di rotazione da float ad intero
 			yaw = (int16_t) yawF;
 		}
 
@@ -353,6 +367,7 @@ void Giroscopio::misuraAngoli(Jitter *J){
 			if(i2cPtr == NULL)
 				I2CReceiveN(GYRO_ADDR, OUT_X_L | MUL_READ , 6, buffer);
 			else
+				/// chiede lettura dall'indirizzo del primo registro OUT_X_L per i successivi 6 bytes
 				i2cPtr->I2CGetN(OUT_X_L | MUL_READ , 6, buffer);
 			x = (int16_t)((buffer[1]<< 8) + buffer[0]) - x0;
 			y = (int)((buffer[3]<< 8) + buffer[2]) -  y0;
@@ -381,8 +396,8 @@ void Giroscopio::misuraAngoli(Jitter *J){
 		PRINTF("\tasse z: %i\r\n", z);*/
 		}
 	}
-	else{
-		/// integra dal valore precedente con intervallo di tempo di 10ms
+	else{ /// if (valore != 0)
+		/// integra dal valore precedente con intervallo di tempo di 10ms, poiché lo stato ottenuto ha presentato un errore
 		f =  yawF *  tick;
 		 yaw += (uint16_t) f;
 		if (( asseOn & 0x3) != 0){
@@ -395,8 +410,11 @@ void Giroscopio::misuraAngoli(Jitter *J){
 	}
 /// stampe sul jitter
 #ifdef _DEBUG_
-		if (delta != 0)
+		if (delta != 0){
 			PRINTF("jitter %d\n", delta);
+			//printFloat(corr, 3);
+		}
+
 #endif
 
 #ifdef _DEBUG_VB_   /// Debug prolisso (verbose)
