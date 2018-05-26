@@ -102,6 +102,17 @@ void Timer4ISR(void){
 /// servizio al watchdog
 void watchDOGisr(void){
 
-	while(1);
+	/// questa interrupt e' usata per segnalare che il reset sta per scattare
+	/// spegne il led verde
+	HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_3 << 2))) &= ~GREEN_LED;
 
+	while(1){
+		/// blink led rosso + verde per segnalare l'imminente reset
+		HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_1 << 2))) ^=  RED_LED;
+		HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_3 << 2))) ^= GREEN_LED; //~GREEN_LED;
+		uint32_t i;
+		for (i = 1000000; i > 0; i--);
+
+		PRINTF("WD\n");
+	}
 }
