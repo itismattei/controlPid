@@ -158,17 +158,17 @@ int comando::RUN(digPID *p, syn_stat *s, PWM_MOTORI *PWM1, PWM_MOTORI *PWM2, enc
 	/// Siccome il metdo RUN viene chiamato ogni 10ms lo scatto del timeout avviene
 	/// dopo 1.5s
 	///
-#ifdef _DEBUG_
-	/// forse l'esecuzione del pid poiche' tick < TIMEOUT_CMD
-	if (statoDebugComando == 0){
-		tick = 0;
-		numPid = RUOTA_SINISTRA;
-		valFin = -90.0;
-		s->token = INDIETRO;
-		statoDebugComando = 1;
-	}
-	////
-#endif
+//#ifdef _DEBUG_
+//	/// forse l'esecuzione del pid poiche' tick < TIMEOUT_CMD
+//	if (statoDebugComando == 0){
+//		tick = 0;
+//		numPid = RUOTA_SINISTRA;
+//		valFin = -90.0;
+//		s->token = INDIETRO;
+//		statoDebugComando = 1;
+//	}
+//	////
+//#endif
 
 	///
 	/// CONTROLLO DEL TIMEOUT OPPURE SELEZIONE DEL PID

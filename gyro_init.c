@@ -201,7 +201,8 @@ void setupMCU(void){
 	/// attesa per l'attuazione delle impostazioni
 	valore = 10;
 	while(--valore);
-	while(HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_0 << 2))) == GPIO_PIN_0);
+	/// PULSANTE DI BLOCCO
+	//while(HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_0 << 2))) == GPIO_PIN_0);
 	//while(HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_0 << 2))) == GPIO_PIN_0);
 
 	/// DEBUG TEMPI DEL CICLO PRINCIPALE

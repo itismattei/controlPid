@@ -36,6 +36,7 @@
 #define 	LETTURA_SENSORE		7
 #define 	RILASCIO_PACK 		8
 #define		MISURA_GRADI		10
+#define 	RESETGLOBALE		11
 
 #define 	TIMEOUT_CMD			150		/// 1.5 s con tic di 10 ms
 

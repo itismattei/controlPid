@@ -13,6 +13,7 @@
 #include "driverlib/uart.h"
 #include "init.h"
 #include "pid.h"
+#include "driverlib/watchdog.h"
 
 #include "sens_col_ir/sens.h"
 #include "distMis.h"
@@ -194,6 +195,19 @@ void convertToToken(syn_stat *STATO, comando *cmdPtr){
 		STATO->token = LETTURA_SENSORE;
 		cmdPtr->azione = false;
 	break;
+
+	/// reset globale
+	case 'Z':
+		STATO->token = RESETGLOBALE;
+		cmdPtr->azione = false;
+		/// preparazione della risposta secondo il protocollo
+		STATO->buff_reply[0] = 'Z';
+		STATO->buff_reply[1] = 'T';
+		STATO->buff_reply[2] = '0';
+		STATO->buff_reply[3] = 'Z' ^ 'T' ^ '0' ^ CHECK_SUM;
+	break;
+
+
 	case 'P':
 		//rilascio rescue pack
 		STATO->token = RILASCIO_PACK;
@@ -203,6 +217,7 @@ void convertToToken(syn_stat *STATO, comando *cmdPtr){
 		STATO->buff_reply[1] = 'T';
 		STATO->buff_reply[2] = '0';
 		STATO->buff_reply[3] = 'P' ^ 'T' ^ '0' ^ CHECK_SUM;
+
 
 	default:
 		/// se nessun comando e'giusto produce un errore.
@@ -231,10 +246,14 @@ void convertToToken(syn_stat *STATO, comando *cmdPtr){
 
 
 void rispondiComando(syn_stat *sSTAT, ALLSTRUCT *collectedD){
-	/// controlla se la sintazzi e' valida
+
+	bool resetGlobale = false;
+	/// controlla se la sintassi e' valida
 	sSTAT->check = 0;
+	sSTAT->token = RESETGLOBALE;
 	/// controllo ridondante gia' effettuato
-	if (sSTAT->valid == VALIDO){
+	//if (sSTAT->valid == VALIDO){
+	if (sSTAT->valid = VALIDO){
 		/// analizza il token e per il momento risposnde alle richieste di dati
 		/// i tokens sono: LETTURA_SENSORE (con nuero di sensore in sSTAT.cmd[1])
 		switch(sSTAT->token){
@@ -252,6 +271,13 @@ void rispondiComando(syn_stat *sSTAT, ALLSTRUCT *collectedD){
 		case LETTURA_SENSORE:
 			/// prepara solamente il buffer di risposta
 			inviaSensore(sSTAT, collectedD);
+		break;
+
+		/// fornisce la risposta alla lettura di un sensore
+		case RESETGLOBALE:
+			/// occorre ricordare che siamo in una operazione speciale:
+			/// IL RESET GLOBALE DELLA SCHEDA
+			resetGlobale = true;
 		break;
 		}
 
@@ -272,6 +298,16 @@ void rispondiComando(syn_stat *sSTAT, ALLSTRUCT *collectedD){
 		/// per la risposta ai comandi, il protocollo prevede:
 		/// 'X' 'T/F' '0' oppure valore lettura , check_sum '*', quindi 4 byte
 		sendReply(sSTAT, 4);
+
+		////
+		//// condizione che avvia il watchdog e resetta la MCU
+//		if (resetGlobale == true){
+//			SysCtlPeripheralEnable(SYSCTL_PERIPH_WDOG0);
+//			WatchdogEnable(WATCHDOG0_BASE);
+//			WatchdogResetEnable(WATCHDOG0_BASE);
+//			WatchdogReloadSet(WATCHDOG0_BASE, 100);
+//			while(1);
+//		}
 	}
 	/// ripulisce il buffer di risposta
 	for (int  i = 0; i < 5; i++)
@@ -400,7 +436,7 @@ void inviaSensore(syn_stat *sSTAT, ALLSTRUCT * collectedD){
 		break;
 
 		/// aggiunta per ROMECUP 2018: sensore gas e nota a 4 khz
-		/// inserire qui il codice per il sens0re n. 2: il valore del gas presente nel percorso
+		/// inserire qui il codice per il sens0re n. 12: il valore del gas presente nel percorso
 		case(12):
 				sSTAT->buff_reply[0] = 12;
 				//cast necessario, bisogna passare un intero. Il valore restituito e' in

@@ -60,6 +60,8 @@ extern void Timer1ISR(void);
 extern void Timer4ISR(void);
 /// gestisce l'adc sul sequencer 0
 extern void adcISR(void);
+/// imposta la gestione del watchdog
+extern void watchDOGisr(void);
 
 //*****************************************************************************
 //
@@ -113,7 +115,7 @@ void (* const g_pfnVectors[])(void) =
     IntDefaultHandler,                      // ADC Sequence 1
     IntDefaultHandler,                      // ADC Sequence 2
     IntDefaultHandler,                      // ADC Sequence 3
-    IntDefaultHandler,                      // Watchdog timer
+	watchDOGisr,                      // Watchdog timer
     Timer0ISR,                      // Timer 0 subtimer A
     IntDefaultHandler,                      // Timer 0 subtimer B
     Timer1ISR,                      // Timer 1 subtimer A

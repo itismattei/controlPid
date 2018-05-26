@@ -98,4 +98,10 @@ void Timer4ISR(void){
 	HWREG(GPIO_PORTA_BASE + (GPIO_O_DATA + (GPIO_PIN_2 << 2))) = 0;
 }
 
+///
+/// servizio al watchdog
+void watchDOGisr(void){
 
+	while(1);
+
+}

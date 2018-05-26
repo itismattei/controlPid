@@ -333,7 +333,7 @@ int main(void) {
 /************************************************************/
 /*  			ATTIVITA' SVOLTE AD OGNI CICLO				*/
 /************************************************************/
-
+		rispondiComando(&synSTATO, &allDATA);
 		/// ESEGUIT AD OGNI CICLO
 		// controllo di messaggio sulla seriale 1 (ricevuto comando da rasp)
 		if (READ_PTR1 != RX_PTR1){
@@ -391,7 +391,7 @@ int main(void) {
 			ENC1.readPos();
 		}
 
-		/// TODO: 20 ms o 10 ms?
+		/// TODO: 200 ms o 100 ms?
 		if (tick20 >= 20){
 			tick20 = 0;
 			if (ADCDataReadyFlag == 1){
