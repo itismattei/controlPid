@@ -250,10 +250,10 @@ void rispondiComando(syn_stat *sSTAT, ALLSTRUCT *collectedD){
 	bool resetGlobale = false;
 	/// controlla se la sintassi e' valida
 	sSTAT->check = 0;
-	sSTAT->token = RESETGLOBALE;
+	/// serve a forzare un particolare comando
+	//sSTAT->token = RESETGLOBALE;
 	/// controllo ridondante gia' effettuato
-	//if (sSTAT->valid == VALIDO){
-	if (sSTAT->valid = VALIDO){
+	if (sSTAT->valid == VALIDO){
 		/// analizza il token e per il momento risposnde alle richieste di dati
 		/// i tokens sono: LETTURA_SENSORE (con nuero di sensore in sSTAT.cmd[1])
 		switch(sSTAT->token){
@@ -301,13 +301,51 @@ void rispondiComando(syn_stat *sSTAT, ALLSTRUCT *collectedD){
 
 		////
 		//// condizione che avvia il watchdog e resetta la MCU
-//		if (resetGlobale == true){
-//			SysCtlPeripheralEnable(SYSCTL_PERIPH_WDOG0);
-//			WatchdogEnable(WATCHDOG0_BASE);
-//			WatchdogResetEnable(WATCHDOG0_BASE);
-//			WatchdogReloadSet(WATCHDOG0_BASE, 100);
-//			while(1);
-//		}
+		if (resetGlobale == true){
+			//
+			// Prima di usare il watchdog occorre abilitare la periferica
+			//
+			SysCtlPeripheralEnable(SYSCTL_PERIPH_WDOG0);
+			//
+		    // L'abilitazione dell'interrupt e' facoltativa
+			// Se viene attivita, al primo scatto del watchdog viene richiamata l'interruzione da watchdog
+			// che quindi va registrata nel file tm4c123gh6pm_startup_ccs.c e al secondo scatto si genera
+			// il reset, qualora tale funzionalita' sia abilitata.
+		    //
+		    //ROM_IntEnable(INT_WATCHDOG);
+
+		    //
+		    // Imposta il periodo del watchdog in relazione al clock di sistema.
+			// in questo caso fck = 80MHz, quindi 80000000 significa uno scatto
+			// dopo 1 secondo. Il valore e' un uint32_t e quindi si può arrivare a (2^32 - 1 )/ 80e6 = 53,69 s
+		    //
+		    WatchdogReloadSet(WATCHDOG0_BASE, 20000000);
+
+		    //
+		    // Abilita il watchdog a generare un segnale di reset. Dipendentemente dall'abilitazione
+		    // dell'interrupt sul watchdog, il reset avviene al primo scato (interrupt disabilitato)
+		    // oppure al secondo scatto (interrupt abilitato)
+		    //
+		    WatchdogResetEnable(WATCHDOG0_BASE);
+
+		    //
+		    // Enable the watchdog timer.
+		    //
+		    WatchdogEnable(WATCHDOG0_BASE);
+
+			HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_3 << 2))) &= ~GREEN_LED;
+
+			/// lampeggia fino al reset
+			while(1){
+				/// blink led rosso + verde per segnalare l'imminente reset
+				HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_1 << 2))) ^=  RED_LED;
+				HWREG(GPIO_PORTF_BASE + (GPIO_O_DATA + (GPIO_PIN_3 << 2))) ^= GREEN_LED; //~GREEN_LED;
+				uint32_t i;
+				for (i = 500000; i > 0; i--);
+
+				PRINTF("WD\n");
+			}
+		}
 	}
 	/// ripulisce il buffer di risposta
 	for (int  i = 0; i < 5; i++)

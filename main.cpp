@@ -333,7 +333,7 @@ int main(void) {
 /************************************************************/
 /*  			ATTIVITA' SVOLTE AD OGNI CICLO				*/
 /************************************************************/
-		rispondiComando(&synSTATO, &allDATA);
+		//rispondiComando(&synSTATO, &allDATA);
 		/// ESEGUIT AD OGNI CICLO
 		// controllo di messaggio sulla seriale 1 (ricevuto comando da rasp)
 		if (READ_PTR1 != RX_PTR1){
