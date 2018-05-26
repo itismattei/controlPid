@@ -14,7 +14,7 @@
 
 /// date:	28-01-2018
 /// Release del software
-volatile uint8_t vers[] = "1.0.2 <- romecup18\0";
+volatile uint8_t vers[] = "1.0.3 <- olipiadiRobotica18\0";
 
 
 void initModule(){
