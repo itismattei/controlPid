@@ -411,7 +411,7 @@ void Giroscopio::misuraAngoli(Jitter *J){
 		}
 	}
 /// stampe sul jitter
-#ifdef _DEBUG_
+#ifdef _DEBUG_JITTER_BRIEF
 		if (delta != 0){
 			PRINTF("jitter %d\n", delta);
 			//printFloat(corr, 3);
