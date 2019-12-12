@@ -502,8 +502,10 @@ void inviaSensore(syn_stat *sSTAT, ALLSTRUCT * collectedD){
 	}
 
 
-	for (int i = 0; i < 3; i++)
-	PRINTF("valore %d\n", sSTAT->buff_reply[i]);
+	PRINTF("valore %d\t", sSTAT->buff_reply[0]);
+	for (int i = 1; i < 3; i++)
+		PRINTF("valore %d ", sSTAT->buff_reply[i]);
+	PRINTF("\n");
 	/// tiene nella struttura della sintassi se il dato richiesto e' valido oppure non lo e'
 	if (datoValido == 1)
 		sSTAT->dato_valido = 1;

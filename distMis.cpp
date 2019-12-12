@@ -121,7 +121,7 @@ void distMis::rawTomm(){
 	/// sensore S1
 	for (i = 0; i < 7; i++){
 		if (dI[1] < 1000){
-			d_mm[1] = 150.0;
+			d_mm[1] = 160.0;
 			break;
 		}
 		if (dI[1] >= 1000 && dI[1] < 1140){

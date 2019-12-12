@@ -548,7 +548,7 @@ int main(void) {
 			/// MISURA IL SENSORE DI ACCELERAZIONE
 			A.misuraAccelerazioni();
 /// stampe dei valori dei sensori di distanza.
-#ifdef _DEBUG_
+#ifndef _DEBUG_
 			for(int i = 0; i < 5; i++){
 
 				PRINTF("val%d: %d \t", i, MISURE.dI[i]);
@@ -564,9 +564,8 @@ int main(void) {
 			PRINTF("POS ENC1: %d\t%d\n", ENC1.dist_mm, ENC1.readDir());
 //
 #endif
-			PRINTF("#######\n\n");
 
-#ifndef _DEBUG_
+#ifdef _DEBUG_
 //				/// ricopia nella struttare DIST:
 			for(int attesa = 0; attesa < 5; attesa++){
 //					if (attesa == 3)
@@ -574,6 +573,7 @@ int main(void) {
 				PRINTF("mm(%d): %d \t", attesa, MISURE.d_mm[attesa]);
 			}
 #endif
+			PRINTF("#######\n\n");
 
 #ifndef _DEBUG_
 
